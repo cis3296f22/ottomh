@@ -9,7 +9,7 @@ package main
 import (
 	"os"
 
-	"github.com/LandenLloyd/OTTOMH/backend/routes"
+	"github.com/cis3296f22/ottomh/backend/routes"
 	"github.com/gin-gonic/gin"
 )
 
