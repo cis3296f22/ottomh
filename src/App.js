@@ -8,7 +8,14 @@ function App() {
   let [response, setResponse] = useState("");
   let [formDisabled, setFormDisabled] = useState(true);
 
-  let ws = new WebSocket(`ws://${window.location.host}/echo`);
+  let ws;
+  // If the webpage was hosted in a secure context, the wss protocol must
+  // be used.
+  if (window.location.protocol == 'https:') {
+    ws = new WebSocket(`wss://${window.location.host}/echo`);
+  } else {
+    ws = new WebSocket(`ws://${window.location.host}/echo`);
+  }
 
   // Make sure the user can't submit with the form while
   // the websocket is closed.
