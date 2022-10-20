@@ -1,28 +1,14 @@
-# Project Name
-Put here a short paragraph describing your project. 
-Adding an screenshot or a mockup of your application in action would be nice.  
+# OTTOMH: A Party-Thinking Game for The Web
 
-![This is a screenshot.](images.png)
-# How to run
-Provide here instructions on how to use your application.   
-- Download the latest binary from the Release section on the right on GitHub.  
-- On the command line uncompress using
-```
-tar -xzf  
-```
-- On the command line run with
-```
-./hello
-```
-- You will see Hello World! on your terminal. 
+## Building
 
-# How to contribute
-Follow this project board to know the latest status of the project: [http://...]([http://...])  
+This repo has been tested on MacOS 12.1 with go 1.18.2, node 16.14.2, and NPM 8.5.0.
 
-### How to build
-- Use this github repository: ... 
-- Specify what branch to use for a more stable release or for cutting edge development.  
-- Use InteliJ 11
-- Specify additional library to download if needed 
-- What file and target to compile and run. 
-- What is expected to happen when the app start. 
+To run the project:
+
+1. Install NPM packages. `cd` into frontend, and run `npm install`.
+2. Bundle JS code. Run `npm run build`.
+3. Install Go packages. `cd` into OTTOMH/, and run `go get`.
+4. Run the server. Run `go run server.go`.
+
+By default, the server listens on port 8080. If you would like to use another port, set the $PORT environment variable.
