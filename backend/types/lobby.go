@@ -11,8 +11,8 @@ type Lobby struct {
 }
 
 // Initializes a new Lobby with a unique ID
-func newLobby() (*Lobby, error) {
-	return &Lobby{}, nil
+func makeLobby(ID string) (Lobby, error) {
+	return Lobby{ID: ID}, nil
 }
 
 // Tries to open a WebSocket with the given context
