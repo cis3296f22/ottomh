@@ -1,6 +1,6 @@
-import logo from './logo.svg';
 import {useState} from 'react';
 import {Form, Button} from 'react-bootstrap';
+import StartMenu from './components/StartMenu'
 
 import './App.css';
 
@@ -53,19 +53,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <div class="input-group mb-3">
+        <StartMenu />
+        {/* <div class="input-group mb-3">
           <input type="text" class="form-control" 
             placholder="WebSocket message" aria-label="WebSocket message"
             id="echoMessageForm" onKeyDown={onFormKey} disabled={formDisabled}/>
@@ -79,7 +68,7 @@ function App() {
           <p>
             {response}
           </p>
-        }
+        } */}
       </header>
     </div>
   );
