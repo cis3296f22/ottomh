@@ -16,12 +16,21 @@ type World struct {
 
 // Creates a new Lobby in the World, and sends a response to
 // the Context contains a unique URL representing that Lobby.
-func (w *World) CreateLobby(c *gin.Context) {
+// Returns an error if the Context is invalid.
+func (w *World) CreateLobby(c *gin.Context) error {
+	return nil
 }
 
 // Connects to a Lobby given it's URL. If the URL is valid,
 // a websocket will be opened on the Context.
-// If the URL is invalid, an error response will be sent over the Context.
-func (w *World) ConnectToLobby(URL string, c *gin.Context) {
+// If the URL is invalid, or if there is an error establishing
+// the websocket, an error is returned.
+func (w *World) ConnectToLobby(URL string, c *gin.Context) error {
+	return nil
+}
 
+// Closes down the Lobby with URL, returns an error if no Lobby exists,
+// of if the Lobby is already closed.
+func (w *World) CloseLobby(URL string) error {
+	return nil
 }
