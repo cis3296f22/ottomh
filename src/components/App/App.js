@@ -8,7 +8,8 @@ export const App = () => {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Home/>} />
-          <Route path="/join" element={<Join />} />
+          <Route path="/new" element={<Join title="Create new lobby" />} />
+          <Route path="/join" element={<Join title="Join game" />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,0 +1,10 @@
+.join-form {
+    background-color: #4C4F56;  
+    padding: 2rem;
+    border-radius: 5px;
+    width: 30rem;
+}
+
+.join h2 {
+    text-align: center;
+}
