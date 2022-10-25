@@ -1,7 +1,9 @@
 package types
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 
@@ -12,9 +14,8 @@ import (
 // The `World` is a collection of all active lobbies,
 // and handles the process of routing
 type World struct {
-	Mu       sync.Mutex // To add a new Lobby, need to acquire lock
-	LobbyIDs []string
-	Lobbies  []Lobby
+	Mu      sync.Mutex // To add a new Lobby, need to acquire lock
+	Lobbies map[string]Lobby
 }
 
 // Creates a new Lobby in the World, and sends a response to
@@ -38,22 +39,43 @@ func (w *World) CreateLobby(c *gin.Context) {
 
 	// Add Lobby to list of active lobbies
 	w.Mu.Lock()
-	w.Lobbies = append(w.Lobbies, lobby)
-	w.LobbyIDs = append(w.LobbyIDs, id)
+	w.Lobbies[id] = lobby
 	w.Mu.Unlock()
 
 	// Send URL back to requester
 	c.JSON(http.StatusOK, gin.H{
 		"url": url,
 	})
+
+	log.Print("Created a new Lobby with id: ", id)
 }
 
 // Connects to a Lobby given it's URL. If the URL is valid,
 // a websocket will be opened on the Context.
 // If the URL is invalid, or if there is an error establishing
 // the websocket, an error is returned.
-func (w *World) ConnectToLobby(URL string, c *gin.Context) error {
-	return nil
+func (w *World) ConnectToLobby(c *gin.Context) {
+	// Get id from URL
+	id := c.Param("id")
+	if len(id) == 0 {
+		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id'"))
+		return
+	}
+
+	// Try retrive the Lobby
+	lobby, exists := w.Lobbies[id]
+	if !exists {
+		c.Error(errors.New(fmt.Sprintf("Lobby with id %s does not exist", id)))
+		return
+	}
+
+	// Try connect the Context to the Lobby
+	ok := lobby.acceptWebSocket(c)
+	if ok != nil {
+		c.Error(ok)
+	}
+
+	log.Print("Lobby with id ", id, " has a new client connection.")
 }
 
 // Closes down the Lobby with URL, returns an error if no Lobby exists,
