@@ -11,6 +11,8 @@ import (
 
 	"github.com/cis3296f22/ottomh/backend/routes"
 	"github.com/gin-gonic/gin"
+	"github.com/cis3296f22/ottomh/backend/types"
+	"sync"
 )
 
 func main() {
@@ -32,6 +34,9 @@ func main() {
 
 	r.GET("/", routes.IndexHandler)
 	r.GET("/echo", routes.EchoHandler)
+
+	lob := types.World{Mu:sync.Mutex{}}
+	r.POST("/CreateLobby", lob.CreateLobby)
 
 	r.Run(":" + port)
 }
