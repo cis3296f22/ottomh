@@ -30,8 +30,10 @@ func main() {
 
 	r.LoadHTMLFiles("build/index.html")
 
-	r.GET("/", routes.IndexHandler)
 	r.GET("/echo", routes.EchoHandler)
+	r.GET("/", routes.IndexHandler)
+	// Catch-all route to work nicely with react-router
+	r.GET("/:path", routes.IndexHandler)
 
 	r.Run(":" + port)
 }
