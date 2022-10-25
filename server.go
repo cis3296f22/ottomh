@@ -9,10 +9,11 @@ package main
 import (
 	"os"
 
-	"github.com/cis3296f22/ottomh/backend/routes"
-	"github.com/gin-gonic/gin"
-	"github.com/cis3296f22/ottomh/backend/types"
 	"sync"
+
+	"github.com/cis3296f22/ottomh/backend/routes"
+	"github.com/cis3296f22/ottomh/backend/types"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -32,13 +33,13 @@ func main() {
 
 	r.LoadHTMLFiles("build/index.html")
 
-	r.GET("/echo", routes.EchoHandler)
+	lob := types.World{Mu: sync.Mutex{}}
+
 	r.GET("/", routes.IndexHandler)
+	r.POST("/CreateLobby", lob.CreateLobby)
+	r.GET("/echo", routes.EchoHandler)
 	// Catch-all route to work nicely with react-router
 	r.GET("/:path", routes.IndexHandler)
-
-	lob := types.World{Mu:sync.Mutex{}}
-	r.POST("/CreateLobby", lob.CreateLobby)
 
 	r.Run(":" + port)
 }
