@@ -24,7 +24,14 @@ type World struct {
 // The URL will be of the form "<host>/lobbies/<id>"
 func (w *World) CreateLobby(c *gin.Context) {
 	// Generate a unique ID for this lobby
-	id := uuid.New().String()
+	id := uuid.New().String()[:6]
+
+	// Make sure the ID does not already exist
+	_, exists := w.Lobbies[id]
+	for exists {
+		id := uuid.New().String()[:6]
+		_, exists = w.Lobbies[id]
+	}
 
 	// Create a new lobby with a unique ID
 	lobby, ok := makeLobby(id)
