@@ -1,0 +1,40 @@
+.join {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10rem;
+}
+
+.join-form {
+    background-color: #4C4F56;  
+    padding: 2rem;
+    border-radius: 5px;
+    width: 30rem;
+}
+
+.join h2 {
+    text-align: center;
+}
+
+.join-logo {
+    height: 20vmin;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .join-logo {
+        animation: join-logo-spin infinite 20s linear;
+    }
+}
+
+@keyframes join-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
