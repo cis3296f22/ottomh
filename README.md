@@ -10,7 +10,6 @@ To use the most recent version of the app, please go to https://ottomh.herokuapp
 
 Currently, you are able to:
 1. Host a new game by clicking the "Create new lobby" button
-2. Join an existing game by (1) using a link given by someone already in the room or (2) clicking "Join game" and entering a code provided by someone already in the room
 
 ## Building
 
