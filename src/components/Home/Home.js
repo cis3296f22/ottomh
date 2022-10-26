@@ -4,7 +4,7 @@ import logo from '../../images/logo.svg';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 
-export const Home = ({openLobby}) => {
+export const Home = ({openLobby, id}) => {
     let lobbyArray, lobbyUrl, lobbyId;
     let navigate = useNavigate();
 
@@ -30,7 +30,7 @@ export const Home = ({openLobby}) => {
     }
 
     function handleJoinClick() {
-        navigate(`/lobbies/${lobbyId}`);
+        navigate(`/join`);
     }
 
 
