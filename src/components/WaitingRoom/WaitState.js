@@ -1,14 +1,14 @@
 import Button from 'react-bootstrap/Button';
 
-export default function WaitState() {
-    return(
+export const WaitState = () => {
+    return (
         <div>
             <h1>OTTOMH</h1>
             <div>
                 <h2>Code:</h2>
                 <p>"room code"</p>
                 <Button variant="primary">Copy URL</Button>
-                <br/>
+                <br />
             </div>
             <div>
                 <h2>Players joined:</h2>
@@ -17,4 +17,4 @@ export default function WaitState() {
             <Button variant="primary" type="submit">Start</Button>
         </div>
     );
-}
+};
