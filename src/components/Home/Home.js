@@ -30,7 +30,7 @@ export const Home = ({openLobby}) => {
     }
 
     function handleJoinClick() {
-        
+        navigate(`/lobbies/${lobbyId}`);
     }
 
 
