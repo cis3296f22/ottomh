@@ -1,0 +1,19 @@
+.join {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10rem;
+}
+
+.join-form {
+    background-color: #4C4F56;  
+    padding: 2rem;
+    border-radius: 5px;
+    width: 30rem;
+}
+
+.join h2 {
+    text-align: center;
+}

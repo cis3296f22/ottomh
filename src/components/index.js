@@ -1,4 +1,3 @@
-export * from './App';
-export * from './HomeLayout';
-export * from './Home';
-export * from './Join';
+export * from './App/App.js';
+export * from './Home/Home.js';
+export * from './Join/Join.js';

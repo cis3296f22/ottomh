@@ -1,12 +1,11 @@
-import '../../assets/global.css';
-import './Join.css';
+import './joinStyles.css';
 import { useState } from 'react';
-import logo from '../../assets/logo.svg';
+import logo from '../../images/logo.svg';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
-export const Join = ({ title }) => {
+export const Join = ({title}) => {
     let [response, setResponse] = useState("");
 
     let ws, lobbyUrl;
@@ -58,7 +57,7 @@ export const Join = ({ title }) => {
     }
 
     return (
-        <main className="join center-vertical-layout">
+        <main className="join">
             <img src={logo} className="home-logo" alt="logo" />
             <h1>OTTOMH</h1>
 

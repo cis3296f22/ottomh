@@ -1,11 +1,10 @@
-import './Home.css';
-import '../../assets/global.css';
+import './homeStyles.css';
 import Button from 'react-bootstrap/Button';
-import logo from '../../assets/logo.svg';
+import logo from '../../images/logo.svg';
 
 export const Home = () => {
     return (
-        <main className="home center-vertical-layout">
+        <main className="home">
             <img src={logo} className="home-logo" alt="logo" />
             <h1>OTTOMH</h1>
 
