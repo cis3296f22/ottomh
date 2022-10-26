@@ -38,7 +38,7 @@ func main() {
 	r.GET("/", routes.IndexHandler)
 	r.POST("/CreateLobby", lob.CreateLobby)
 	r.GET("/echo", routes.EchoHandler)
-	r.GET("/lobbies/:id", lob.ConnectToLobby)
+	r.GET("/sockets/:id", lob.ConnectToLobby)
 	// Catch-all route to work nicely with react-router
 	r.GET("/:path", routes.IndexHandler)
 
