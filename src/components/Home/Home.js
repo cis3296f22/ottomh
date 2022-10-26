@@ -22,7 +22,7 @@ export const Home = ({openLobby}) => {
 
         // get the lobbyId from the lobbyUrl
         lobbyArray = lobbyUrl.split('/');
-        lobbyId = lobbyArray.length-1;
+        lobbyId = lobbyArray[lobbyArray.length-1];
 
         // set lobbyId 
         openLobby(lobbyId);

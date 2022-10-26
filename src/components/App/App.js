@@ -8,7 +8,6 @@ export const App = () => {
 
   return (
     <div className="App">
-      <p>I'm {lobbyId}</p>
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Home openLobby={setLobbyId} />} />
