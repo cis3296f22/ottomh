@@ -4,15 +4,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, WaitState } from '../';
 
 export const App = () => {
-  let [lobbyUrl, setLobbyUrl] = useState("");
+  let [lobbyId, setLobbyId] = useState("");
 
   return (
     <div className="App">
-      <p>I'm {lobbyUrl}</p>
+      <p>I'm {lobbyId}</p>
       <BrowserRouter>
         <Routes>
-          <Route exact path="/" element={<Home openLobby={setLobbyUrl} />} />
-          <Route path={lobbyUrl} element={<WaitState url={lobbyUrl} />} />
+          <Route exact path="/" element={<Home openLobby={setLobbyId} />} />
+          <Route path={"/lobbies/" + lobbyId} element={<WaitState id={lobbyId} />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -5,19 +5,28 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 
 export const Home = ({openLobby}) => {
-    let lobbyUrl;
+    let lobbyArray, lobbyUrl, lobbyId;
     let navigate = useNavigate();
 
     async function handleNewLobbyClick() {
+        // send a request to the server to create a new lobby
         let response = await fetch(`http://${window.location.host}/CreateLobby`, {
             method: 'POST'
         });
+
+        // get the url from the request
         if (response.status === 200) {
             let data = await response.json();
             lobbyUrl = data.url;
         }
-        openLobby(lobbyUrl);
-        navigate(lobbyUrl);
+
+        // get the lobbyId from the lobbyUrl
+        lobbyArray = lobbyUrl.split('/');
+        lobbyId = lobbyArray.length-1;
+
+        // set lobbyId 
+        openLobby(lobbyId);
+        navigate(`/lobbies/${lobbyId}`);
     }
 
     function handleJoinClick() {
