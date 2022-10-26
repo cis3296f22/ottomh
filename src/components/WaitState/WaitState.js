@@ -1,14 +1,14 @@
 import './waitStateStyle.css';
 import Button from 'react-bootstrap/Button';
 
-export const WaitState = () => {
+export const WaitState = ({id}) => {
 
     let ws;
     
     if (window.location.protocol == 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}/player`);
+        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}/player`);
+        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
     }
 
     ws.onopen = (_) => {
@@ -33,7 +33,8 @@ export const WaitState = () => {
             <h1>OTTOMH</h1>
             <div>
                 <h2>Code:</h2>
-                <p>"room code"</p>
+                {id}
+                <br/>
                 <Button variant="primary">Copy URL</Button>
             </div>
             <div>
