@@ -1,4 +1,4 @@
-import './WaitState.css';
+import './waitStateStyle.css';
 import Button from 'react-bootstrap/Button';
 
 export const WaitState = () => {
