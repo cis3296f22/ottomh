@@ -9,8 +9,15 @@ export const Home = ({openLobby, id}) => {
     let navigate = useNavigate();
 
     async function handleNewLobbyClick() {
+        let url;
+        
         // send a request to the server to create a new lobby
-        let response = await fetch(`http://${window.location.host}/CreateLobby`, {
+        if(window.location.protocol === 'https:' ) {
+            url = `https://${window.location.host}/CreateLobby`;
+        } else {
+            url = `http://${window.location.host}/CreateLobby`;
+        }
+        let response = await fetch(url, {
             method: 'POST'
         });
 
