@@ -1,34 +1,47 @@
-import './Home.css';
+import './homeStyles.css';
+import logo from '../../images/logo.svg';
+
 import Button from 'react-bootstrap/Button';
-import logo from '../../assets/logo.svg';
+import { useNavigate } from 'react-router-dom';
 
-export const Home = () => {
-    // let ws;
-    // // If the webpage was hosted in a secure context, the wss protocol must
-    // // be used.
-    // if (window.location.protocol == 'https:') {
-    //     ws = new WebSocket(`wss://${window.location.host}/lobby`);
-    // } else {
-    //     ws = new WebSocket(`ws://${window.location.host}/lobby`);
-    // }
+export const Home = ({openLobby, id}) => {
+    let lobbyArray, lobbyUrl, lobbyId;
+    let navigate = useNavigate();
 
+    async function handleNewLobbyClick() {
+        // send a request to the server to create a new lobby
+        let response = await fetch(`http://${window.location.host}/CreateLobby`, {
+            method: 'POST'
+        });
 
-    function createNewLobby() {
-        alert("you clicked 'create new lobby'");
+        // get the url from the request
+        if (response.status === 200) {
+            let data = await response.json();
+            lobbyUrl = data.url;
+        }
+
+        // get the lobbyId from the lobbyUrl
+        lobbyArray = lobbyUrl.split('/');
+        lobbyId = lobbyArray[lobbyArray.length-1];
+
+        // set lobbyId 
+        openLobby(lobbyId);
+        navigate(`/lobbies/${lobbyId}`);
     }
 
-    function joinGame() {
-        alert("you clicked 'join a game'");
+    function handleJoinClick() {
+        navigate(`/join`);
     }
+
 
     return (
         <main className="home">
             <img src={logo} className="home-logo" alt="logo" />
             <h1>OTTOMH</h1>
 
-            {/* create new lobby input and button */}
-            <Button variant="outline-primary" type="button" href="/join">Create new lobby</Button>
-            <Button variant="outline-primary" type="button" href="/join">Join a game</Button>
+            {/* Buttons to create new lobby and join game */}
+            <Button variant="primary" type="button" onClick={handleNewLobbyClick} className="mb-3">Create new lobby</Button>
+            <Button variant="primary" type="button" onClick={handleJoinClick}>Join a game</Button>
         </main>
     );
 };

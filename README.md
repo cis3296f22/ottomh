@@ -1,8 +1,16 @@
 # OTTOMH: A Party-Thinking Game for The Web
 
-## Overview
+FOR social game players WHO are looking for a game to play. THE OTTOMH game is a web-based party trivia game THAT challenges players to come up with as many words that start with a certain letter and belong to a certain category in a set amount of time while competing against other players. 
+ 
+UNLIKE physical board games, OTTOMH is easier to setup and can be played by geographically distributed players. OUR PRODUCT provides a user-friendly, web-based experience similar to the popular board game Scattegories, allowing players to exercise their brains while having a good time. 
 
-OTTOMH (off the top of my head) -- pronounced “Otum” -- is a multiplayer web-based party game inspired by Scattergories and The Jackbox Party Pack. A game host can setup a new lobby on our servers that players can join using a link or code sent by the host. In each round of play, players are given a target letter and a category; the goal is to come up with as many items belonging to the category whose name starts with the target letter. The player who can think of the most items “off the top of their head” wins. 
+## Live Demo
+[https://ottomh.herokuapp.com](https://ottomh.herokuapp.com)
+
+## Installing
+```bash
+git clone https://github.com/cis3296f22/ottomh.git
+```
 
 ## Using the App
 
