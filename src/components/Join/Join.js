@@ -71,7 +71,7 @@ export const Join = ({title}) => {
                             aria-label="Enter lobby name"
                             aria-describedby="create-new-lobby"
                         />
-                        <Button variant="primary" id="create-new-lobby" type="submit">
+                        <Button variant="primary" id="create-new-lobby" type="submit" href="/wait">
                             Submit
                         </Button>
                     </InputGroup>
