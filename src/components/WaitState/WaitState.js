@@ -29,7 +29,7 @@ export const WaitState = ({id}) => {
     }
 
     return(
-        <div class="waitState">
+        <div className="waitState">
             <h1>OTTOMH</h1>
             <div>
                 <h2>Code:</h2>
