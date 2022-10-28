@@ -1,10 +1,15 @@
 .home {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0 10rem;
+    margin-top: 5rem;
+    text-align: center;
+}
+
+.home h1 {
+    font-size: 5rem;
 }
 
 .home-logo {
@@ -16,10 +21,6 @@
     .home-logo {
         animation: home-logo-spin infinite 20s linear;
     }
-}
-
-.home-link {
-    color: #61dafb;
 }
 
 @keyframes home-logo-spin {

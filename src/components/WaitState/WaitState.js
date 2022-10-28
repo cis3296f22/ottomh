@@ -5,7 +5,7 @@ export const WaitState = ({id}) => {
 
     let ws;
     
-    if (window.location.protocol == 'https:') {
+    if (window.location.protocol === 'https:') {
         ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
     } else {
         ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);

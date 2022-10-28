@@ -1,18 +1,19 @@
 import './homeStyles.css';
-import logo from '../../images/logo.svg';
 
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import { useStore } from '../../store';
 
-export const Home = ({openLobby, id}) => {
+export const Home = () => {
     let lobbyArray, lobbyUrl, lobbyId;
-    let navigate = useNavigate();
+    const navigate = useNavigate();
+    const setLobbyId = useStore((state) => state.setLobbyId);
 
     async function handleNewLobbyClick() {
         let url;
-        
+
         // send a request to the server to create a new lobby
-        if(window.location.protocol === 'https:' ) {
+        if (window.location.protocol === 'https:') {
             url = `https://${window.location.host}/CreateLobby`;
         } else {
             url = `http://${window.location.host}/CreateLobby`;
@@ -29,10 +30,10 @@ export const Home = ({openLobby, id}) => {
 
         // get the lobbyId from the lobbyUrl
         lobbyArray = lobbyUrl.split('/');
-        lobbyId = lobbyArray[lobbyArray.length-1];
+        lobbyId = lobbyArray[lobbyArray.length - 1];
 
         // set lobbyId 
-        openLobby(lobbyId);
+        setLobbyId(lobbyId);
         navigate(`/lobbies/${lobbyId}`);
     }
 
@@ -43,12 +44,13 @@ export const Home = ({openLobby, id}) => {
 
     return (
         <main className="home">
-            <img src={logo} className="home-logo" alt="logo" />
             <h1>OTTOMH</h1>
 
             {/* Buttons to create new lobby and join game */}
-            <Button variant="primary" type="button" onClick={handleNewLobbyClick} className="mb-3">Create new lobby</Button>
-            <Button variant="primary" type="button" onClick={handleJoinClick}>Join a game</Button>
+            <div className="d-grid gap-2">
+                <Button variant="primary" type="button" size="lg" onClick={handleNewLobbyClick} className="mb-3">Create new lobby</Button>
+                <Button variant="primary" type="button" size="lg" onClick={handleJoinClick}>Join a game</Button>
+            </div>
         </main>
     );
 };

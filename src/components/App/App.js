@@ -1,14 +1,13 @@
 import './appStyles.css';
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home, Join, WaitState } from '../';
+import {useStore} from '../../store';
 
 export const App = () => {
-  let [lobbyId, setLobbyId] = useState("none");
-  let [username, setUsername] = useState("none");
+  const [lobbyId, username] = useStore(state => [state.lobbyId, state.username]);
 
   return (
-    <div className="App">
+    <div className="app">
       <p>
         State information (for debugging):
         <br />Lobby id: {lobbyId}
@@ -16,8 +15,8 @@ export const App = () => {
       </p>
       <BrowserRouter>
         <Routes>
-          <Route exact path="/" element={<Home openLobby={setLobbyId} />} />
-          <Route path="/join" element={<Join openLobby={setLobbyId} />}></Route>
+          <Route exact path="/" element={<Home />} />
+          <Route path="/join" element={<Join />}></Route>
           <Route path={"/lobbies/:lobbyId"} element={<WaitState id={lobbyId} />} />
         </Routes>
       </BrowserRouter>
