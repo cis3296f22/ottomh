@@ -5,13 +5,15 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { useNavigate } from 'react-router-dom';
 
-export const Join = ({title}) => {
+export const Join = ({openLobby}) => {
     let navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
         let lobbyId = document.getElementById("input-lobby-code").value;
         alert(`Lobby name: ${lobbyId}`);
+
+        openLobby(lobbyId);
         navigate(`/lobbies/${lobbyId}`);
     }
 
