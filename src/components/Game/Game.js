@@ -27,11 +27,11 @@ export const Game = () => {
                             placeholder="Enter Answer Here"
                             aria-label="Enter Answer"
                             aria-describedby="submit-answer"
-                        />
-                        <Button variant="primary" id="submit-answer" type="submit">
-                            Submit Answer
-                        </Button>
+                        />    
                     </InputGroup>
+                    <Button className="input-button" variant="primary" id="submit-answer" type="submit">
+                            Submit Answer
+                    </Button>
                 </Form>
             </div>
             <div>
