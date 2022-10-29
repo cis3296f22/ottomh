@@ -18,7 +18,7 @@ export const IndexPage = () => {
                             Create new lobby
                         </Button>
                         <Button variant="primary" type="button" size="lg" onClick={() => setMenu("join")}>
-                            Join a game
+                            Join lobby
                         </Button>
                     </div>
                 </>

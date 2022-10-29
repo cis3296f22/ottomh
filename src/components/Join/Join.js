@@ -57,9 +57,8 @@ export const Join = ({ isCreate, onBackClick }) => {
     return (
         <>
             <div className="join-form mb-3 p-3 rounded">
-                <h2 className="h4 
-                mb-3">
-                    {isCreate ? "Create new lobby" : "Join game"}
+                <h2 className="h4 mb-3">
+                    {isCreate ? "Create new lobby" : "Join lobby"}
                 </h2>
                 <Form onSubmit={handleSubmit} className="d-grid gap-3">
                     <Form.Control ref={inputNameRef} type="text" placeholder="Username" />
