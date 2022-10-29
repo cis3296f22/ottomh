@@ -1,7 +1,9 @@
 import './waitStateStyle.css';
 import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 export const WaitState = ({id}) => {
+    const navigate = useNavigate();
 
     let ws;
     
@@ -20,7 +22,9 @@ export const WaitState = ({id}) => {
     }
 
     ws.onerror = (error) => {
-        alert(`WebSocketd error: ${error.message}`);
+        alert(`WebSocketd error: ${error.message}
+        No room exists with this code ${id}`);
+        navigate("/");
         ws.close();
     }
 
@@ -43,6 +47,7 @@ export const WaitState = ({id}) => {
                 <p>"Players"</p>
             </div>
             <Button variant="primary" type="submit">Start</Button>
+            <Button variant="primary" type="button" href="/">Refresh to home</Button>
         </div>
     );
 }

@@ -19,20 +19,21 @@ export const Join = ({ isCreate, onBackClick }) => {
         inputNameRef.current.focus();
     });
 
-    async function handleSubmit() {
+    async function handleSubmit(e) {
+        e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
         let lobbyId;
 
         // get lobby id either from the server or the input box
         if (isCreate) { // get lobby id from server
-            let wsUrl;
+            let fetchUrl;
 
             // send a request to the server to create a new lobby
             if (window.location.protocol === 'https:') {
-                wsUrl = `https://${window.location.host}/CreateLobby`;
+                fetchUrl = `https://${window.location.host}/CreateLobby`;
             } else {
-                wsUrl = `http://${window.location.host}/CreateLobby`;
+                fetchUrl = `http://${window.location.host}/CreateLobby`;
             }
-            let response = await fetch(wsUrl, {
+            let response = await fetch(fetchUrl, {
                 method: 'POST'
             });
 
