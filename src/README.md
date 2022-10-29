@@ -1,5 +1,17 @@
 # Frontend README
 
+- [Frontend README](#frontend-readme)
+  - [Connecting the different game pages together](#connecting-the-different-game-pages-together)
+  - [Accessing the `lobbyId` and `username`](#accessing-the-lobbyid-and-username)
+    - [Access the `lobbyId`: Method 1: Using the `useParams()` hook from `react-router` and the url](#access-the-lobbyid-method-1-using-the-useparams-hook-from-react-router-and-the-url)
+    - [Access the `lobbyId` AND `username`: Method 2: Using the `useStore()` hook from `src/store.js`](#access-the-lobbyid-and-username-method-2-using-the-usestore-hook-from-srcstorejs)
+      - [Usage: Different ways to access each variable in the store](#usage-different-ways-to-access-each-variable-in-the-store)
+      - [Usage: Using the setter functions](#usage-using-the-setter-functions)
+      - [Usage: Getting everything from the `store.js`](#usage-getting-everything-from-the-storejs)
+    - [Debugging `store.js` state variables](#debugging-storejs-state-variables)
+  - [How to export and import different components](#how-to-export-and-import-different-components)
+  - [Simple file structure](#simple-file-structure)
+
 ## Connecting the different game pages together
 We will use the `LobbyPage.js` file in `src/components/LobbyPage` to switch between the different stages of the game. This will keep our app in the same page without creating new pages and url links.
 
@@ -98,6 +110,18 @@ export const MyComponent = () => {
 };
 ```
 
+#### Usage: Getting everything from the `store.js`
+
+It's apparently bad practice to grab everything from the store UNLESS you're actually going to USE everything. Because if you grab everything, and NOT use all of them, then it will still update all the states and their dependent components. And it could end up reloading the entire page as a worst case scenario, which would slow down the website. But I don't think we'll have any issues with that even if we did get everything.
+
+```javascript
+import { useStore } from '../../store'
+
+export const MyComponent = () => {
+    const {lobbyId, username, setLobbyId, setUsername, clear } = userStore();
+};
+```
+
 ### Debugging `store.js` state variables
 
 1. Install the chrome extension [React Devtools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
@@ -154,7 +178,7 @@ import { MyComponent } from './components'
 // This is why we export components from the components/index.js file
 ```
 
-## Simple file structure and naming conventions
+## Simple file structure
 
 All components will be in the `components` folder. Each component should have their own folders so we can keep all the related `.js` and `.css` files together.
 
