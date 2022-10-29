@@ -17,7 +17,7 @@ We will use the `LobbyPage.js` file in `src/components/LobbyPage` to switch betw
 
 Once we're done creating the individual components for each stage of the game, we will import it into `LobbyPage.js` and add it to it's respective stage as shown below.
 
-**A function prop MUST be passed to the component!!** This function will call `setStage()` and GO TO the NEXT stage. For example: 
+**A function prop MUST be passed to the component!! This function will give your component that ability to move to the next "page"/stage of the game.** This function will call `setStage()` and GO TO the NEXT stage. For example: 
 - If we're in the waiting room, when we click the start button, it will GO TO the PLAYGAME stage. We pass the `onStartClick` function prop that will be called when the start button is clicked so that we can actually switch pages.
 - If we're in the game stage, when the timer runs out, we will call the `onTimeover` function prop
 
