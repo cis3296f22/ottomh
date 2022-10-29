@@ -1,3 +1,4 @@
+import './gameStyle.css';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -13,7 +14,7 @@ export const Game = () => {
     }
 
     return(
-        <div class="Game">
+        <div class="game">
             <div>
                 <h2>
                     Category <Badge bg="secondary">A</Badge>
@@ -21,6 +22,7 @@ export const Game = () => {
                 <Form onSubmit={handleSubmit}>
                     <InputGroup>
                         <Form.Control
+                            className="input-box"
                             id="input-answer"
                             placeholder="Enter Answer Here"
                             aria-label="Enter Answer"
@@ -34,7 +36,7 @@ export const Game = () => {
             </div>
             <div>
                 <br/>
-                <h2>Time Remaining: </h2>
+                <h3>Time Remaining: </h3>
                 <p>"Timer here"</p>
             </div>
             <div>

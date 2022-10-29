@@ -1,10 +1,10 @@
 import './waitStateStyle.css';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import { useStore } from '../../store.js';
 
-export const WaitState = ({id}) => {
+export const WaitState = ({id, onStart}) => {
     const navigate = useNavigate();
-
     let ws;
     
     if (window.location.protocol === 'https:') {
@@ -46,7 +46,7 @@ export const WaitState = ({id}) => {
                 <h2>Players joined:</h2>
                 <p>"Players"</p>
             </div>
-            <Button variant="primary" type="submit">Start</Button>
+            <Button variant="primary" type="button" onClick={onStart}>Start</Button>
             <Button variant="primary" type="button" href="/">Refresh to home</Button>
         </div>
     );
