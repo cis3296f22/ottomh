@@ -47,6 +47,7 @@ export const Join = ({ isCreate, onBackClick }) => {
             lobbyId = inputCodeRef.current.value;
         }
 
+
         // set state and go to waiting room
         setLobbyId(lobbyId);
         setUsername(inputNameRef.current.value);
