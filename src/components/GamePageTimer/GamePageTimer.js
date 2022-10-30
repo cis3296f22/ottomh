@@ -1,6 +1,5 @@
 import Button from 'react-bootstrap/Button';
 import { useState, useRef, useEffect } from 'react'
-import './GamePageTimer.css';
 
 export const GamePageTimer = (setLoading) => {
 
