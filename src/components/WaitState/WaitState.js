@@ -7,41 +7,36 @@ export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
 
-    // let ws;
+    let ws;
 
-    // if (window.location.protocol === 'https:') {
-    //     ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
-    // } else {
-    //     ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
-    // }
+    if (window.location.protocol === 'https:') {
+        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
+    } else {
+        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
+    }
 
-    // ws.onopen = (_) => {
-    //     alert("websocket is open now");
-    // }
+    ws.onopen = (_) => {
+        alert("websocket is open now");
+    }
 
-    // ws.onclose = (_) => {
-    //     alert("websocket is closed now");
-    // }
+    ws.onclose = (_) => {
+        alert("websocket is closed now");
+    }
 
-    // ws.onerror = (error) => {
-    //     alert(`WebSocketd error: ${error.message}
-    //     No room exists with this code ${id}`);
-    //     navigate("/");
-    //     ws.close();
-    // }
+    const copyToClipBoard = async copyMe => {
+          await navigator.clipboard.writeText(copyMe);
+          alert("Code Copied to clipboard");
+      };
+    
 
-    // ws.onmessage = (event) => {
-    //     alert(``);
-    // }
-
-    return (
+    return(
         <div className="waitState">
             <h1>OTTOMH</h1>
             <div>
                 <h2>Code:</h2>
                 {id}
-                <br />
-                <Button variant="primary">Copy URL</Button>
+                <br/>
+                <Button onClick={() => copyToClipBoard(id)} variant="primary">Copy Room Code</Button>
             </div>
             <div>
                 <br />
