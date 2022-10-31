@@ -32,7 +32,10 @@ export const Voting = ({onTimeover, words}) => {
     return (
         <Container fluid className='m-5 w-auto text-center'
                 style={{'height': '95vh'}}>
-            <Row className='h-75 overflow-auto'>
+            <Row className='h-25 align-items-center'>
+                <h1>Cross off words that don't fit!</h1>
+            </Row>
+            <Row className='h-50 overflow-auto'>
                 <ListGroup>
                     {wordList}
                 </ListGroup>
