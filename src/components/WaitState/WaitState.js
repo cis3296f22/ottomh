@@ -34,6 +34,7 @@ export const WaitState = ({id, onStart}) => {
 
     const copyToClipBoard = async copyMe => {
           await navigator.clipboard.writeText(copyMe);
+          alert("Code Copied to clipboard");
       };
     
 
@@ -44,7 +45,7 @@ export const WaitState = ({id, onStart}) => {
                 <h2>Code:</h2>
                 {id}
                 <br/>
-                <Button onClick={() => copyToClipBoard(id)} variant="primary">Copy URL</Button>
+                <Button onClick={() => copyToClipBoard(id)} variant="primary">Copy Room Code</Button>
             </div>
             <div>
                 <br/>
