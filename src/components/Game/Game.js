@@ -3,8 +3,11 @@ import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
+import {useState } from "react";
 
-export const Game = () => {
+export const Game = ({onTimeover}) => {
+    const [isLoading, setLoading] = useState(true);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -13,6 +16,7 @@ export const Game = () => {
         //send answer here
     }
 
+    if (isLoading) {
     return(
         <div class="game">
             <div>
@@ -37,7 +41,13 @@ export const Game = () => {
             <div>
                 <br/>
                 <h3>Time Remaining: </h3>
-                <p>"Timer here"</p>
+               
+               
+                    <h1>{GamePageTimer(setLoading)}</h1>
+        
+                <Button variant="primary" id ="directToVote" type="button" onClick={onTimeover} hidden></Button>
+
+
             </div>
             <div>
                 <br/>
@@ -45,4 +55,9 @@ export const Game = () => {
             </div>
         </div>
     );
+    }
+    else{
+           document.getElementById('directToVote').click()
+        }
+
 };
