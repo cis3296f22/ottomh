@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { WaitState, Game } from "../";
+import { WaitState, Game, Scores } from "../";
 
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
@@ -12,7 +12,7 @@ export const LobbyPage = () => {
 
             {stage === "playGame" && <Game onTimeover={() => setStage("voting")} />}
 
-            {stage === "voting"}
+            {stage === "voting" && <Scores onFinish={() => setStage("scores")} />}
 
             {stage === "scores"}
         </>
