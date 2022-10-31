@@ -3,36 +3,36 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 
-export const WaitState = ({ id }) => {
+export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
 
-    let ws;
+    // let ws;
 
-    if (window.location.protocol === 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
-    } else {
-        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
-    }
+    // if (window.location.protocol === 'https:') {
+    //     ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
+    // } else {
+    //     ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
+    // }
 
-    ws.onopen = (_) => {
-        alert("websocket is open now");
-    }
+    // ws.onopen = (_) => {
+    //     alert("websocket is open now");
+    // }
 
-    ws.onclose = (_) => {
-        alert("websocket is closed now");
-    }
+    // ws.onclose = (_) => {
+    //     alert("websocket is closed now");
+    // }
 
-    ws.onerror = (error) => {
-        alert(`WebSocketd error: ${error.message}
-        No room exists with this code ${id}`);
-        navigate("/");
-        ws.close();
-    }
+    // ws.onerror = (error) => {
+    //     alert(`WebSocketd error: ${error.message}
+    //     No room exists with this code ${id}`);
+    //     navigate("/");
+    //     ws.close();
+    // }
 
-    ws.onmessage = (event) => {
-        alert(``);
-    }
+    // ws.onmessage = (event) => {
+    //     alert(``);
+    // }
 
     return (
         <div className="waitState">
@@ -49,7 +49,7 @@ export const WaitState = ({ id }) => {
                 <p>"Players"</p>
             </div>
             <div className="d-flex justify-content flex-column align-items-center gap-3">
-                <Button className="d-block" variant="primary" type="submit">Start</Button>
+                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button>
                 <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>
