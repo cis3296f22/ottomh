@@ -63,7 +63,7 @@ export const GamePageTimer = (setLoading) => {
   
     return (
         <div>
-            <Button onClick={() => setIsStart(true)}>Start Timer <h2>{timer}</h2> </Button>
+            <Button onClick={() => setIsStart(true)}>Timer <h2>{timer}</h2> </Button>
 
         </div>
     )
