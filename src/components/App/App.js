@@ -1,20 +1,16 @@
 import './appStyles.css';
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home, Join, WaitState } from '../';
+import { IndexPage, LobbyPage } from '../';
 
 export const App = () => {
-  let [lobbyId, setLobbyId] = useState("hello");
-
   return (
-    <div className="App">
+    <main className="app">
       <BrowserRouter>
         <Routes>
-          <Route exact path="/" element={<Home openLobby={setLobbyId} />} />
-          <Route path="/join" element={<Join />}></Route>
-          <Route path={"/lobbies/" + lobbyId} element={<WaitState id={lobbyId} />} />
+          <Route exact path="/" element={<IndexPage />} />
+          <Route path={"/lobbies/:lobbyId"} element={<LobbyPage />} />
         </Routes>
       </BrowserRouter>
-    </div>
+    </main>
   );
 };
