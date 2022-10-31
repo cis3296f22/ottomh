@@ -6,7 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import {useState } from "react";
 
-export const Game = ({onTimeover}) => {
+export const Game = ({onTimeover, cat, letter}) => {
     const [isLoading, setLoading] = useState(true);
 
     async function handleSubmit(e) {
@@ -16,13 +16,14 @@ export const Game = ({onTimeover}) => {
         //send answer here
         document.getElementById("input-answer").value = '';
     }
+    
 
     if (isLoading) {
     return(
         <div class="game">
             <div>
                 <h2>
-                    Category <Badge bg="secondary">A</Badge>
+                    {cat} <Badge bg="secondary">{letter}</Badge>
                 </h2>
                 <Form onSubmit={handleSubmit}>
                     <InputGroup>
