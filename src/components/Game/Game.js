@@ -14,6 +14,7 @@ export const Game = ({onTimeover}) => {
         let answer = document.getElementById("input-answer").value;
         alert(`Answer submitted: ${answer}`);
         //send answer here
+        document.getElementById("input-answer").value = '';
     }
 
     if (isLoading) {
