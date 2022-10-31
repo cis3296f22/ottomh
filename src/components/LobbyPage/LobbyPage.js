@@ -25,6 +25,6 @@ export const LobbyPage = () => {
             {stage === "voting" }
 
             {stage === "scores" && <Scores />}
-        </>
+        </div>
     );
 };
