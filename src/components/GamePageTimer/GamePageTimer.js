@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 export const GamePageTimer = (setLoading) => {
 
     const Ref = useRef(null);
-    const [isStart, setIsStart] = useState(false);
+    const [isStart, setIsStart] = useState(true);
     const [timer, setTimer] = useState('00:60');
 
    const getTimeRemaining = (e) => {

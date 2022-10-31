@@ -12,9 +12,9 @@ export const LobbyPage = () => {
 
             {stage === "playGame" && <Game onTimeover={() => setStage("voting")} />}
 
-            {stage === "voting" && <Scores onFinish={() => setStage("scores")} />}
+            {stage === "voting" }
 
-            {stage === "scores"}
+            {stage === "scores" && <Scores />}
         </>
     );
 };
