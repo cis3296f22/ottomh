@@ -1,5 +1,6 @@
 import './scoresStyle.css';
 import Button from 'react-bootstrap/Button';
+import crown from './crown.png';
 
 export const Scores = () => {
 
@@ -9,8 +10,8 @@ export const Scores = () => {
                 Final Scores
             </h2>
             <div class="scores-box">
-                <p>"Player 1+Crown" "score"</p>
-                <p>"Player 2" "score"</p>
+                <p class="gold">"Player 1"<img class="crown" src={crown}/> "score"</p>
+                <p class="silver">"Player 2" "score"</p>
             </div>
             <div class="winner-box">
                 <h3>Winner: "player"</h3>

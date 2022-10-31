@@ -11,6 +11,15 @@
     border-color: white;
     border-radius: 0.5rem;
 }
+.gold{
+    font-size: 3rem;
+}
+.silver{
+    font-size: 2rem;
+}
 .winner-box{
     margin-top: 1rem;
+}
+.crown{
+    width: 5rem;
 }
