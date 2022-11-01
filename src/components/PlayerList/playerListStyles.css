@@ -1,0 +1,25 @@
+.playerlist {
+    height: 250px;
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.playerlist-avatar {
+    background-color: #4C4F56;
+    width: 6rem;
+    height: 6rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-all;
+}
+
+.playerlist .host {
+    border: 2px solid orange;
+}
