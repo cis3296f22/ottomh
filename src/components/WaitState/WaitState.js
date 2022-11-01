@@ -2,6 +2,7 @@ import './waitStateStyle.css';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
+import { PlayerList } from '../';
 
 export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ export const WaitState = ({ id, onStart }) => {
             <div>
                 <br />
                 <h2>Players joined:</h2>
-                <p>"Players"</p>
+                <PlayerList />
             </div>
             <div className="d-flex justify-content flex-column align-items-center gap-3">
                 <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button>
