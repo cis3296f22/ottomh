@@ -22,7 +22,8 @@ export const Join = ({ isCreate, onBackClick }) => {
     async function handleSubmit(e) {
         e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
         let lobbyId;
-
+        let username;
+        username = inputNameRef.current.value;
         // get lobby id either from the server or the input box
         if (isCreate) { // get lobby id from server
             let fetchUrl;
@@ -45,8 +46,13 @@ export const Join = ({ isCreate, onBackClick }) => {
             }
         } else { // get lobby id from input box
             lobbyId = inputCodeRef.current.value;
+            username = inputNameRef.current.value;
         }
 
+        fetch(`http://${window.location.host}/GetNames`, {
+            method: "POST",
+            body: JSON.stringify({username})
+        }) 
 
         // set state and go to waiting room
         setLobbyId(lobbyId);
