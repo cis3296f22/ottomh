@@ -7,3 +7,5 @@ export * from './Game/Game.js';
 export * from './PlayerList/PlayerList.js';
 export * from './GamePageTimer/GamePageTimer.js'
 export * from './Scores/Scores.js';
+
+export * from './Voting/Voting.js';
