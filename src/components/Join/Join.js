@@ -49,10 +49,10 @@ export const Join = ({ isCreate, onBackClick }) => {
             username = inputNameRef.current.value;
         }
 
-        fetch(`http://${window.location.host}/GetNames`, {
-            method: "POST",
-            body: JSON.stringify({username})
-        }) 
+        // fetch(`http://${window.location.host}/GetNames`, {
+        //     method: "POST",
+        //     body: JSON.stringify({username})
+        // }) 
 
         // set state and go to waiting room
         setLobbyId(lobbyId);

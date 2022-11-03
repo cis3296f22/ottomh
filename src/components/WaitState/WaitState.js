@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { PlayerList } from '../';
 
+import { io } from 'socket.io-client';
+
 export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
@@ -11,18 +13,18 @@ export const WaitState = ({ id, onStart }) => {
     let ws;
 
     if (window.location.protocol === 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
+        ws = io(`wss://${window.location.host}`);
     } else {
-        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
+        ws = io(`ws://${window.location.host}`);
     }
 
-    ws.onopen = (_) => {
-        alert("websocket is open now");
-    }
+    ws.on('connect', () => {
+        console.log('WebSocket is open now.');
+    });
 
-    ws.onclose = (_) => {
-        alert("websocket is closed now");
-    }
+    ws.on('disconnect', () => {
+        console.log('WebSocket is closed now.')
+    });
 
     const copyToClipBoard = async copyMe => {
           await navigator.clipboard.writeText(copyMe);
