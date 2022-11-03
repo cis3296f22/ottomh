@@ -9,14 +9,65 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	socketio "github.com/googollee/go-socket.io"
 )
 
 // The `World` is a collection of all active lobbies,
-// and handles the process of routing
+// and handles socket.io events.
 type World struct {
 	Mu      sync.Mutex // To add a new Lobby, need to acquire lock
 	Lobbies map[string]Lobby
+	Server  *socketio.Server
 }
+
+// Initializes a new World with no Lobbies, a Mutex Mu,
+// and a Server.
+func NewWorld() *World {
+	world := &World{Mu: sync.Mutex{}, Lobbies: make(map[string]Lobby)}
+
+	server := socketio.NewServer(nil)
+
+	// Create routes for socket.io
+	// Refer to go-socket.io examples here:
+	// https://github.com/googollee/go-socket.io/blob/master/_examples/gin-gonic/main.go
+	server.OnConnect("/", func(s socketio.Conn) error {
+		s.SetContext("")
+		log.Println("connected:", s.ID())
+		return nil
+	})
+
+	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
+		log.Println("notice:", msg)
+		s.Emit("reply", "have "+msg)
+	})
+
+	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
+		s.SetContext(msg)
+		return "recv " + msg
+	})
+
+	server.OnEvent("/", "bye", func(s socketio.Conn) string {
+		last := s.Context().(string)
+		s.Emit("bye", last)
+		s.Close()
+		return last
+	})
+
+	server.OnError("/", func(s socketio.Conn, e error) {
+		log.Println("meet error:", e)
+	})
+
+	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
+		log.Println("closed", reason)
+	})
+
+	world.Server = server
+
+	return world
+}
+
+// Starts Server; it is recommended this function
+// is run in a non-blocking go thread
 
 // Creates a new Lobby in the World, and sends a response to
 // the Context contains a unique URL representing that Lobby.
@@ -55,6 +106,23 @@ func (w *World) CreateLobby(c *gin.Context) {
 	})
 
 	log.Print("Created a new Lobby with id: ", id)
+}
+
+func (w *World) StartServer() {
+	if err := w.Server.Serve(); err != nil {
+		log.Fatalf("socketio listen error: %s\n", err)
+	}
+}
+
+// Registers GET and POST requests to URLS of the form /socket.io/* to Server
+func (w *World) RegisterRoutes(r *gin.Engine) {
+	r.GET("/socket.io/*any", gin.WrapH(w.Server))
+	r.POST("/socket.io/*any", gin.WrapH(w.Server))
+}
+
+// Performs clean-up as needed at the end of the app lifetime
+func (w *World) Close() {
+	w.Server.Close()
 }
 
 // Connects to a Lobby given it's URL. If the URL is valid,

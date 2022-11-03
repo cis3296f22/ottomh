@@ -10,13 +10,9 @@ import (
 	"log"
 	"os"
 
-	"sync"
-
 	"github.com/cis3296f22/ottomh/backend/routes"
 	"github.com/cis3296f22/ottomh/backend/types"
 	"github.com/gin-gonic/gin"
-
-	socketio "github.com/googollee/go-socket.io"
 )
 
 func main() {
@@ -27,49 +23,10 @@ func main() {
 
 	r := gin.Default()
 
-	server := socketio.NewServer(nil)
-
-	// Create routes for socket.io
-	// Refer to go-socket.io examples here:
-	// https://github.com/googollee/go-socket.io/blob/master/_examples/gin-gonic/main.go
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		log.Println("connected:", s.ID())
-		return nil
-	})
-
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		log.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
-	})
-
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-		s.SetContext(msg)
-		return "recv " + msg
-	})
-
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
-		last := s.Context().(string)
-		s.Emit("bye", last)
-		s.Close()
-		return last
-	})
-
-	server.OnError("/", func(s socketio.Conn, e error) {
-		log.Println("meet error:", e)
-	})
-
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		log.Println("closed", reason)
-	})
-
+	lob := types.NewWorld()
 	// Start sockets.io server
-	go func() {
-		if err := server.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
-		}
-	}()
-	defer server.Close()
+	go lob.StartServer()
+	defer lob.Close()
 
 	r.Static("/static", "build/static")
 	r.StaticFile("/favicon.ico", "build/favicon.ico")
@@ -80,11 +37,8 @@ func main() {
 
 	r.LoadHTMLFiles("build/index.html")
 
-	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]types.Lobby)}
-
-	// Catch-all routes four socket.io
-	r.GET("/socket.io/*any", gin.WrapH(server))
-	r.POST("/socket.io/*any", gin.WrapH(server))
+	// Registers routes needed for web sockets
+	lob.RegisterRoutes(r)
 
 	r.GET("/", routes.IndexHandler)
 	r.POST("/CreateLobby", lob.CreateLobby)
