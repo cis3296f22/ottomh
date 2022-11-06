@@ -33,7 +33,7 @@ func main() {
 
 	r.LoadHTMLFiles("build/index.html")
 
-	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]types.Lobby)}
+	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]*types.Lobby)}
 
 	r.GET("/", routes.IndexHandler)
 	r.POST("/CreateLobby", lob.CreateLobby)

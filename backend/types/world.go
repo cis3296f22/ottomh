@@ -15,7 +15,7 @@ import (
 // and handles the process of routing
 type World struct {
 	Mu      sync.Mutex // To add a new Lobby, need to acquire lock
-	Lobbies map[string]Lobby
+	Lobbies map[string]*Lobby
 }
 
 // Creates a new Lobby in the World, and sends a response to
