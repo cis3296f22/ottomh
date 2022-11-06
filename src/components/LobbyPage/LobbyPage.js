@@ -36,7 +36,7 @@ export const LobbyPage = () => {
         <div className="container-fluid h-100">
             {stage === "waitingRoom" && <WaitState onStart={() => setStage("playGame")} id={lobbyId} />}
 
-            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter}/>}
+            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} ws={ws}/>}
 
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")} 
                 words={['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',
