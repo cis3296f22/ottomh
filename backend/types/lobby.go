@@ -2,7 +2,6 @@ package types
 
 import (
 	"log"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -10,22 +9,45 @@ import (
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	mu      sync.Mutex
-	ID      string
-	sockets []*WebSocket
+	addSocketChan chan *WebSocket
+	ID            string
+	sockets       []*WebSocket // Do not modify directly; instead send new sockets to `addSocketChan`
 }
 
 // Initializes a new Lobby with a unique ID
 func makeLobby(ID string) (*Lobby, error) {
-	l := &Lobby{mu: sync.Mutex{}, ID: ID}
+	l := &Lobby{addSocketChan: make(chan *WebSocket, 5), ID: ID}
+	go l.lifecycle()
 	return l, nil
 }
 
-// Safely appends `ws` to the list of WebSockets owned by `l`
-func (l *Lobby) appendWebSocket(ws *WebSocket) {
-	l.mu.Lock()
-	l.sockets = append(l.sockets, ws)
-	l.mu.Unlock()
+// This forever-loop continuosly checks WebSockets for messages from
+// the client, and responds to those messages.
+func (l *Lobby) lifecycle() {
+	for {
+		// If there new WebSockets, add them to the list
+		for {
+			select {
+			case ws := <-l.addSocketChan:
+				l.sockets = append(l.sockets, ws)
+			default:
+				// Need to use goto to break out of for-loop
+				goto LOOP
+			}
+		}
+
+		// Loop over sockets, checking each for messages
+	LOOP:
+		for _, ws := range l.sockets {
+			if ws.IsAlive() {
+				m, err := ws.ReadMessage()
+				if err == nil {
+					// Handle messages here!
+					log.Print("Recieved message from WebSocket: ", m)
+				}
+			}
+		}
+	}
 }
 
 // Tries to open a WebSocket with the given context
@@ -36,7 +58,8 @@ func (l *Lobby) acceptWebSocket(c *gin.Context) error {
 		return err
 	}
 
-	l.appendWebSocket(ws)
+	// Append new Socket
+	l.addSocketChan <- ws
 
 	// go l.handleWebSocket(ws.ws)
 
@@ -49,6 +72,8 @@ func (l *Lobby) handleWebSocket(ws *websocket.Conn) {
 	defer ws.Close()
 
 	for {
+		log.Print("Polling...")
+
 		mt, message, err := ws.ReadMessage()
 		if err != nil {
 			log.Print("Error reading over web socket: ", err)
