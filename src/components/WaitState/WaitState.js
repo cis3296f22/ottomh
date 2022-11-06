@@ -31,7 +31,11 @@ export const WaitState = ({ id, onStart }) => {
           alert("Code Copied to clipboard");
       };
     
-
+    const isHost = useStore(state => state.hostname)
+    let hostUser;
+    if (isHost.length > 0){
+        hostUser = "admin";
+    }
     return(
         <div className="waitState">
             <h1>OTTOMH</h1>
@@ -47,7 +51,8 @@ export const WaitState = ({ id, onStart }) => {
                 <PlayerList />
             </div>
             <div className="d-flex justify-content flex-column align-items-center gap-3">
-                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button>
+            {hostUser === "admin" ?
+                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button> : null }
                 <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>
