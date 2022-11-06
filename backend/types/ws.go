@@ -16,10 +16,11 @@ var timeout = 5 * time.Second // Time between pongs before ws declared dead
 // The WebSocket wrapper provides channel-based messag reading
 // from the WebSocket, and a convenient Ping / Pong.
 type WebSocket struct {
-	ws      *websocket.Conn
-	r       chan string
-	muAlive sync.Mutex
-	isAlive bool
+	ws        *websocket.Conn
+	r         chan string
+	writeLock sync.Mutex
+	muAlive   sync.Mutex
+	isAlive   bool
 }
 
 func (ws *WebSocket) Close() {
@@ -71,7 +72,13 @@ func (ws *WebSocket) IsAlive() bool {
 }
 
 // Write a message over the web socket.
-// TODO: writes can be blocking; how do we handle writes without
+// TODO: writes can be blocking; how do we handle writes without blocking?
+func (ws *WebSocket) WriteMessage(m string) error {
+	ws.writeLock.Lock()
+	defer ws.writeLock.Unlock()
+	err := ws.ws.WriteMessage(websocket.TextMessage, []byte(m))
+	return err
+}
 
 func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*WebSocket, error) {
 	g_ws, err := upgrader.Upgrade(w, r, responseHeader)
@@ -80,10 +87,11 @@ func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.H
 	}
 
 	ws := &WebSocket{
-		ws:      g_ws,
-		r:       make(chan string, 10),
-		muAlive: sync.Mutex{},
-		isAlive: true,
+		ws:        g_ws,
+		r:         make(chan string, 10),
+		writeLock: sync.Mutex{},
+		muAlive:   sync.Mutex{},
+		isAlive:   true,
 	}
 
 	go ws.readCycle()

@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
 // A "Lobby" represents a game that is currently open or running.
@@ -44,6 +43,9 @@ func (l *Lobby) lifecycle() {
 				if err == nil {
 					// Handle messages here!
 					log.Print("Recieved message from WebSocket: ", m)
+					if err := ws.WriteMessage(m); err != nil {
+						log.Print("Error write message to WebSocket: ", err)
+					}
 				}
 			}
 		}
@@ -61,31 +63,5 @@ func (l *Lobby) acceptWebSocket(c *gin.Context) error {
 	// Append new Socket
 	l.addSocketChan <- ws
 
-	// go l.handleWebSocket(ws.ws)
-
 	return nil
-}
-
-// Internal function that maintains the WebSocket, responding
-// to message as they appear
-func (l *Lobby) handleWebSocket(ws *websocket.Conn) {
-	defer ws.Close()
-
-	for {
-		log.Print("Polling...")
-
-		mt, message, err := ws.ReadMessage()
-		if err != nil {
-			log.Print("Error reading over web socket: ", err)
-			return
-		}
-
-		log.Print("Echoing message: ", string(message[:]))
-
-		err = ws.WriteMessage(mt, message)
-		if err != nil {
-			log.Print("Error writing over web socket: ", err)
-			return
-		}
-	}
 }
