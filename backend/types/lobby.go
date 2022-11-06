@@ -7,8 +7,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
-
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
 	ID string
@@ -22,12 +20,12 @@ func makeLobby(ID string) (Lobby, error) {
 // Tries to open a WebSocket with the given context
 func (l *Lobby) acceptWebSocket(c *gin.Context) error {
 	// First, "upgrade" the HTTP connection to a WebSocket connection
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	ws, err := MakeWebSocket(c.Writer, c.Request, nil)
 	if err != nil {
 		return err
 	}
 
-	go l.handleWebSocket(ws)
+	go l.handleWebSocket(ws.ws)
 
 	return nil
 }
