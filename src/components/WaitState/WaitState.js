@@ -8,21 +8,6 @@ export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
 
-    let ws;
-
-    if (window.location.protocol === 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
-    } else {
-        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
-    }
-
-    ws.onopen = (_) => {
-        alert("websocket is open now");
-    }
-
-    ws.onclose = (_) => {
-        alert("websocket is closed now");
-    }
 
     const copyToClipBoard = async copyMe => {
           await navigator.clipboard.writeText(copyMe);
