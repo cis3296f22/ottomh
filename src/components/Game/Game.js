@@ -7,7 +7,7 @@ import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import {useState } from "react";
 
-export const Game = ({onTimeover, cat, letter}) => {
+export const Game = ({onTimeover, cat, letter, ws}) => {
     const [isLoading, setLoading] = useState(true);
 
     async function handleSubmit(e) {
@@ -16,6 +16,10 @@ export const Game = ({onTimeover, cat, letter}) => {
         alert(`Answer submitted: ${answer}`);
         //send answer here
         document.getElementById("input-answer").value = '';
+    }
+
+    ws.onmessage= (e) => {
+        alert("message received: " + e.data);
     }
     
 
