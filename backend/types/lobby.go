@@ -41,12 +41,14 @@ func (l *Lobby) lifecycle() {
 			ws := l.sockets[i]
 			if ws.IsAlive() { // If WebSocket is still active, read from it
 				m, err := ws.ReadMessage()
-				if err == nil {
+				if err == nil { // If a message is currently available
 					// Handle messages here!
 					log.Print("Recieved message from WebSocket: ", m)
 					if err := ws.WriteMessage(m); err != nil {
-						log.Print("Error write message to WebSocket: ", err)
+						log.Print("Error writing message to WebSocket: ", err)
 					}
+				} else { // Else, there is no message, so ping to keep it alive
+					go ws.Ping()
 				}
 
 				i += 1

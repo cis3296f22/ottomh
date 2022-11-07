@@ -38,7 +38,7 @@ func (ws *WebSocket) Close() {
 // Right now, we assume all messages are text.
 func (ws *WebSocket) readCycle() {
 	for {
-		_, message, err := ws.ws.ReadMessage()
+		mt, message, err := ws.ws.ReadMessage()
 		if err != nil {
 			log.Print("Error reading over web socket: ", err)
 
@@ -48,7 +48,10 @@ func (ws *WebSocket) readCycle() {
 			return
 		}
 
-		ws.r <- string(message)
+		// Add text messages to the channel
+		if mt == websocket.TextMessage {
+			ws.r <- string(message)
+		}
 	}
 }
 
@@ -78,6 +81,14 @@ func (ws *WebSocket) WriteMessage(m string) error {
 	defer ws.writeLock.Unlock()
 	err := ws.ws.WriteMessage(websocket.TextMessage, []byte(m))
 	return err
+}
+
+// Send a quick message to the WebSocket to keep it alive.
+// The readCycle will detect a missed Pong, and close the socket accordingly.
+func (ws *WebSocket) Ping() {
+	ws.writeLock.Lock()
+	defer ws.writeLock.Unlock()
+	ws.ws.WriteMessage(websocket.PingMessage, []byte("keepalive"))
 }
 
 func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*WebSocket, error) {
