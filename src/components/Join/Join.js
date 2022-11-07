@@ -11,8 +11,9 @@ export const Join = ({ isCreate, onBackClick }) => {
     const inputCodeRef = useRef(); // get HTML DOM reference to the input box for the lobby code
     const inputNameRef = useRef(); // get HTML DOM reference to the input box for the username
     const inputHostNameRef = useRef();
-    const [setLobbyId, setUsername, setHostname] = useStore((state) => (
-        [state.setLobbyId, state.setUsername, state.setHostname]
+    const [setLobbyId, setUsername, setHostname, ws, setWs] = useStore((state) => (
+        [state.setLobbyId, state.setUsername, state.setHostname, 
+            state.socket, state.setSocket]
     ));
     // when the component loads, immediately focus on the lobby code input box so that user can type immediately
     // useEffect(() => {
@@ -59,6 +60,16 @@ export const Join = ({ isCreate, onBackClick }) => {
 
         // set state and go to waiting room
         setLobbyId(lobbyId);
+
+        // if the web socket does not already exist, open it
+        if (!ws) {
+            if (window.location.protocol === 'https:') {
+                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}`));
+            } else {
+                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}`));
+            }
+        }
+
         navigate(`/lobbies/${lobbyId}`);
     }
 
