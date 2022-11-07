@@ -41,5 +41,20 @@ func main() {
 	// Catch-all route to work nicely with react-router
 	r.GET("/:path", routes.IndexHandler)
 
+	// DEBUG code: to profile this server:
+	// Add the following imports:
+	// "log"
+	// "net/http"
+	// _ "net/http/pprof"
+	//
+	// Uncomment these lines:
+	// go func() {
+	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
+	//
+	// And use one of the following:
+	// go tool pprof localhost:6060/debug/pprof/heap  # for memory
+	// go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30  # for cpu
+
 	r.Run(":" + port)
 }

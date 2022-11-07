@@ -48,7 +48,7 @@ func (l *Lobby) lifecycle() {
 						log.Print("Error writing message to WebSocket: ", err)
 					}
 				} else { // Else, there is no message, so ping to keep it alive
-					go ws.Ping()
+					ws.Ping()
 				}
 
 				i += 1
