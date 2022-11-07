@@ -37,8 +37,9 @@ func (l *Lobby) lifecycle() {
 
 		// Loop over sockets, checking each for messages
 	LOOP:
-		for _, ws := range l.sockets {
-			if ws.IsAlive() {
+		for i := 0; i < len(l.sockets); {
+			ws := l.sockets[i]
+			if ws.IsAlive() { // If WebSocket is still active, read from it
 				m, err := ws.ReadMessage()
 				if err == nil {
 					// Handle messages here!
@@ -47,6 +48,13 @@ func (l *Lobby) lifecycle() {
 						log.Print("Error write message to WebSocket: ", err)
 					}
 				}
+
+				i += 1
+			} else { // Otherwise, remove the WebSocket from slice
+				// Remove element at i in constant time by overwriting with
+				// last element in the slice.
+				l.sockets[i] = l.sockets[len(l.sockets)-1]
+				l.sockets = l.sockets[:len(l.sockets)-1]
 			}
 		}
 	}
