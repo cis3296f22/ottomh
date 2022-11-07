@@ -6,7 +6,8 @@ import { WaitState, Game, Scores, Voting } from "../";
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
     const [stage, setStage] = useState("waitingRoom");
-    const [ws, setUserlist] = useStore((state) => [state.socket, state.setUserlist]);
+    const [ws, username, hostname, setHostname, setUserlist] = useStore(
+        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist]);
     
     const category = [
         "Food",
@@ -42,6 +43,15 @@ export const LobbyPage = () => {
 
     ws.onopen = (_) => {
         alert("websocket is open now");
+
+        // Send username to websocket
+        const packetObject = {
+            event: "adduser",
+            username: username,
+            hostname: hostname,
+        }
+        const packetString = JSON.stringify(packetObject);
+        ws.send(packetString);
 
         // DEV ONLY: set list when web socket opens to prevent infinite sets
         setUserlist(userList);

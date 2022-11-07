@@ -31,6 +31,7 @@ export const Join = ({ isCreate, onBackClick }) => {
             let fetchUrl;
             username = inputHostNameRef.current.value;
             setHostname(username);
+            setUsername(username);
             // send a request to the server to create a new lobby
             if (window.location.protocol === 'https:') {
                 fetchUrl = `https://${window.location.host}/CreateLobby`;
