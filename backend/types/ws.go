@@ -35,7 +35,7 @@ func (ws *WebSocket) Close() {
 // an issue in the gorilla websockets API: reads are blocking. So, we
 // cannot have the Lobby read from each thread as one inactive WebSocket could
 // block the whole program.
-// Right now, we assume all messages are test.
+// Right now, we assume all messages are text.
 func (ws *WebSocket) readCycle() {
 	for {
 		_, message, err := ws.ws.ReadMessage()
