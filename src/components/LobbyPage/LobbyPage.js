@@ -6,7 +6,7 @@ import { WaitState, Game, Scores, Voting } from "../";
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
     const [stage, setStage] = useState("waitingRoom");
-    const ws = useStore((state) => state.socket);
+    const [ws, setUserlist] = useStore((state) => [state.socket, state.setUserlist]);
     
     const category = [
         "Food",
@@ -18,8 +18,33 @@ export const LobbyPage = () => {
     let cat = category[Math.floor(Math.random() * category.length)];
     let letter = characters[Math.floor(Math.random() * characters.length)];
 
+    const userList = [
+        "pikachu",
+        "bulbasaur",
+        "meowth",
+        "charzard",
+        "puppycat",
+        "shiba inu",
+        "raven",
+        "beastboy",
+        "batman",
+        "superman",
+        "john doe",
+        "jane doe",
+        "seraphina",
+        "august",
+        "odette",
+        "perry",
+        "coconut",
+        "strawberry",
+        "peach"
+    ];
+
     ws.onopen = (_) => {
         alert("websocket is open now");
+
+        // DEV ONLY: set list when web socket opens to prevent infinite sets
+        setUserlist(userList);
     }
 
     ws.onclose = (_) => {

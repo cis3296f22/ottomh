@@ -8,10 +8,12 @@ export const useStore = create(
             username: '',
             lobbyId: '',
             socket: '',
+            userlist: [],
             setHostname: (name) => set(() => ({ hostname: name })),
             setUsername: (name) => set(() => ({ username: name })),
             setLobbyId: (id) => set(() => ({ lobbyId: id })),
             setSocket: (s) => set(() => ({ socket: s })),
+            setUserlist: (list) => set(() => ({ userlist: list})),
             clearStore: () => set(() => (
                 {
                     hostname:"",
