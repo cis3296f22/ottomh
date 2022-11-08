@@ -30,7 +30,7 @@ func makeLobby(ID string) (*Lobby, error) {
 func (l *Lobby) lifecycle() {
 	// Loop over sockets, checking each for messages
 	for {
-		for _, socket := range l.userList.sockets {
+		for _, socket := range l.userList.GetSocketList() {
 			if socket.IsAlive() { // If WebSocket is still active, read from it
 				m, err := socket.ReadMessage()
 				if err == nil { // If a message is currently available
