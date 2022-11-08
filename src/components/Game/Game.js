@@ -6,9 +6,20 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import {useState } from "react";
+import { useStore } from "../../store";
 
-export const Game = ({onTimeover, cat, letter, ws}) => {
-    const [isLoading, setLoading] = useState(true);
+export const Game = ({onTimeover, cat, letter}) => {
+    const [isLoading, _setLoading] = useState(true);
+    const ws = useStore((state) => state.socket);
+
+    const setLoading = (loading) => {
+        // If the timer has ended
+        if (!loading) {
+            ws.send(JSON.stringify({Event: 'endround'}));
+        }
+        
+        _setLoading(loading);
+    }
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -17,11 +28,6 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
         //send answer here
         document.getElementById("input-answer").value = '';
     }
-
-    ws.onmessage= (e) => {
-        alert("message received: " + e.data);
-    }
-    
 
     if (isLoading) {
     return(

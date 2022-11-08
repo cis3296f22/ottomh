@@ -45,6 +45,16 @@ func (l *Lobby) lifecycle() {
 
 					// Handle messages here!
 					switch packetIn.Event {
+					case "endround":
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "endround",
+						})
+						l.userList.MessageAll(packetOut)
+					case "endvoting":
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "endvoting",
+						})
+						l.userList.MessageAll(packetOut)
 					case "begingame":
 						// Select a random category and letter
 						cat_i := rand.Intn(len(config.Categories))

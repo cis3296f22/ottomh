@@ -2,10 +2,13 @@ import './votingStyles.css';
 import { Container, Row, ListGroup } from 'react-bootstrap';
 import { GamePageTimer } from '../';
 import { useState } from 'react';
+import { useStore } from "../../store";
 
 export const Voting = ({onTimeover, words}) => {
+    const ws = useStore((state) => state.socket);
+
     let onTimerStop = (_) => {
-        onTimeover();
+        ws.send(JSON.stringify({Event: "endvoting"}))
     }
 
     // Create an array of boolean that stores whether or not a word is crossed
