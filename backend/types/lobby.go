@@ -3,7 +3,10 @@ package types
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
+	"time"
 
+	"github.com/cis3296f22/ottomh/backend/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,6 +18,9 @@ type Lobby struct {
 
 // Initializes a new Lobby with a unique ID
 func makeLobby(ID string) (*Lobby, error) {
+	// For generating random numbers, we start by seeding rand
+	rand.Seed(int64(time.Now().Second()))
+
 	l := &Lobby{
 		ID: ID,
 		userList: UserList{
@@ -40,9 +46,17 @@ func (l *Lobby) lifecycle() {
 					// Handle messages here!
 					switch packetIn.Event {
 					case "begingame":
+						// Select a random category and letter
+						cat_i := rand.Intn(len(config.Categories))
+						category := config.Categories[cat_i]
+						// Recall that A has a byte value of 65, and there are 26 letters
+						letter := string(byte(rand.Intn(26) + 65))
+
 						// Tell all sockets to start the game
 						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event": "begingame",
+							"Event":    "begingame",
+							"Category": category,
+							"Letter":   letter,
 						})
 						l.userList.MessageAll(packetOut)
 					default:
