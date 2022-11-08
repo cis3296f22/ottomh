@@ -39,6 +39,12 @@ func (l *Lobby) lifecycle() {
 
 					// Handle messages here!
 					switch packetIn.Event {
+					case "begingame":
+						// Tell all sockets to start the game
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "begingame",
+						})
+						l.userList.MessageAll(packetOut)
 					default:
 						log.Print("Recieved message from WebSocket: ", m)
 						if err := socket.WriteMessage(m); err != nil {
