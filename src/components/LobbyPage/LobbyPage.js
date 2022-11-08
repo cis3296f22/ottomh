@@ -29,6 +29,10 @@ export const LobbyPage = () => {
                 case "updateusers":
                     setUserlist(packetObject.List);
                     setHostname(packetObject.Host);
+                    break;
+                case "begingame":
+                    setStage("playGame")
+                    break;
                 default:
                     console.log(`Received data from backend: ${event.data}`);
             }
