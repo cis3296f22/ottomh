@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -8,14 +9,18 @@ import (
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	addSocketChan chan *WebSocket
-	ID            string
-	sockets       []*WebSocket // Do not modify directly; instead send new sockets to `addSocketChan`
+	ID       string
+	userList UserList
 }
 
 // Initializes a new Lobby with a unique ID
 func makeLobby(ID string) (*Lobby, error) {
-	l := &Lobby{addSocketChan: make(chan *WebSocket, 5), ID: ID}
+	l := &Lobby{
+		ID: ID,
+		userList: UserList{
+			sockets: make(map[string]*WebSocket),
+		},
+	}
 	go l.lifecycle()
 	return l, nil
 }
@@ -23,45 +28,52 @@ func makeLobby(ID string) (*Lobby, error) {
 // This forever-loop continuosly checks WebSockets for messages from
 // the client, and responds to those messages.
 func (l *Lobby) lifecycle() {
+	// Loop over sockets, checking each for messages
 	for {
-		// If there new WebSockets, add them to the list
-		for {
-			select {
-			case ws := <-l.addSocketChan:
-				l.sockets = append(l.sockets, ws)
-			default:
-				// Need to use goto to break out of for-loop
-				goto LOOP
-			}
-		}
+		for _, socket := range l.userList.sockets {
+			if socket.IsAlive() { // If WebSocket is still active, read from it
+				m, err := socket.ReadMessage()
+				if err == nil { // If a message is currently available
+					var packetIn WSPacket
+					json.Unmarshal(m, &packetIn)
 
-		// Loop over sockets, checking each for messages
-	LOOP:
-		for _, ws := range l.sockets {
-			if ws.IsAlive() {
-				m, err := ws.ReadMessage()
-				if err == nil {
 					// Handle messages here!
-					log.Print("Recieved message from WebSocket: ", m)
-					if err := ws.WriteMessage(m); err != nil {
-						log.Print("Error write message to WebSocket: ", err)
+					switch packetIn.Event {
+					default:
+						log.Print("Recieved message from WebSocket: ", m)
+						if err := socket.WriteMessage(m); err != nil {
+							log.Print("Error writing message to WebSocket: ", err)
+						}
 					}
+				} else { // Else, there is no message, so ping to keep it alive
+					socket.Ping()
 				}
 			}
 		}
 	}
 }
 
+// Checks a few conditions on `username`:
+// 1. `username` must not already exits
+// 2. `l` must not be full according to game settings
+func (l *Lobby) ValidateUsername(username string) error {
+	return nil
+}
+
 // Tries to open a WebSocket with the given context
-func (l *Lobby) acceptWebSocket(c *gin.Context) error {
+func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) error {
 	// First, "upgrade" the HTTP connection to a WebSocket connection
 	ws, err := MakeWebSocket(c.Writer, c.Request, nil)
 	if err != nil {
 		return err
 	}
 
+	log.Print("Adding user ", username)
+
 	// Append new Socket
-	l.addSocketChan <- ws
+	l.userList.AddSocket(username, ws, host)
+
+	log.Print("Added user ", username)
 
 	return nil
 }

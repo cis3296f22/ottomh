@@ -11,8 +11,9 @@ export const Join = ({ isCreate, onBackClick }) => {
     const inputCodeRef = useRef(); // get HTML DOM reference to the input box for the lobby code
     const inputNameRef = useRef(); // get HTML DOM reference to the input box for the username
     const inputHostNameRef = useRef();
-    const [setLobbyId, setUsername, setHostname] = useStore((state) => (
-        [state.setLobbyId, state.setUsername, state.setHostname]
+    const [setLobbyId, setUsername, setHostname, ws, setWs] = useStore((state) => (
+        [state.setLobbyId, state.setUsername, state.setHostname, 
+            state.socket, state.setSocket]
     ));
     // when the component loads, immediately focus on the lobby code input box so that user can type immediately
     // useEffect(() => {
@@ -24,12 +25,14 @@ export const Join = ({ isCreate, onBackClick }) => {
         e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
         let lobbyId;
         let username;
+        let host = ""; // If we know the host, add it to the URL
         
         // get lobby id either from the server or the input box
         if (isCreate) { // get lobby id from server
             let fetchUrl;
             username = inputHostNameRef.current.value;
             setHostname(username);
+            setUsername(username);
             // send a request to the server to create a new lobby
             if (window.location.protocol === 'https:') {
                 fetchUrl = `https://${window.location.host}/CreateLobby`;
@@ -46,19 +49,27 @@ export const Join = ({ isCreate, onBackClick }) => {
                 let tempArray = data.url.split('/'); // turn the data url into an array of strings
                 lobbyId = tempArray[tempArray.length - 1]; // get the lobby id from array
             }
+
+            host = username
         } else { // get lobby id from input box
             lobbyId = inputCodeRef.current.value;
             username = inputNameRef.current.value;
             setUsername(username);
         }
 
-        fetch(`http://${window.location.host}/GetNames`, {
-            method: "POST",
-            body: JSON.stringify({username})
-        }) 
-
         // set state and go to waiting room
         setLobbyId(lobbyId);
+
+
+        // if the web socket does not already exist, open it
+        if (!ws) {
+            if (window.location.protocol === 'https:') {
+                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}?username=${username}&host=${host}`));
+            } else {
+                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}?username=${username}&host=${host}`));
+            }
+        }
+
         navigate(`/lobbies/${lobbyId}`);
     }
 
