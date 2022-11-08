@@ -3,6 +3,7 @@ import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import Modal from 'react-bootstrap/Modal';
 import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import {useState } from "react";
@@ -14,6 +15,9 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
     const hostPlayer = useStore(state => state.hostname)
     const player = useStore(state => state.username)
     const { lobbyId } = useParams();
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     let currentPlayer;
     if (hostPlayer.length > 0){
         currentPlayer = hostPlayer
@@ -58,9 +62,26 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
     return(
         <div className="game">
             <div>
-                <h2>
+                <Button variant="outline-info" onClick={handleShow}>
+                    How to Play!
+                </Button>
+
+                <h2 className="title-h">
                     {cat} <Badge bg="secondary">{letter}</Badge>
                 </h2>
+
+                <Modal className="instruction-popup" show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>INFO</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    </Modal.Footer>
+                </Modal>
+
                 <Form onSubmit={handleSubmit}>
                     <InputGroup>
                         <Form.Control
