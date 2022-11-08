@@ -6,18 +6,10 @@ import { WaitState, Game, Scores, Voting } from "../";
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
     const [stage, setStage] = useState("waitingRoom");
+    const [cat, setCat] = useState("");
+    const [letter, setLetter] = useState("");
     const [ws, username, hostname, setHostname, setUserlist] = useStore(
         (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist]);
-    
-    const category = [
-        "Food",
-        "Animal",
-        "Game",
-        "Tech"
-    ];
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let cat = category[Math.floor(Math.random() * category.length)];
-    let letter = characters[Math.floor(Math.random() * characters.length)];
 
     ws.onopen = (_) => {
         alert("websocket is open now");
@@ -31,7 +23,10 @@ export const LobbyPage = () => {
                     setHostname(packetObject.Host);
                     break;
                 case "begingame":
-                    setStage("playGame")
+                    // 3 state sets, one re-render by React batching
+                    setCat(packetObject.Category);
+                    setLetter(packetObject.Letter)
+                    setStage("playGame");
                     break;
                 default:
                     console.log(`Received data from backend: ${event.data}`);
