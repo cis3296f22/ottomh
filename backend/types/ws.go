@@ -10,6 +10,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// This struct is used to hold data recieved over web sockets
+type WSPacket struct {
+	Event string
+	Data  string
+}
+
 var upgrader = websocket.Upgrader{}
 var timeout = 5 * time.Second // Time between pongs before ws declared dead
 
@@ -17,7 +23,7 @@ var timeout = 5 * time.Second // Time between pongs before ws declared dead
 // from the WebSocket, and a convenient Ping / Pong.
 type WebSocket struct {
 	ws        *websocket.Conn
-	r         chan string
+	r         chan []byte
 	writeLock sync.Mutex
 	muAlive   sync.Mutex
 	isAlive   bool
@@ -50,19 +56,19 @@ func (ws *WebSocket) readCycle() {
 
 		// Add text messages to the channel
 		if mt == websocket.TextMessage {
-			ws.r <- string(message)
+			ws.r <- message
 		}
 	}
 }
 
 // Try to read a message from the web socket. If no message is available,
 // it returns an error.
-func (ws *WebSocket) ReadMessage() (string, error) {
+func (ws *WebSocket) ReadMessage() ([]byte, error) {
 	select {
 	case m := <-ws.r:
 		return m, nil
 	default:
-		return "", errors.New("No message in queue")
+		return []byte(""), errors.New("No message in queue")
 	}
 }
 
@@ -76,10 +82,10 @@ func (ws *WebSocket) IsAlive() bool {
 
 // Write a message over the web socket.
 // TODO: writes can be blocking; how do we handle writes without blocking?
-func (ws *WebSocket) WriteMessage(m string) error {
+func (ws *WebSocket) WriteMessage(m []byte) error {
 	ws.writeLock.Lock()
 	defer ws.writeLock.Unlock()
-	err := ws.ws.WriteMessage(websocket.TextMessage, []byte(m))
+	err := ws.ws.WriteMessage(websocket.TextMessage, m)
 	return err
 }
 
@@ -99,7 +105,7 @@ func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.H
 
 	ws := &WebSocket{
 		ws:        g_ws,
-		r:         make(chan string, 10),
+		r:         make(chan []byte, 10),
 		writeLock: sync.Mutex{},
 		muAlive:   sync.Mutex{},
 		isAlive:   true,

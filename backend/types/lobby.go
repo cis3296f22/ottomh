@@ -1,7 +1,9 @@
 package types
 
 import (
+	"encoding/json"
 	"log"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +12,10 @@ import (
 type Lobby struct {
 	addSocketChan chan *WebSocket
 	ID            string
+	socketsMu     sync.Mutex
 	sockets       []*WebSocket // Do not modify directly; instead send new sockets to `addSocketChan`
+	_users        []string
+	host          string
 }
 
 // Initializes a new Lobby with a unique ID
@@ -18,6 +23,14 @@ func makeLobby(ID string) (*Lobby, error) {
 	l := &Lobby{addSocketChan: make(chan *WebSocket, 5), ID: ID}
 	go l.lifecycle()
 	return l, nil
+}
+
+// Helper function for lifecycle() that sends a message to all websockets.
+// Must acquire `socketsMu` before using.
+func (l *Lobby) _writeAll(m []byte) {
+	for _, socket := range l.sockets {
+		socket.WriteMessage(m)
+	}
 }
 
 // This forever-loop continuosly checks WebSockets for messages from
@@ -28,7 +41,9 @@ func (l *Lobby) lifecycle() {
 		for {
 			select {
 			case ws := <-l.addSocketChan:
+				l.socketsMu.Lock()
 				l.sockets = append(l.sockets, ws)
+				l.socketsMu.Unlock()
 			default:
 				// Need to use goto to break out of for-loop
 				goto LOOP
@@ -37,15 +52,45 @@ func (l *Lobby) lifecycle() {
 
 		// Loop over sockets, checking each for messages
 	LOOP:
+		l.socketsMu.Lock()
 		for i := 0; i < len(l.sockets); {
 			ws := l.sockets[i]
 			if ws.IsAlive() { // If WebSocket is still active, read from it
 				m, err := ws.ReadMessage()
 				if err == nil { // If a message is currently available
+					var packetIn WSPacket
+					json.Unmarshal(m, &packetIn)
+
+					log.Println(m)
+					log.Println(packetIn.Event, packetIn.Data)
+
 					// Handle messages here!
-					log.Print("Recieved message from WebSocket: ", m)
-					if err := ws.WriteMessage(m); err != nil {
-						log.Print("Error writing message to WebSocket: ", err)
+					switch packetIn.Event {
+					case "adduser":
+						if len(packetIn.Data) > 0 {
+							l._users = append(l._users, packetIn.Data)
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "updateusers",
+								"List":  l._users,
+								"Host":  l.host,
+							})
+							l._writeAll(packetOut)
+						}
+					case "addhost":
+						if len(packetIn.Data) > 0 {
+							l.host = packetIn.Data
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "updateusers",
+								"List":  l._users,
+								"Host":  l.host,
+							})
+							l._writeAll(packetOut)
+						}
+					default:
+						log.Print("Recieved message from WebSocket: ", m)
+						if err := ws.WriteMessage(m); err != nil {
+							log.Print("Error writing message to WebSocket: ", err)
+						}
 					}
 				} else { // Else, there is no message, so ping to keep it alive
 					ws.Ping()
@@ -59,6 +104,7 @@ func (l *Lobby) lifecycle() {
 				l.sockets = l.sockets[:len(l.sockets)-1]
 			}
 		}
+		l.socketsMu.Unlock()
 	}
 }
 

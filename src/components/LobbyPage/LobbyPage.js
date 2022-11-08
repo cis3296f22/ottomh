@@ -45,16 +45,19 @@ export const LobbyPage = () => {
         alert("websocket is open now");
 
         // Send username to websocket
-        const packetObject = {
-            event: "adduser",
-            username: username,
-            hostname: hostname,
+        ws.send(JSON.stringify({Event: "adduser", Data: username}));
+
+        // If we have the hostname, send it to the websocket
+        if (hostname) {
+            ws.send(JSON.stringify({Event: "addhost", Data: hostname}));
         }
-        const packetString = JSON.stringify(packetObject);
-        ws.send(packetString);
 
         // DEV ONLY: set list when web socket opens to prevent infinite sets
         setUserlist(userList);
+    }
+
+    ws.onmessage = (event) => {
+        console.log(`Received data from backend: ${event.data}`);
     }
 
     ws.onclose = (_) => {
