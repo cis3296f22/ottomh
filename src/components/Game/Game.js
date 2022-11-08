@@ -24,7 +24,6 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
     async function handleSubmit(e) {
         e.preventDefault();
         let answer = document.getElementById("input-answer").value;
-        // alert(`Answer submitted: ${answer}`);
         //send answer here
         document.getElementById("input-answer").value = '';
 
@@ -38,8 +37,12 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
         })
         if (response.status === 200) {
             let all_answers = await response.json();
-            alert(`Answer submitted and captured: ${answer}`);           
-            // console.log("List of stored answers ", all_answers["Submissions"]) //list of all the lobbyid, user name, and answers given 
+
+            if(all_answers["Submissions"] === true) {
+                alert(`Accepted; Word submitted: [\"${answer}\"]`);   
+            }  else{
+                alert(`Rejected: Word ["${answer}"] already given`); 
+            }
         }
              
         
