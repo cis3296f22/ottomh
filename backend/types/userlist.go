@@ -1,38 +1,41 @@
 package types
 
-import "sync"
+import (
+	"encoding/json"
+	"sync"
+)
 
 // A WebSocket and its username is very closely related, so we
-// store them in a collection together in a transpartent manner.
+// store them in a collection together in a transparent manner.
 type UserList struct {
-	userMu sync.Mutex
-	users  []*User
-	host   string
+	mu      sync.Mutex
+	sockets map[string]*WebSocket
+	host    string
 }
 
-func (ul *UserList) AddSocket(ws *WebSocket) {
-	ul.userMu.Lock()
-	defer ul.userMu.Unlock()
-	user := &User{socket: ws}
-	ul.users = append(ul.users, user)
+func (ul *UserList) AddSocket(username string, ws *WebSocket) {
+	ul.mu.Lock()
+	ul.sockets[username] = ws
+	ul.mu.Unlock()
+
+	// Inform all sockets a new user has been added
+	packetOut, _ := json.Marshal(map[string]interface{}{
+		"Event": "updateusers",
+		"List":  ul.GetUsernameList(),
+		"Host":  ul.GetHost(),
+	})
+	ul.MessageAll(packetOut)
 }
 
-func (ul *UserList) GetUsers() []*User {
-	ul.userMu.Lock()
-	defer ul.userMu.Unlock()
-	// Create a copy of the slice for easier sync
-	return ul.users[:]
+func (ul *UserList) ContainsUser(search string) bool {
+	_, exists := ul.sockets[search]
+	return exists
 }
 
 func (ul *UserList) GetUsernameList() []string {
-	ul.userMu.Lock()
-	defer ul.userMu.Unlock()
 	unameList := make([]string, 0)
-	for _, user := range ul.users {
-		name := user.name
-		if len(name) > 0 {
-			unameList = append(unameList, name)
-		}
+	for username := range ul.sockets {
+		unameList = append(unameList, username)
 	}
 	return unameList
 }
@@ -50,38 +53,7 @@ func (ul *UserList) SetInactive(index int) {
 }
 
 func (ul *UserList) MessageAll(m []byte) {
-	users := ul.GetUsers()
-	for _, user := range users {
-		user.WriteMessage(m)
+	for _, socket := range ul.sockets {
+		socket.WriteMessage(m)
 	}
-}
-
-// The User wrapper class, on top of our WebSocket wrapper class (I just love wrapper classes)
-// maps each websocket to a username, allowing for users to reconnect.
-type User struct {
-	mu     sync.Mutex
-	socket *WebSocket
-	name   string
-}
-
-func (u *User) IsAlive() bool {
-	return u.socket.IsAlive()
-}
-
-func (u *User) ReadMessage() ([]byte, error) {
-	return u.socket.ReadMessage()
-}
-
-func (u *User) WriteMessage(m []byte) error {
-	return u.socket.WriteMessage(m)
-}
-
-func (u *User) Ping() {
-	u.socket.Ping()
-}
-
-func (u *User) UpdateUsername(name string) {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-	u.name = name
 }

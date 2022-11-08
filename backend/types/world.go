@@ -65,7 +65,7 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 	// Get id from URL
 	id := c.Param("id")
 	if len(id) == 0 {
-		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id'"))
+		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
 		return
 	}
 
@@ -76,8 +76,19 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 		return
 	}
 
+	// Get username from URL and validate
+	username := c.Query("username")
+	if len(username) == 0 {
+		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
+		return
+	}
+	if err := lobby.ValidateUsername(username); err != nil {
+		c.Error(err)
+		return
+	}
+
 	// Try connect the Context to the Lobby
-	ok := lobby.acceptWebSocket(c)
+	ok := lobby.acceptWebSocket(c, username)
 	if ok != nil {
 		c.Error(ok)
 	}

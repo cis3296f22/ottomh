@@ -15,7 +15,12 @@ type Lobby struct {
 
 // Initializes a new Lobby with a unique ID
 func makeLobby(ID string) (*Lobby, error) {
-	l := &Lobby{ID: ID, userList: UserList{users: make([]*User, 0)}}
+	l := &Lobby{
+		ID: ID,
+		userList: UserList{
+			sockets: make(map[string]*WebSocket),
+		},
+	}
 	go l.lifecycle()
 	return l, nil
 }
@@ -25,9 +30,9 @@ func makeLobby(ID string) (*Lobby, error) {
 func (l *Lobby) lifecycle() {
 	// Loop over sockets, checking each for messages
 	for {
-		for i, user := range l.userList.GetUsers() {
-			if user.IsAlive() { // If WebSocket is still active, read from it
-				m, err := user.ReadMessage()
+		for _, socket := range l.userList.sockets {
+			if socket.IsAlive() { // If WebSocket is still active, read from it
+				m, err := socket.ReadMessage()
 				if err == nil { // If a message is currently available
 					var packetIn WSPacket
 					json.Unmarshal(m, &packetIn)
@@ -37,16 +42,6 @@ func (l *Lobby) lifecycle() {
 
 					// Handle messages here!
 					switch packetIn.Event {
-					case "adduser":
-						if len(packetIn.Data) > 0 {
-							user.UpdateUsername(packetIn.Data)
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "updateusers",
-								"List":  l.userList.GetUsernameList(),
-								"Host":  l.userList.GetHost(),
-							})
-							l.userList.MessageAll(packetOut)
-						}
 					case "addhost":
 						if len(packetIn.Data) > 0 {
 							l.userList.SetHost(packetIn.Data)
@@ -59,32 +54,39 @@ func (l *Lobby) lifecycle() {
 						}
 					default:
 						log.Print("Recieved message from WebSocket: ", m)
-						if err := user.WriteMessage(m); err != nil {
+						if err := socket.WriteMessage(m); err != nil {
 							log.Print("Error writing message to WebSocket: ", err)
 						}
 					}
 				} else { // Else, there is no message, so ping to keep it alive
-					user.Ping()
+					socket.Ping()
 				}
-
-				i += 1
-			} else { // Otherwise, remove the WebSocket from slice
-				l.userList.SetInactive(i)
 			}
 		}
 	}
 }
 
+// Checks a few conditions on `username`:
+// 1. `username` must not already exits
+// 2. `l` must not be full according to game settings
+func (l *Lobby) ValidateUsername(username string) error {
+	return nil
+}
+
 // Tries to open a WebSocket with the given context
-func (l *Lobby) acceptWebSocket(c *gin.Context) error {
+func (l *Lobby) acceptWebSocket(c *gin.Context, username string) error {
 	// First, "upgrade" the HTTP connection to a WebSocket connection
 	ws, err := MakeWebSocket(c.Writer, c.Request, nil)
 	if err != nil {
 		return err
 	}
 
+	log.Print("Adding user ", username)
+
 	// Append new Socket
-	l.userList.AddSocket(ws)
+	l.userList.AddSocket(username, ws)
+
+	log.Print("Added user ", username)
 
 	return nil
 }

@@ -22,24 +22,21 @@ export const LobbyPage = () => {
     ws.onopen = (_) => {
         alert("websocket is open now");
 
-        // Send username to websocket
-        ws.send(JSON.stringify({Event: "adduser", Data: username}));
+        ws.onmessage = (event) => {
+            const packet = event.data;
+            const packetObject = JSON.parse(packet);
+            switch (packetObject.Event) {
+                case "updateusers":
+                    setUserlist(packetObject.List);
+                    setHostname(packetObject.Host);
+                default:
+                    console.log(`Received data from backend: ${event.data}`);
+            }
+        }
 
-        // If we have the hostname, send it to the websocket
+        // If we have the hostname, inform the WebSocket
         if (hostname) {
             ws.send(JSON.stringify({Event: "addhost", Data: hostname}));
-        }
-    }
-
-    ws.onmessage = (event) => {
-        const packet = event.data;
-        const packetObject = JSON.parse(packet);
-        switch (packetObject.Event) {
-            case "updateusers":
-                setUserlist(packetObject.List);
-                setHostname(packetObject.Host);
-            default:
-                console.log(`Received data from backend: ${event.data}`);
         }
     }
 

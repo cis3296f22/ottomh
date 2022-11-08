@@ -54,20 +54,15 @@ export const Join = ({ isCreate, onBackClick }) => {
             setUsername(username);
         }
 
-        fetch(`http://${window.location.host}/GetNames`, {
-            method: "POST",
-            body: JSON.stringify({username})
-        }) 
-
         // set state and go to waiting room
         setLobbyId(lobbyId);
 
         // if the web socket does not already exist, open it
         if (!ws) {
             if (window.location.protocol === 'https:') {
-                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}`));
+                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}?username=${username}`));
             } else {
-                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}`));
+                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}?username=${username}`));
             }
         }
 
