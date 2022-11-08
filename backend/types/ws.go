@@ -17,7 +17,7 @@ type WSPacket struct {
 }
 
 var upgrader = websocket.Upgrader{}
-var timeout = 5 * time.Second // Time between pongs before ws declared dead
+var pingDelay = 5 * time.Second // Time between pings
 
 // The WebSocket wrapper provides channel-based messag reading
 // from the WebSocket, and a convenient Ping / Pong.
@@ -27,6 +27,7 @@ type WebSocket struct {
 	writeLock sync.Mutex
 	muAlive   sync.Mutex
 	isAlive   bool
+	lastPing  time.Time
 }
 
 func (ws *WebSocket) Close() {
@@ -92,9 +93,12 @@ func (ws *WebSocket) WriteMessage(m []byte) error {
 // Send a quick message to the WebSocket to keep it alive.
 // The readCycle will detect a missed Pong, and close the socket accordingly.
 func (ws *WebSocket) Ping() {
-	ws.writeLock.Lock()
-	defer ws.writeLock.Unlock()
-	ws.ws.WriteMessage(websocket.PingMessage, []byte("keepalive"))
+	// We only ping if the time since the last ping is long enough
+	if ws.lastPing.Sub(time.Now()) >= pingDelay {
+		ws.writeLock.Lock()
+		defer ws.writeLock.Unlock()
+		ws.ws.WriteMessage(websocket.PingMessage, []byte("keepalive"))
+	}
 }
 
 func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*WebSocket, error) {
@@ -109,6 +113,7 @@ func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.H
 		writeLock: sync.Mutex{},
 		muAlive:   sync.Mutex{},
 		isAlive:   true,
+		lastPing:  time.Now(),
 	}
 
 	go ws.readCycle()
