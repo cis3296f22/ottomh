@@ -183,3 +183,19 @@ import { MyComponent } from './components'
 All components will be in the `components` folder. Each component should have their own folders so we can keep all the related `.js` and `.css` files together.
 
 ![Screenshot 2022-10-28 191739](https://user-images.githubusercontent.com/44854928/198749476-1a03c36e-4104-4e07-b9f0-fedffb3ede52.png)
+
+## Handling WebSocket messages
+
+WebSocket messages are read from the WebSocket by a separate go thread that loops in the background, and these messages can be accesses by WebSocket.ReadMessage(). Messages sent over the WebSocket must follow a very specific format due to Go's static typing: messages should be a JSON string with two string fields: "Event" and "Data". To send a message in this format, refer to this example:
+
+```javascript
+ws.send(JSON.stringify({Event: "adduser", Data: username}));
+```
+
+This format should be sufficient for the basic messaging this app requires. 
+
+To add logic that handles one type of event, add a case to the switch statement at lobby.go:41. The lifecycle loop continuously checks each WebSocket for a message, and if there is a message, it is parsed into `packetIn`, so fields can be access with `packetIn.Event` and `packetIn.Data`. 
+
+Use `WebSocket.WriteMessage` to send responses over a WebSocket, or `UserList.MessageAll` to send a message to all WebSockets (for example: move to the next page).
+
+The `UserList` data structure provides a mapping between someone's username and their WebSocket, while managing corner cases for WebSockets such as users disconnecting / reconnecting (TODO). If you are to store some additional data, I recommend placing it in the Lobby struct and modifying it solely from the lifecycle function.
