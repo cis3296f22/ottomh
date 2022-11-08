@@ -19,28 +19,6 @@ export const LobbyPage = () => {
     let cat = category[Math.floor(Math.random() * category.length)];
     let letter = characters[Math.floor(Math.random() * characters.length)];
 
-    const userList = [
-        "pikachu",
-        "bulbasaur",
-        "meowth",
-        "charzard",
-        "puppycat",
-        "shiba inu",
-        "raven",
-        "beastboy",
-        "batman",
-        "superman",
-        "john doe",
-        "jane doe",
-        "seraphina",
-        "august",
-        "odette",
-        "perry",
-        "coconut",
-        "strawberry",
-        "peach"
-    ];
-
     ws.onopen = (_) => {
         alert("websocket is open now");
 
@@ -51,13 +29,18 @@ export const LobbyPage = () => {
         if (hostname) {
             ws.send(JSON.stringify({Event: "addhost", Data: hostname}));
         }
-
-        // DEV ONLY: set list when web socket opens to prevent infinite sets
-        setUserlist(userList);
     }
 
     ws.onmessage = (event) => {
-        console.log(`Received data from backend: ${event.data}`);
+        const packet = event.data;
+        const packetObject = JSON.parse(packet);
+        switch (packetObject.Event) {
+            case "updateusers":
+                setUserlist(packetObject.List);
+                setHostname(packetObject.Host);
+            default:
+                console.log(`Received data from backend: ${event.data}`);
+        }
     }
 
     ws.onclose = (_) => {
