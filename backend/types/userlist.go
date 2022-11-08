@@ -27,7 +27,7 @@ func (ul *UserList) GetUsers() []*User {
 func (ul *UserList) GetUsernameList() []string {
 	ul.userMu.Lock()
 	defer ul.userMu.Unlock()
-	unameList := make([]string, len(ul.users))
+	unameList := make([]string, 0)
 	for _, user := range ul.users {
 		name := user.name
 		if len(name) > 0 {

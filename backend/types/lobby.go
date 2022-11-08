@@ -15,7 +15,7 @@ type Lobby struct {
 
 // Initializes a new Lobby with a unique ID
 func makeLobby(ID string) (*Lobby, error) {
-	l := &Lobby{ID: ID}
+	l := &Lobby{ID: ID, userList: UserList{users: make([]*User, 0)}}
 	go l.lifecycle()
 	return l, nil
 }
