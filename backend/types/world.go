@@ -87,8 +87,11 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 		return
 	}
 
+	// Is the user the host
+	host := c.Query("host")
+
 	// Try connect the Context to the Lobby
-	ok := lobby.acceptWebSocket(c, username)
+	ok := lobby.acceptWebSocket(c, username, host)
 	if ok != nil {
 		c.Error(ok)
 	}

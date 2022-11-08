@@ -13,9 +13,12 @@ type UserList struct {
 	host    string
 }
 
-func (ul *UserList) AddSocket(username string, ws *WebSocket) {
+func (ul *UserList) AddSocket(username string, ws *WebSocket, host string) {
 	ul.mu.Lock()
 	ul.sockets[username] = ws
+	if len(host) != 0 { // If we have been given a new hostname
+		ul.host = username
+	}
 	ul.mu.Unlock()
 
 	// Inform all sockets a new user has been added
@@ -38,10 +41,6 @@ func (ul *UserList) GetUsernameList() []string {
 		unameList = append(unameList, username)
 	}
 	return unameList
-}
-
-func (ul *UserList) SetHost(host string) {
-	ul.host = host
 }
 
 func (ul *UserList) GetHost() string {

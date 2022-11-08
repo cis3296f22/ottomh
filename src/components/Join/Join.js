@@ -25,6 +25,7 @@ export const Join = ({ isCreate, onBackClick }) => {
         e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
         let lobbyId;
         let username;
+        let host = ""; // If we know the host, add it to the URL
         
         // get lobby id either from the server or the input box
         if (isCreate) { // get lobby id from server
@@ -48,6 +49,8 @@ export const Join = ({ isCreate, onBackClick }) => {
                 let tempArray = data.url.split('/'); // turn the data url into an array of strings
                 lobbyId = tempArray[tempArray.length - 1]; // get the lobby id from array
             }
+
+            host = username
         } else { // get lobby id from input box
             lobbyId = inputCodeRef.current.value;
             username = inputNameRef.current.value;
@@ -57,12 +60,13 @@ export const Join = ({ isCreate, onBackClick }) => {
         // set state and go to waiting room
         setLobbyId(lobbyId);
 
+
         // if the web socket does not already exist, open it
         if (!ws) {
             if (window.location.protocol === 'https:') {
-                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}?username=${username}`));
+                setWs(new WebSocket(`wss://${window.location.host}/sockets/${lobbyId}?username=${username}&host=${host}`));
             } else {
-                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}?username=${username}`));
+                setWs(new WebSocket(`ws://${window.location.host}/sockets/${lobbyId}?username=${username}&host=${host}`));
             }
         }
 

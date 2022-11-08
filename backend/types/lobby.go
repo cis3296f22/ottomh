@@ -37,21 +37,8 @@ func (l *Lobby) lifecycle() {
 					var packetIn WSPacket
 					json.Unmarshal(m, &packetIn)
 
-					log.Println(m)
-					log.Println(packetIn.Event, packetIn.Data)
-
 					// Handle messages here!
 					switch packetIn.Event {
-					case "addhost":
-						if len(packetIn.Data) > 0 {
-							l.userList.SetHost(packetIn.Data)
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "updateusers",
-								"List":  l.userList.GetUsernameList(),
-								"Host":  l.userList.GetHost(),
-							})
-							l.userList.MessageAll(packetOut)
-						}
 					default:
 						log.Print("Recieved message from WebSocket: ", m)
 						if err := socket.WriteMessage(m); err != nil {
@@ -74,7 +61,7 @@ func (l *Lobby) ValidateUsername(username string) error {
 }
 
 // Tries to open a WebSocket with the given context
-func (l *Lobby) acceptWebSocket(c *gin.Context, username string) error {
+func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) error {
 	// First, "upgrade" the HTTP connection to a WebSocket connection
 	ws, err := MakeWebSocket(c.Writer, c.Request, nil)
 	if err != nil {
@@ -84,7 +71,7 @@ func (l *Lobby) acceptWebSocket(c *gin.Context, username string) error {
 	log.Print("Adding user ", username)
 
 	// Append new Socket
-	l.userList.AddSocket(username, ws)
+	l.userList.AddSocket(username, ws, host)
 
 	log.Print("Added user ", username)
 
