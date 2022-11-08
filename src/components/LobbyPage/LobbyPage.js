@@ -44,9 +44,14 @@ export const LobbyPage = () => {
         alert("websocket is closed now");
     }
 
+    // Action for pressing the "Start" button while on the Waiting Page
+    const onStart = () => {
+        ws.send(JSON.stringify({Event: "begingame"}));
+    }
+
     return (
         <div className="container-fluid h-100">
-            {stage === "waitingRoom" && <WaitState onStart={() => setStage("playGame")} id={lobbyId} />}
+            {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
             {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} ws={ws}/>}
 
