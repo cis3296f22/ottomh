@@ -34,9 +34,9 @@ export const Game = ({onTimeover, cat, letter}) => {
         let response = await fetch(`http://${window.location.host}/GetAnswers`, {
             method: "POST",
             body: JSON.stringify({
-                currentPlayer: currentPlayer,
-                answer: answer,
-                lobbyId: lobbyId })
+                CurrentPlayer: currentPlayer,
+                Answer: answer,
+                LobbyId: lobbyId })
         })
         if (response.status === 200) {
             let all_answers = await response.json();

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -10,9 +11,14 @@ import (
 )
 
 type userWordsMap struct {
-	Mu sync.RWMutex 
-	m (map[string][]string)	
+	Mu sync.RWMutex
+	m  (map[string][]string)
+}
 
+type WordPacket struct {
+	CurrentPlayer string
+	Answer        string
+	LobbyID       string
 }
 
 func New() *userWordsMap {
@@ -23,43 +29,41 @@ func New() *userWordsMap {
 
 func (s *userWordsMap) mapSetter(someKey string, someValue string) {
 	s.Mu.Lock()
-	s.m[someKey] = append(s.m[someKey],someValue)
+	s.m[someKey] = append(s.m[someKey], someValue)
 	s.Mu.Unlock()
 }
 
+func (v *userWordsMap) UserWords(c *gin.Context) {
+	info, _ := ioutil.ReadAll(c.Request.Body) //captures body of json post
 
-func (v userWordsMap) UserWords(c *gin.Context) {
-	x, _ := ioutil.ReadAll(c.Request.Body)
-	info := string(x)	//captures body of json post
+	//tokenizing information sent from frontend
+	var packetIn WordPacket
+	json.Unmarshal(info, &packetIn)
 
-	//tokenizing information sent from frontend 
-	parts := strings.Split(info, ",")
-	username := strings.Split(parts[0], ":") 
-	entire_answer := strings.Split(parts[1], ":") 
-	answer := strings.Split(entire_answer[1], "}") 
-	entire_lobbyId := strings.Split(parts[2], ":")
-	lobbyId := strings.Split(entire_lobbyId[1], "}")
-	lobbyUser := lobbyId[0] +":"+ username[1]
+	username := packetIn.CurrentPlayer
+	answer := packetIn.Answer
+	lobbyId := packetIn.LobbyID
+	lobbyUser := lobbyId + ":" + username
 
 	//result will return False if we find duplicate submission in map
 	result := true
 	v.Mu.RLock()
 	returnedMap := v.m
-	for k, element := range returnedMap { 
+	for k, element := range returnedMap {
 		id := strings.Split(k, ":")
-		for i := range element{
-			if (lobbyId[0] == id[0] && answer[0] == element[i]){
+		for i := range element {
+			if lobbyId == id[0] && answer == element[i] {
 				result = false
 			}
 		}
-    }
+	}
 	v.Mu.RUnlock()
 
-	if (result) {
-		//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted 
-			v.mapSetter(lobbyUser, answer[0])
-		} 	
-	
+	if result {
+		//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted
+		v.mapSetter(lobbyUser, answer)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"Submissions": result,
 	})
