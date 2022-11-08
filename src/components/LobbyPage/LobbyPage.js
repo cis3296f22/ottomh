@@ -18,6 +18,12 @@ export const LobbyPage = () => {
             const packet = event.data;
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
+                case "endround":
+                    setStage("voting");
+                    break;
+                case "endvoting":
+                    setStage("scores");
+                    break;
                 case "updateusers":
                     setUserlist(packetObject.List);
                     setHostname(packetObject.Host);
@@ -52,7 +58,7 @@ export const LobbyPage = () => {
         <div className="container-fluid h-100">
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
-            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} ws={ws}/>}
+            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} />}
 
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")} 
                 words={['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',

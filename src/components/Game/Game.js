@@ -6,20 +6,23 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import {useState } from "react";
-import { useStore } from '../../store';
+import { useStore } from "../../store";
 import { useParams } from "react-router-dom";
 
-export const Game = ({onTimeover, cat, letter, ws}) => {
-    const [isLoading, setLoading] = useState(true);
-    const hostPlayer = useStore(state => state.hostname)
-    const player = useStore(state => state.username)
-    const { lobbyId } = useParams();
-    let currentPlayer;
-    if (hostPlayer.length > 0){
-        currentPlayer = hostPlayer
-    } else {
-        currentPlayer = player
+export const Game = ({onTimeover, cat, letter}) => {
+    const [isLoading, _setLoading] = useState(true);
+    const ws = useStore((state) => state.socket);
+
+    const setLoading = (loading) => {
+        // If the timer has ended
+        if (!loading) {
+            ws.send(JSON.stringify({Event: 'endround'}));
+        }
+
+        _setLoading(loading);
     }
+    const currentPlayer = useStore(state => state.username)
+    const { lobbyId } = useParams();
     
     async function handleSubmit(e) {
         e.preventDefault();
@@ -47,12 +50,6 @@ export const Game = ({onTimeover, cat, letter, ws}) => {
              
         
     }
-    
-
-    ws.onmessage= (e) => {
-        alert("message received: " + e.data);
-    }
-    
 
     if (isLoading) {
     return(
