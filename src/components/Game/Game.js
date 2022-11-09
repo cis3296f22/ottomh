@@ -36,7 +36,14 @@ export const Game = ({onTimeover, cat, letter}) => {
         document.getElementById("input-answer").value = '';
 
         //send recieved answers along with user and lobbyId to backend for processing 
-        let response = await fetch(`http://${window.location.host}/GetAnswers`, {
+        let url;
+        if (window.location.protocol === 'https:') {
+            url = `htts://${window.location.host}/GetAnswers`;
+        } else {
+            url = `http://${window.location.host}/GetAnswers`;
+        }
+
+        let response = await fetch(url, {
             method: "POST",
             body: JSON.stringify({
                 CurrentPlayer: currentPlayer,
