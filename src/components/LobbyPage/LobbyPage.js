@@ -63,7 +63,7 @@ export const LobbyPage = () => {
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")} 
                 words={['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',
                         'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
-                        'here', 'I', 'am', 'manually', 'extending', 'it']}/>}
+                        'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter}/>}
 
             {stage === "scores" && <Scores />}
         </div>
