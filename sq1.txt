@@ -1,0 +1,75 @@
+title OTTOMH (Opening and joining a lobby)
+
+participant Join1
+participant Join2
+participant Join3
+participant world
+participant userlist
+participant LobbyPage
+participant WaitState
+participant Game
+
+Join1->world:Create new lobby
+activate Join1
+activate world
+note over Join1,world:Create lobbypage request
+Join1<--world:lobby ID
+deactivate world
+
+Join1->world:Join lobby
+activate world
+note over Join1,world:Host will request to join lobby after creation
+world->LobbyPage:Create LobbyPage
+activate LobbyPage
+note over world,LobbyPage:Users join lobby
+note over LobbyPage:Lobby has the ability to maintain all stages under the lobbypage
+Join1<--world: websocket
+deactivate world
+Join1->userlist:Send username
+activate userlist
+note over Join1,userlist:Send username to server
+deactivate Join1
+
+
+Join2->world:Join Lobby
+activate Join2
+note over Join2,world:User request to join lobby
+activate world
+world ->LobbyPage:Create LobbyPage 
+activate LobbyPage
+Join2<--world: websocket
+deactivate world
+Join2->userlist:Send username
+deactivate Join2
+
+
+Join3->world:Join Lobby
+activate Join3
+activate world
+world ->LobbyPage:Create LobbyPage 
+activate LobbyPage
+Join3<--world: websocket
+deactivate world
+Join3->userlist:Send username
+deactivate Join3
+
+
+LobbyPage->WaitState:id, ws
+activate WaitState
+note over LobbyPage,WaitState:Lobby setStage to WaitState
+
+LobbyPage->WaitState:id, ws
+activate WaitState
+
+LobbyPage->WaitState:id, ws
+activate WaitState
+
+
+WaitState --> LobbyPage: onStart
+deactivate WaitState
+deactivate WaitState
+deactivate WaitState
+
+LobbyPage->Game:setStage(playGame)
+activate Game
+note over LobbyPage,Game:Lobby setStage to Game
