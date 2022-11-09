@@ -14,6 +14,7 @@ import (
 	"github.com/cis3296f22/ottomh/backend/routes"
 	"github.com/cis3296f22/ottomh/backend/types"
 	"github.com/gin-gonic/gin"
+	
 )
 
 func main() {
@@ -33,14 +34,30 @@ func main() {
 
 	r.LoadHTMLFiles("build/index.html")
 
-	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]types.Lobby)}
+	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]*types.Lobby)}
+	v := types.New()
 
 	r.GET("/", routes.IndexHandler)
 	r.POST("/CreateLobby", lob.CreateLobby)
-	r.GET("/echo", routes.EchoHandler)
 	r.GET("/sockets/:id", lob.ConnectToLobby)
 	// Catch-all route to work nicely with react-router
 	r.GET("/:path", routes.IndexHandler)
+	r.POST("/GetAnswers", v.UserWords)
+
+	// DEBUG code: to profile this server:
+	// Add the following imports:
+	// "log"
+	// "net/http"
+	// _ "net/http/pprof"
+	//
+	// Uncomment these lines:
+	// go func() {
+	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
+	//
+	// And use one of the following:
+	// go tool pprof localhost:6060/debug/pprof/heap  # for memory
+	// go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30  # for cpu
 
 	r.Run(":" + port)
 }

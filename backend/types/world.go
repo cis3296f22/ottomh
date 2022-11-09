@@ -15,7 +15,7 @@ import (
 // and handles the process of routing
 type World struct {
 	Mu      sync.Mutex // To add a new Lobby, need to acquire lock
-	Lobbies map[string]Lobby
+	Lobbies map[string]*Lobby
 }
 
 // Creates a new Lobby in the World, and sends a response to
@@ -65,7 +65,7 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 	// Get id from URL
 	id := c.Param("id")
 	if len(id) == 0 {
-		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id'"))
+		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
 		return
 	}
 
@@ -76,8 +76,22 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 		return
 	}
 
+	// Get username from URL and validate
+	username := c.Query("username")
+	if len(username) == 0 {
+		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
+		return
+	}
+	if err := lobby.ValidateUsername(username); err != nil {
+		c.Error(err)
+		return
+	}
+
+	// Is the user the host
+	host := c.Query("host")
+
 	// Try connect the Context to the Lobby
-	ok := lobby.acceptWebSocket(c)
+	ok := lobby.acceptWebSocket(c, username, host)
 	if ok != nil {
 		c.Error(ok)
 	}

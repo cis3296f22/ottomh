@@ -8,27 +8,13 @@ export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
 
-    let ws;
-
-    if (window.location.protocol === 'https:') {
-        ws = new WebSocket(`wss://${window.location.host}/sockets/${id}`);
-    } else {
-        ws = new WebSocket(`ws://${window.location.host}/sockets/${id}`);
-    }
-
-    ws.onopen = (_) => {
-        alert("websocket is open now");
-    }
-
-    ws.onclose = (_) => {
-        alert("websocket is closed now");
-    }
 
     const copyToClipBoard = async copyMe => {
           await navigator.clipboard.writeText(copyMe);
           alert("Code Copied to clipboard");
       };
     
+    const [hostUser, username] = useStore(state => [state.hostname, state.username])
 
     return(
         <div className="waitState">
@@ -45,7 +31,8 @@ export const WaitState = ({ id, onStart }) => {
                 <PlayerList />
             </div>
             <div className="d-flex justify-content flex-column align-items-center gap-3">
-                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button>
+            {hostUser === username ?
+                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button> : null }
                 <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>
