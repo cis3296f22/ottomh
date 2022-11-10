@@ -12,8 +12,10 @@ import (
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	ID       string
-	userList UserList
+	ID          string
+	userList    UserList
+	roundEnded  bool
+	votingEnded bool
 }
 
 // Initializes a new Lobby with a unique ID
@@ -46,15 +48,21 @@ func (l *Lobby) lifecycle() {
 					// Handle messages here!
 					switch packetIn.Event {
 					case "endround":
-						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event": "endround",
-						})
-						l.userList.MessageAll(packetOut)
+						if !l.roundEnded {
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "endround",
+							})
+							l.userList.MessageAll(packetOut)
+							l.roundEnded = true
+						}
 					case "endvoting":
-						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event": "endvoting",
-						})
-						l.userList.MessageAll(packetOut)
+						if !l.votingEnded {
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "endvoting",
+							})
+							l.userList.MessageAll(packetOut)
+							l.votingEnded = true
+						}
 					case "begingame":
 						// Select a random category and letter
 						cat_i := rand.Intn(len(config.Categories))
