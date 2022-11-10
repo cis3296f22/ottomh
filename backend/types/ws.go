@@ -94,9 +94,11 @@ func (ws *WebSocket) WriteMessage(m []byte) error {
 // The readCycle will detect a missed Pong, and close the socket accordingly.
 func (ws *WebSocket) Ping() {
 	// We only ping if the time since the last ping is long enough
-	if ws.lastPing.Sub(time.Now()) >= pingDelay {
+	now := time.Now()
+	if now.Sub(ws.lastPing) >= pingDelay {
 		ws.writeLock.Lock()
 		defer ws.writeLock.Unlock()
+		ws.lastPing = now
 		ws.ws.WriteMessage(websocket.PingMessage, []byte("keepalive"))
 	}
 }
