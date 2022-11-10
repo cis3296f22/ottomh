@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
 import { WaitState, Game, Scores, Voting } from "../";
 
@@ -8,8 +8,9 @@ export const LobbyPage = () => {
     const [stage, setStage] = useState("waitingRoom");
     const [cat, setCat] = useState("");
     const [letter, setLetter] = useState("");
-    const [ws, username, hostname, setHostname, setUserlist] = useStore(
-        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist]);
+    const [ws, username, hostname, setHostname, setUserlist, clearStore] = useStore(
+        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist, state.clearStore]);
+    const navigate = useNavigate();
 
     ws.onopen = (_) => {
         alert("websocket is open now");
@@ -47,6 +48,10 @@ export const LobbyPage = () => {
 
     ws.onclose = (event) => {
         alert(`websocket is closed now: ${event}`);
+
+        // prevent users from joining a lobby that doesn't
+        clearStore();
+        navigate("/");
     }
 
     // Action for pressing the "Start" button while on the Waiting Page
