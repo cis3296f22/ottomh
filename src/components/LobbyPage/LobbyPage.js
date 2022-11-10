@@ -45,8 +45,8 @@ export const LobbyPage = () => {
         }
     }
 
-    ws.onclose = (_) => {
-        alert("websocket is closed now");
+    ws.onclose = (event) => {
+        alert(`websocket is closed now: ${event}`);
     }
 
     // Action for pressing the "Start" button while on the Waiting Page
