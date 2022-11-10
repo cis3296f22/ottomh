@@ -109,6 +109,10 @@ func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.H
 		return nil, err
 	}
 
+	g_ws.SetPongHandler(func(msg string) error {
+		return nil
+	})
+
 	ws := &WebSocket{
 		ws:        g_ws,
 		r:         make(chan []byte, 10),
