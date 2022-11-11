@@ -4,7 +4,7 @@ import { GamePageTimer } from '../';
 import { useState } from 'react';
 import { useStore } from "../../store";
 
-export const Voting = ({ onTimeover, words, cat, letter }) => {
+export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
     const ws = useStore((state) => state.socket);
 
     let onTimerStop = (_) => {
@@ -47,7 +47,7 @@ export const Voting = ({ onTimeover, words, cat, letter }) => {
                 </ListGroup>
             </Row>
             <Row className='h-25 align-items-center'>
-                {GamePageTimer(onTimerStop)}
+                {GamePageTimer(onTimerStop, time_picked)}
             </Row>
         </Container>
     );

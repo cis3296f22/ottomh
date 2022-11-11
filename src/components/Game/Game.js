@@ -10,7 +10,7 @@ import {useState } from "react";
 import { useStore } from "../../store";
 import { useParams } from "react-router-dom";
 
-export const Game = ({onTimeover, cat, letter}) => {
+export const Game = ({onTimeover, cat, letter, time_picked}) => {
     const [isLoading, _setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
     const [show, setShow] = useState(false);
@@ -107,7 +107,7 @@ export const Game = ({onTimeover, cat, letter}) => {
                 <h3>Time Remaining: </h3>
                
                
-                    <h1>{GamePageTimer(setLoading)}</h1>
+                    <h1>{GamePageTimer(setLoading, time_picked)}</h1>
         
                 <Button variant="primary" id ="directToVote" type="button" onClick={onTimeover} hidden></Button>
 

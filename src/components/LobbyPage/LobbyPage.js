@@ -58,17 +58,18 @@ export const LobbyPage = () => {
     const onStart = () => {
         ws.send(JSON.stringify({Event: "begingame"}));
     }
+    const time_picked = "00:30"
 
     return (
         <div className="container-fluid h-100">
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
-            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} />}
+            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} time_picked= {time_picked}/>}
 
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")} 
                 words={['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',
                         'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
-                        'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter}/>}
+                        'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter} time_picked= {time_picked}/>}
 
             {stage === "scores" && <Scores />}
         </div>
