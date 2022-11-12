@@ -28,8 +28,7 @@ export const GamePageTimer = (setLoading, time_picked ) => {
     const startTimer = (e) => {
         let { total, minutes, seconds} 
                     = getTimeRemaining(e);
-        
-        if (minutes == 0 && seconds == 0){
+        if (minutes <= 0 && seconds <= 0){
             clearInterval(Ref.current)
             setLoading(false) 
         }

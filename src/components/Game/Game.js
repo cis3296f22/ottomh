@@ -54,9 +54,9 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
             let all_answers = await response.json();
 
             if(all_answers["Submissions"] === true) {
-                alert(`Accepted; Word submitted: [\"${answer}\"]`);   
+                console.log(`Accepted; Word submitted: [\"${answer}\"]`);   
             }  else{
-                alert(`Rejected: Word ["${answer}"] already given`); 
+                console.log(`Rejected: Word ["${answer}"] already given`); 
             }
         }
              

@@ -58,6 +58,7 @@ export const LobbyPage = () => {
     const onStart = () => {
         ws.send(JSON.stringify({Event: "begingame"}));
     }
+    
     const time_picked = "00:30"
 
     return (
@@ -71,7 +72,7 @@ export const LobbyPage = () => {
                         'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
                         'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter} time_picked= {time_picked}/>}
 
-            {stage === "scores" && <Scores />}
+            {stage === "scores" && <Scores onReplay={() => setStage("waitingRoom")} id={lobbyId}/>}
         </div>
     );
 };

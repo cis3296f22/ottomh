@@ -5,14 +5,30 @@ import crown from './crown.png';
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
-export const Scores = () => {
+export const Scores = ({id, onReplay}) => {
     
     const playerName = useStore((state) => state.username);
+    const lobbyId = useStore((state) => state.lobbyId);
     function getRandomInt(max) {
         return Math.floor(Math.random() * max);
     }
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
+
+    //resetting the userwordsmap when we reach score page 
+    let url;
+    if (window.location.protocol === 'https:') {
+        url = `https://${window.location.host}/GetAnswers`;
+    } else {
+        url = `http://${window.location.host}/GetAnswers`;
+    }
+    fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+            CurrentPlayer: "delete101x",
+            Answer: "delete101x",
+            LobbyId: lobbyId })
+    })
     return(
         <div class="scores">
             <h2>
@@ -31,6 +47,9 @@ export const Scores = () => {
             <div>
                 <Button variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Back to Main
+                </Button>
+                <Button variant="primary" type="button" onClick={ onReplay }>
+                    Replay game
                 </Button>
             </div>
         </div>
