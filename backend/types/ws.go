@@ -32,6 +32,10 @@ type WebSocket struct {
 
 func (ws *WebSocket) Close() {
 	ws.muAlive.Lock()
+	// Do not close a WebSocket twice
+	if !ws.isAlive {
+		return
+	}
 	ws.isAlive = false
 	ws.muAlive.Unlock()
 	close(ws.r)
