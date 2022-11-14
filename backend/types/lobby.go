@@ -99,8 +99,8 @@ func (l *Lobby) lifecycle() {
 // 1. `username` must not already exits
 // 2. `l` must not be full according to game settings
 func (l *Lobby) ValidateUsername(username string) error {
-	_, ok := l.userList.sockets[username]
-	if ok {
+	exists := l.userList.ContainsUser(username)
+	if exists {
 		return ErrDuplicateUser
 	}
 	return nil

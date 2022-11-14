@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -30,6 +32,9 @@ func TestWorld(t *testing.T) {
 	var id string
 
 	t.Run("Test Lobby Creation", func(t *testing.T) {
+		// Use a random seed to force lobby ID collision resolution
+		uuid.SetRand(rand.New(rand.NewSource(1000)))
+
 		// Create a fake HTTP request to create a new Lobby
 		req, err := http.NewRequest("POST", "/CreateLobby", nil)
 		if err != nil {
@@ -56,6 +61,39 @@ func TestWorld(t *testing.T) {
 
 		// Ensure that a Lobby with the given id exists
 		_, ok := lob.Lobbies[id]
+		if !ok {
+			t.Error("Lobby not created successfully in the World")
+		}
+
+		// Try create another lobby, using the same random number generator,
+		// to test duplicate UUID resolution
+		// Use a random seed to force lobby ID collision resolution
+		uuid.SetRand(rand.New(rand.NewSource(1000)))
+
+		req, err = http.NewRequest("POST", "/CreateLobby", nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Use a response recorder to inspect output
+		w = httptest.NewRecorder()
+
+		// Make the request
+		r.ServeHTTP(w, req)
+
+		// Attempt to get url from response
+		b = w.Body.Bytes()
+		err = json.Unmarshal(b, &j)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Get ID from URL
+		comps = strings.Split(j.Url, "/")
+		id = comps[len(comps)-1]
+
+		// Ensure that a Lobby with the given id exists
+		_, ok = lob.Lobbies[id]
 		if !ok {
 			t.Error("Lobby not created successfully in the World")
 		}
@@ -123,16 +161,9 @@ func TestWorld(t *testing.T) {
 		}
 
 		// Now, try join again with the same username, and expect an error
-		req, err = http.NewRequest("GET", fmt.Sprintf("/sockets/%s?username=tester", id), nil)
-		if err != nil {
-			t.Error(err)
-		}
-
-		w = httptest.NewRecorder()
-
-		r.ServeHTTP(w, req)
-		if w.Code != http.StatusBadRequest {
-			t.Error("World does not handle duplicate usernames correctly", w.Code)
+		_, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
+		if err != websocket.ErrBadHandshake {
+			t.Error("Error handling duplicate username")
 		}
 	})
 

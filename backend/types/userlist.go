@@ -39,6 +39,8 @@ func (ul *UserList) AddSocket(username string, ws *WebSocket, host string) {
 
 // Returns true if the UserList already contains an active user with `name`
 func (ul *UserList) ContainsUser(name string) bool {
+	ul.mu.Lock()
+	defer ul.mu.Unlock()
 	_, exists := ul.sockets[name]
 	return exists
 }
