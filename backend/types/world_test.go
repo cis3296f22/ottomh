@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type createLobbyJSON struct {
@@ -22,7 +24,7 @@ func TestWorld(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	r.POST("/CreateLobby", lob.CreateLobby)
-	r.GET("/sockets:id", lob.ConnectToLobby)
+	r.GET("/sockets/:id", lob.ConnectToLobby)
 
 	// We use 1 lobby to test various operations
 	var id string
@@ -56,6 +58,81 @@ func TestWorld(t *testing.T) {
 		_, ok := lob.Lobbies[id]
 		if !ok {
 			t.Error("Lobby not created successfully in the World")
+		}
+	})
+
+	t.Run("Test Lobby Join", func(t *testing.T) {
+		// Try join lobby without an id
+		req, err := http.NewRequest("GET", "/sockets", nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w := httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusNotFound {
+			t.Error("World does not handle URL without id correctly")
+		}
+
+		// Try join a lobby that does not exist
+		req, err = http.NewRequest("GET", "/sockets/7", nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w = httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusBadRequest {
+			t.Error("World does not handle non-existent lobby correctly")
+		}
+
+		// Try join a lobby without supplying a username
+		req, err = http.NewRequest("GET", fmt.Sprintf("/sockets/%s", id), nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w = httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusBadRequest {
+			t.Error("World does not handle request without username correctly")
+		}
+
+		// Try join a Lobby with a malformed WebSocket request
+		req, err = http.NewRequest("GET", fmt.Sprintf("/sockets/%s?username=tester", id), nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w = httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusBadRequest {
+			t.Error("World does not handle malformed WebSocket request correctly", w.Code)
+		}
+
+		// Try join a Lobby with a correct request
+		// Creating a WebSocket specifically requires that the Gin Engine actually runs
+		go r.Run(":56789")
+		_, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Now, try join again with the same username, and expect an error
+		req, err = http.NewRequest("GET", fmt.Sprintf("/sockets/%s?username=tester", id), nil)
+		if err != nil {
+			t.Error(err)
+		}
+
+		w = httptest.NewRecorder()
+
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusBadRequest {
+			t.Error("World does not handle duplicate usernames correctly", w.Code)
 		}
 	})
 

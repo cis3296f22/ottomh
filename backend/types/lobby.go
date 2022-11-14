@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"math/rand"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/cis3296f22/ottomh/backend/config"
 	"github.com/gin-gonic/gin"
 )
+
+var ErrDuplicateUser error = errors.New("User with given username already exists")
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
@@ -20,7 +23,7 @@ type Lobby struct {
 }
 
 // Initializes a new Lobby with a unique ID
-func makeLobby(ID string) (*Lobby, error) {
+func makeLobby(ID string) *Lobby {
 	// For generating random numbers, we start by seeding rand
 	rand.Seed(int64(time.Now().Second()))
 
@@ -31,7 +34,7 @@ func makeLobby(ID string) (*Lobby, error) {
 		},
 	}
 	go l.lifecycle()
-	return l, nil
+	return l
 }
 
 // This forever-loop continuosly checks WebSockets for messages from
@@ -96,6 +99,10 @@ func (l *Lobby) lifecycle() {
 // 1. `username` must not already exits
 // 2. `l` must not be full according to game settings
 func (l *Lobby) ValidateUsername(username string) error {
+	_, ok := l.userList.sockets[username]
+	if ok {
+		return ErrDuplicateUser
+	}
 	return nil
 }
 
