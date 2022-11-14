@@ -24,6 +24,9 @@ func TestWorld(t *testing.T) {
 	r.POST("/CreateLobby", lob.CreateLobby)
 	r.GET("/sockets:id", lob.ConnectToLobby)
 
+	// We use 1 lobby to test various operations
+	var id string
+
 	t.Run("Test Lobby Creation", func(t *testing.T) {
 		// Create a fake HTTP request to create a new Lobby
 		req, err := http.NewRequest("POST", "/CreateLobby", nil)
@@ -47,12 +50,32 @@ func TestWorld(t *testing.T) {
 
 		// Get ID from URL
 		comps := strings.Split(j.Url, "/")
-		id := comps[len(comps)-1]
+		id = comps[len(comps)-1]
 
 		// Ensure that a Lobby with the given id exists
 		_, ok := lob.Lobbies[id]
 		if !ok {
 			t.Error("Lobby not created successfully in the World")
+		}
+	})
+
+	t.Run("Test Lobby Close", func(t *testing.T) {
+		// Close down the lobby originally
+		err := lob.CloseLobby(id)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Make sure subsequent Close calls do not panic
+		err = lob.CloseLobby(id)
+		if err == nil {
+			t.Error("No error when closing lobby second time")
+		}
+
+		// Confirm delete actually went through
+		_, ok := lob.Lobbies[id]
+		if ok {
+			t.Error("Lobby was not successfully removed from list of lobbies")
 		}
 	})
 }

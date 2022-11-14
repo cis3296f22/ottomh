@@ -100,7 +100,16 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 }
 
 // Closes down the Lobby with URL, returns an error if no Lobby exists,
-// of if the Lobby is already closed.
-func (w *World) CloseLobby(URL string) error {
+// or if the Lobby is already closed.
+func (w *World) CloseLobby(id string) error {
+	w.Mu.Lock()
+	defer w.Mu.Unlock()
+	_, ok := w.Lobbies[id]
+	if !ok {
+		return errors.New("Lobby does not exist")
+	}
+
+	delete(w.Lobbies, id)
+
 	return nil
 }
