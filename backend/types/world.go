@@ -104,6 +104,7 @@ func (w *World) CloseLobby(id string) error {
 		return errors.New("Lobby does not exist")
 	}
 
+	w.Lobbies[id].Close()
 	delete(w.Lobbies, id)
 
 	return nil
