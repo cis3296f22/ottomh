@@ -1,9 +1,11 @@
 package types
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -26,8 +28,20 @@ func TestWebSocket(t *testing.T) {
 		}))
 	defer s.Close()
 
+	// URL for attempting to open WebSocket
+	u := "ws" + strings.TrimPrefix(s.URL, "http")
+
+	t.Run("Test Faulty WebSocket Initialization", func(t *testing.T) {
+		r := httptest.NewRequest("GET", u, strings.NewReader("Hello, Error!"))
+		w := httptest.NewRecorder()
+		_, err := MakeWebSocket(w, r, r.Header)
+
+		if err == nil {
+			t.Error("WebSocket initializer did not return error on faulty request")
+		}
+	})
+
 	t.Run("Test WebSocket Initialization", func(t *testing.T) {
-		u := "ws" + strings.TrimPrefix(s.URL, "http")
 		var err error
 		client_ws, _, err = websocket.DefaultDialer.Dial(u, nil)
 
@@ -42,34 +56,18 @@ func TestWebSocket(t *testing.T) {
 		}
 	})
 
-	// t.Run("Test Ping Implementation", func(t *testing.T) {
-	// 	var clientPingReceived, serverPongReceived bool = false, false
+	t.Run("Test Ping Implementation", func(t *testing.T) {
+		// NOTE: this test does not check that the Ping is actually received.
+		// Ping has weird behavior when working with httptest, as in there is
+		// no response to Ping on the client side. So, as long as read works,
+		// we are going to claim Ping probably works.
 
-	// 	client_ws.SetPingHandler(func(appData string) error {
-	// 		clientPingReceived = true
-	// 		client_ws.WriteMessage(websocket.PongMessage, []byte("keepalive"))
-	// 		return nil
-	// 	})
+		// Ping only sends a message if a certain delay has passed;
+		// set the time to make sure the Ping does go off
+		server_ws.lastPing = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-	// 	server_ws.ws.SetPongHandler(func(appData string) error {
-	// 		serverPongReceived = true
-	// 		return nil
-	// 	})
-
-	// 	// Ping only sends a message if a certain delay has passed;
-	// 	// set the time to make sure the Ping does go off
-	// 	server_ws.lastPing = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-	// 	server_ws.Ping()
-
-	// 	if !clientPingReceived {
-	// 		t.Error("Client did not receive ping")
-	// 	}
-
-	// 	if !serverPongReceived {
-	// 		t.Error("Server did not receive pong")
-	// 	}
-	// })
+		server_ws.Ping()
+	})
 
 	t.Run("Test WebSocket Read Implementation", func(t *testing.T) {
 		m := []byte("Hello, world!")
@@ -111,7 +109,59 @@ func TestWebSocket(t *testing.T) {
 		}
 	})
 
+	t.Run("Test WebSocket With Multiple Readers", func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		set := sync.Map{}
+
+		// Create ten go threads that will keep reading until they get
+		// a non-nil message
+		for i := 0; i < 10; i += 1 {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				m, err := server_ws.ReadMessage()
+				for m == nil {
+					if err == ErrClosedWebSocket {
+						return
+					}
+					m, err = server_ws.ReadMessage()
+				}
+				set.Store(string(m), true)
+			}()
+		}
+
+		// Send ten messages to the WebSocket
+		for i := 0; i < 10; i += 1 {
+			m := []byte(fmt.Sprint(i))
+			client_ws.WriteMessage(websocket.TextMessage, m)
+		}
+
+		// Wait for all go threads to stop
+		// If there is a deadlock here, there is an error.
+		wg.Wait()
+
+		// Make sure all values are accounted for
+		for i := 0; i < 10; i += 1 {
+			k := fmt.Sprint(i)
+			if _, ok := set.Load(k); !ok {
+				t.Error("Sent message not accounted for: ", k)
+			}
+		}
+	})
+
 	t.Run("Closing WebSocket Without Panic", func(t *testing.T) {
+		if !server_ws.IsAlive() {
+			t.Error("WebSocket closed unexpectedly")
+		}
+
 		server_ws.Close()
+
+		if server_ws.IsAlive() {
+			t.Error("WebSocket open unexpectedly")
+		}
+
+		if _, err := server_ws.ReadMessage(); err != ErrClosedWebSocket {
+			t.Error("Read Message is not stopped correctly")
+		}
 	})
 }
