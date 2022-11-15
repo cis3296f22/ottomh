@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+const v8toIstanbul = require('v8-to-istanbul');
+const fs = require('fs');
 
 test('CreateAndLeaveLobby', async ({ page }) => {
-
   await page.goto('http://localhost:8080/');
 
   await page.getByText('OTTOMHCreate new lobbyJoin lobby').click();
@@ -17,5 +18,4 @@ test('CreateAndLeaveLobby', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Leave Lobby' }).click();
   await expect(page).toHaveURL('http://localhost:8080/');
-
 });
