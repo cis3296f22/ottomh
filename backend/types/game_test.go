@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -19,6 +18,12 @@ type UserListPacket struct {
 	Event string
 	List  []string
 	Host  string
+}
+
+type StartGamePacket struct {
+	Event    string
+	Category string
+	Letter   string
 }
 
 func TestTwoPlayerGame(t *testing.T) {
@@ -111,7 +116,73 @@ func TestTwoPlayerGame(t *testing.T) {
 		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) {
 			t.Error("Lobby stores incorrect user list")
 		}
+
+		// Ignore player self-connection message
+		player.ReadMessage()
 	})
 
-	log.Print(player.Subprotocol())
+	t.Run("Test Game Start", func(t *testing.T) {
+		// Ensure start message successfully sends to the backend
+		err := host.WriteMessage(websocket.TextMessage, []byte("{\"Event\": \"begingame\"}"))
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Ensure both host and player receive a "begingame" event
+		// Start by reading from host
+		mt, m, err := host.ReadMessage()
+		if err != nil {
+			t.Error(err)
+		}
+		if mt != websocket.TextMessage {
+			t.Error(err)
+		}
+
+		// Attempt to interpret host's message as JSON
+		// Interpret message as JSON
+		var j_host StartGamePacket
+		err = json.Unmarshal(m, &j_host)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Check expected values
+		if j_host.Event != "begingame" {
+			t.Error("Host received unexpected event")
+		}
+		if len(j_host.Category) == 0 {
+			t.Error("Host did not receive Category")
+		}
+		if len(j_host.Letter) == 0 {
+			t.Error("Host did not receive Letter")
+		}
+
+		// Next, read from the player
+		mt, m, err = player.ReadMessage()
+		if err != nil {
+			t.Error(err)
+		}
+		if mt != websocket.TextMessage {
+			t.Error(err)
+		}
+
+		// Attempt to interpret host's message as JSON
+		// Interpret message as JSON
+		var j_player StartGamePacket
+		err = json.Unmarshal(m, &j_player)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Check expected values
+		if j_player.Event != "begingame" {
+			t.Error("Player received unexpected event")
+		}
+		if j_player.Category != j_host.Category {
+			t.Error("Player did not receive Category")
+		}
+		if j_player.Letter != j_host.Letter {
+			t.Error("Player did not receive Letter")
+		}
+	})
 }
