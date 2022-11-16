@@ -37,40 +37,48 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
     async function handleSubmit(e) {
         e.preventDefault();
         let answer = document.getElementById("input-answer").value;
+        function letterCheck(word){
+            return word.charAt(0) === letter
+        }
         //send answer here
         document.getElementById("input-answer").value = '';
         
-        //send recieved answers along with user and lobbyId to backend for processing 
-        let url;
-        if (window.location.protocol === 'https:') {
-            url = `https://${window.location.host}/GetAnswers`;
-        } else {
-            url = `http://${window.location.host}/GetAnswers`;
-        }
-
-        let response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
-                CurrentPlayer: currentPlayer,
-                Answer: answer,
-                LobbyId: lobbyId })
-        })
-        if (response.status === 200) {
-            let all_answers = await response.json();
-            setWord(answer)
-            if(all_answers["Submissions"] === true) {
-                setGoodResponse(true)
-                setTimeout(() => {
-                    setGoodResponse(false)
-                  }, "700")
-
-            }  else {
-                setBadResponse(true)
-                setTimeout(() => {
-                    setBadResponse(false)
-                  }, "1500")
+        if (letterCheck(answer)){
+            //send recieved answers along with user and lobbyId to backend for processing 
+            let url;
+            if (window.location.protocol === 'https:') {
+                url = `https://${window.location.host}/GetAnswers`;
+            } else {
+                url = `http://${window.location.host}/GetAnswers`;
             }
+
+            let response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify({
+                    CurrentPlayer: currentPlayer,
+                    Answer: answer,
+                    LobbyId: lobbyId })
+            })
+            if (response.status === 200) {
+                let all_answers = await response.json();
+                setWord(answer)
+                if(all_answers["Submissions"] === true) {
+                    setGoodResponse(true)
+                    setTimeout(() => {
+                        setGoodResponse(false)
+                    }, "700")
+
+                }  else {
+                    setBadResponse(true)
+                    setTimeout(() => {
+                        setBadResponse(false)
+                    }, "1500")
+                }
+            }
+        }else{
+            handleShow()
         }
+        
              
         
     }
@@ -79,18 +87,15 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
     return(
         <div className="game">
             <div>
-            
-                <Button variant="outline-info" onClick={handleShow}>
-                    How to Play!
-                </Button>
 
                 <h2 className="title-h">
                     {cat} <Badge bg="secondary">{letter}</Badge>
                 </h2>
+                <p>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</p>
                 
                 <Modal className="instruction-popup" show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>INFO</Modal.Title>
+                        <Modal.Title className="reject-title">Answer Rejected: Wrong Letter</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</Modal.Body>
                     <Modal.Footer>
