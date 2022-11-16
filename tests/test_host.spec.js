@@ -22,6 +22,64 @@ test('CreateAndLeaveLobby', async ({ page }) => {
   await page.getByRole('button', { name: 'Leave Lobby' }).click();
   await expect(page).toHaveURL('http://localhost:8080/');
 
+  await page.getByRole('button', { name: 'Create new lobby' }).click();
+  await page.getByPlaceholder('Username').fill('testhost');
+  page.once('dialog', dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    dialog.dismiss().catch(() => {});
+  });
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8080\/lobbies\/[a-zA-Z0-9]{6}/);
+  let path_comps = page.url().split('/');
+  let id = path_comps[path_comps.length - 1];
+  page.once('dialog', dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    dialog.dismiss().catch(() => {});
+  });
+  await page.getByRole('button', { name: 'Copy Room Code' }).click();
+  await page.getByRole('button', { name: 'Leave Lobby' }).click();
+  await expect(page).toHaveURL('http://localhost:8080/');
+  await page.getByRole('button', { name: 'Join lobby' }).click();
+  await page.getByPlaceholder('Username').fill('testuser');
+  await page.getByPlaceholder('Lobby code').click();
+  await page.getByPlaceholder('Lobby code').fill(id);
+  page.once('dialog', dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    dialog.dismiss().catch(() => {});
+  });
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8080\/lobbies\/[a-zA-Z0-9]{6}/);
+  await page.getByRole('button', { name: 'Leave Lobby' }).click();
+  await expect(page).toHaveURL('http://localhost:8080/');
+  await page.getByRole('button', { name: 'Create new lobby' }).click();
+  await page.getByPlaceholder('Username').fill('testhost');
+  page.once('dialog', dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    dialog.dismiss().catch(() => {});
+  });
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page).toHaveURL(/http:\/\/localhost:8080\/lobbies\/[a-zA-Z0-9]{6}/);
+  await page.getByRole('button', { name: 'Start' }).click();
+  await page.getByPlaceholder('Enter Answer Here').click();
+  await page.getByPlaceholder('Enter Answer Here').fill('testenter');
+  await page.getByPlaceholder('Enter Answer Here').press('Enter');
+  await page.getByPlaceholder('Enter Answer Here').fill('testsubmit');
+  await page.getByPlaceholder('Enter Answer Here').press('Enter');
+  await page.getByRole('button', { name: 'How to Play!' }).click();
+  await page.getByText('Close').click();
+
+  await page.getByRole('button', { name: 'Ipsum' }).click();
+  await page.getByRole('button', { name: 'dummy' }).click();
+  await page.getByRole('button', { name: 'too' }).click();
+  await page.getByRole('button', { name: 'too' }).click();
+  await page.getByRole('button', { name: 'dummy' }).click();
+
+  await page.getByRole('button', { name: 'Replay game' }).click();
+  await page.getByRole('button', { name: 'Start' }).click();
+  await page.getByPlaceholder('Enter Answer Here').click();
+  await page.getByPlaceholder('Enter Answer Here').fill('gamestartsuccess');
+  await page.getByPlaceholder('Enter Answer Here').press('Enter');
+
   // Courtesy of jfgreffier: https://github.com/microsoft/playwright/issues/9208#issuecomment-1147884893
   // Get and save V8 coverage
   const coverage = await page.coverage.stopJSCoverage();
