@@ -77,6 +77,14 @@ func (l *Lobby) lifecycle() {
 							"Letter":   letter,
 						})
 						l.userList.MessageAll(packetOut)
+					case "getscores":
+						sm := CreateScores()
+						scorelist := sm.scorem
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event":  "getscores",
+							"scores": scorelist,
+						})
+						l.userList.MessageAll(packetOut)
 					default:
 						log.Print("Recieved message from WebSocket: ", m)
 						if err := socket.WriteMessage(m); err != nil {

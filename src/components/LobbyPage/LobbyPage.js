@@ -8,8 +8,8 @@ export const LobbyPage = () => {
     const [stage, setStage] = useState("waitingRoom");
     const [cat, setCat] = useState("");
     const [letter, setLetter] = useState("");
-    const [ws, username, hostname, setHostname, setUserlist, clearStore] = useStore(
-        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist, state.clearStore]);
+    const [ws, username, hostname, setHostname, setUserlist, setScorelist, clearStore] = useStore(
+        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
     const navigate = useNavigate();
 
     ws.onopen = (_) => {
@@ -24,6 +24,9 @@ export const LobbyPage = () => {
                     break;
                 case "endvoting":
                     setStage("scores");
+                    break;
+                case "getscore":
+                    setScorelist(packetObject.Scorelist);
                     break;
                 case "updateusers":
                     setUserlist(packetObject.List);
@@ -59,7 +62,8 @@ export const LobbyPage = () => {
         ws.send(JSON.stringify({Event: "begingame"}));
     }
     
-    const time_picked = "00:30"
+    const time_picked = "00:3"
+
 
     return (
         <div className="container-fluid h-100">
