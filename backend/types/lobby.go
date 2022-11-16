@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"math/rand"
 	"time"
@@ -10,16 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var ErrDuplicateUser error = errors.New("User with given username already exists")
+
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
 	ID          string
 	userList    UserList
 	roundEnded  bool
 	votingEnded bool
+	lobbyEnded  bool
 }
 
 // Initializes a new Lobby with a unique ID
-func makeLobby(ID string) (*Lobby, error) {
+func makeLobby(ID string) *Lobby {
 	// For generating random numbers, we start by seeding rand
 	rand.Seed(int64(time.Now().Second()))
 
@@ -30,7 +34,7 @@ func makeLobby(ID string) (*Lobby, error) {
 		},
 	}
 	go l.lifecycle()
-	return l, nil
+	return l
 }
 
 // This forever-loop continuosly checks WebSockets for messages from
@@ -39,53 +43,53 @@ func (l *Lobby) lifecycle() {
 	// Loop over sockets, checking each for messages
 	for {
 		for _, socket := range l.userList.GetSocketList() {
-			if socket.IsAlive() { // If WebSocket is still active, read from it
-				m, err := socket.ReadMessage()
-				if err == nil { // If a message is currently available
-					var packetIn WSPacket
-					json.Unmarshal(m, &packetIn)
+			m, err := socket.ReadMessage()
+			if err == nil { // If a message is currently available
+				var packetIn WSPacket
+				json.Unmarshal(m, &packetIn)
 
-					// Handle messages here!
-					switch packetIn.Event {
-					case "endround":
-						if !l.roundEnded {
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "endround",
-							})
-							l.userList.MessageAll(packetOut)
-							l.roundEnded = true
-						}
-					case "endvoting":
-						if !l.votingEnded {
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "endvoting",
-							})
-							l.userList.MessageAll(packetOut)
-							l.votingEnded = true
-						}
-					case "begingame":
-						// Select a random category and letter
-						cat_i := rand.Intn(len(config.Categories))
-						category := config.Categories[cat_i]
-						// Recall that A has a byte value of 65, and there are 26 letters
-						letter := string(byte(rand.Intn(26) + 65))
-
-						// Tell all sockets to start the game
+				// Handle messages here!
+				switch packetIn.Event {
+				case "endround":
+					if !l.roundEnded {
 						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event":    "begingame",
-							"Category": category,
-							"Letter":   letter,
+							"Event": "endround",
 						})
 						l.userList.MessageAll(packetOut)
-					default:
-						log.Print("Recieved message from WebSocket: ", m)
-						if err := socket.WriteMessage(m); err != nil {
-							log.Print("Error writing message to WebSocket: ", err)
-						}
+						l.roundEnded = true
 					}
-				} else { // Else, there is no message, so ping to keep it alive
-					socket.Ping()
+				case "endvoting":
+					if !l.votingEnded {
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "endvoting",
+						})
+						l.userList.MessageAll(packetOut)
+						l.votingEnded = true
+					}
+				case "begingame":
+					// Select a random category and letter
+					cat_i := rand.Intn(len(config.Categories))
+					category := config.Categories[cat_i]
+					// Recall that A has a byte value of 65, and there are 26 letters
+					letter := string(byte(rand.Intn(26) + 65))
+
+					// Tell all sockets to start the game
+					packetOut, _ := json.Marshal(map[string]interface{}{
+						"Event":    "begingame",
+						"Category": category,
+						"Letter":   letter,
+					})
+					l.userList.MessageAll(packetOut)
+				default:
+					log.Print("Recieved message from WebSocket: ", m)
+					if err := socket.WriteMessage(m); err != nil {
+						log.Print("Error writing message to WebSocket: ", err)
+					}
 				}
+			} else if err == ErrClosedWebSocket {
+				// Handle a WebSocket that has closed
+			} else {
+				socket.Ping()
 			}
 		}
 	}
@@ -95,6 +99,10 @@ func (l *Lobby) lifecycle() {
 // 1. `username` must not already exits
 // 2. `l` must not be full according to game settings
 func (l *Lobby) ValidateUsername(username string) error {
+	exists := l.userList.ContainsUser(username)
+	if exists {
+		return ErrDuplicateUser
+	}
 	return nil
 }
 
@@ -114,4 +122,8 @@ func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) er
 	log.Print("Added user ", username)
 
 	return nil
+}
+
+func (l *Lobby) Close() {
+	l.lobbyEnded = true
 }

@@ -34,11 +34,7 @@ func (w *World) CreateLobby(c *gin.Context) {
 	}
 
 	// Create a new lobby with a unique ID
-	lobby, ok := makeLobby(id)
-	if ok != nil {
-		c.Error(ok)
-		return
-	}
+	lobby := makeLobby(id)
 
 	// Build URL using ID and hostname
 	host := c.Request.Host
@@ -64,15 +60,12 @@ func (w *World) CreateLobby(c *gin.Context) {
 func (w *World) ConnectToLobby(c *gin.Context) {
 	// Get id from URL
 	id := c.Param("id")
-	if len(id) == 0 {
-		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
-		return
-	}
 
 	// Try retrive the Lobby
 	lobby, exists := w.Lobbies[id]
 	if !exists {
 		c.Error(errors.New(fmt.Sprintf("Lobby with id %s does not exist", id)))
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -80,10 +73,12 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 	username := c.Query("username")
 	if len(username) == 0 {
 		c.Error(errors.New("WebSocket should be of the form '/lobbies/:id?username=bob'"))
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	if err := lobby.ValidateUsername(username); err != nil {
 		c.Error(err)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -100,7 +95,17 @@ func (w *World) ConnectToLobby(c *gin.Context) {
 }
 
 // Closes down the Lobby with URL, returns an error if no Lobby exists,
-// of if the Lobby is already closed.
-func (w *World) CloseLobby(URL string) error {
+// or if the Lobby is already closed.
+func (w *World) CloseLobby(id string) error {
+	w.Mu.Lock()
+	defer w.Mu.Unlock()
+	_, ok := w.Lobbies[id]
+	if !ok {
+		return errors.New("Lobby does not exist")
+	}
+
+	w.Lobbies[id].Close()
+	delete(w.Lobbies, id)
+
 	return nil
 }
