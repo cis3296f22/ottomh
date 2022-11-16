@@ -63,7 +63,7 @@ export const LobbyPage = () => {
         ws.send(JSON.stringify({Event: "begingame"}));
     }
     
-    const time_picked = "00:3"
+    const time_picked = "00:30"
 
 
     return (
