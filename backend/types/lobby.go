@@ -14,6 +14,7 @@ import (
 type Lobby struct {
 	ID          string
 	userList    UserList
+	userWords	*userWordsMap
 	roundEnded  bool
 	votingEnded bool
 }
@@ -28,8 +29,9 @@ func makeLobby(ID string) (*Lobby, error) {
 		userList: UserList{
 			sockets: make(map[string]*WebSocket),
 		},
+		userWords: New(),	// create new userWordsMap
 	}
-	go l.lifecycle()
+	go l.lifecycle()	// sets the values for roundedEnded and votingEnded
 	return l, nil
 }
 
@@ -47,6 +49,19 @@ func (l *Lobby) lifecycle() {
 
 					// Handle messages here!
 					switch packetIn.Event {
+					case "checkword":
+						var word WordPacket // WordPacket type struct declared in userWords.go
+						var isDup bool // if word submitted by user already exists in the user words map
+
+						json.Unmarshal([]byte(packetIn.Data), &word) // convert json object from packetIn.Data into a WordPacket type
+						isDup = l.userWords.UserWords(word) // check if word is a duplicate
+
+						// send isDup boolean result back to the frontend
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "checkword",
+							"CheckWord": isDup,
+						})
+						socket.WriteMessage(packetOut)
 					case "endround":
 						if !l.roundEnded {
 							packetOut, _ := json.Marshal(map[string]interface{}{

@@ -36,29 +36,34 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         document.getElementById("input-answer").value = '';
 
         //send recieved answers along with user and lobbyId to backend for processing 
-        let url;
-        if (window.location.protocol === 'https:') {
-            url = `https://${window.location.host}/GetAnswers`;
-        } else {
-            url = `http://${window.location.host}/GetAnswers`;
-        }
+        ws.send(JSON.stringify({
+            CurrentPlayer: currentPlayer,
+            Answer: answer,
+            LobbyId: lobbyId
+        }));
+        // let url;
+        // if (window.location.protocol === 'https:') {
+        //     url = `https://${window.location.host}/GetAnswers`;
+        // } else {
+        //     url = `http://${window.location.host}/GetAnswers`;
+        // }
 
-        let response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
-                CurrentPlayer: currentPlayer,
-                Answer: answer,
-                LobbyId: lobbyId })
-        })
-        if (response.status === 200) {
-            let all_answers = await response.json();
+        // let response = await fetch(url, {
+        //     method: "POST",
+        //     body: JSON.stringify({
+        //         CurrentPlayer: currentPlayer,
+        //         Answer: answer,
+        //         LobbyId: lobbyId })
+        // })
+        // if (response.status === 200) {
+        //     let all_answers = await response.json();
 
-            if(all_answers["Submissions"] === true) {
-                console.log(`Accepted; Word submitted: [\"${answer}\"]`);   
-            }  else{
-                console.log(`Rejected: Word ["${answer}"] already given`); 
-            }
-        }
+        //     if(all_answers["Submissions"] === true) {
+        //         console.log(`Accepted; Word submitted: [\"${answer}\"]`);   
+        //     }  else{
+        //         console.log(`Rejected: Word ["${answer}"] already given`); 
+        //     }
+        // }
              
         
     }
