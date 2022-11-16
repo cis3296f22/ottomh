@@ -26,6 +26,29 @@ type StartGamePacket struct {
 	Letter   string
 }
 
+type EventPacket struct {
+	Event string
+}
+
+// A helper function that reads one message from `socket` and unmarshals
+// it into `j`. Will error if there is an issue reading the message, the
+// message is not text, or if the message cannot be unmarshaled.
+func getTextPacket(socket *websocket.Conn, j any, t *testing.T) {
+	mt, m, err := socket.ReadMessage()
+	if err != nil {
+		t.Error(err)
+	}
+	if mt != websocket.TextMessage {
+		t.Error("Host received non-text message")
+	}
+
+	// Interpret message as JSON
+	err = json.Unmarshal(m, &j)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestTwoPlayerGame(t *testing.T) {
 	// Each test needs to use a different port; adjust accordingly
 	port := "12345"
@@ -91,20 +114,8 @@ func TestTwoPlayerGame(t *testing.T) {
 		// The host should have received a message telling them a new player joined
 		// If timeout, no message was received so an error occurred.
 		host.ReadMessage() // First message tells the host itself joined
-		mt, m, err := host.ReadMessage()
-		if err != nil {
-			t.Error(err)
-		}
-		if mt != websocket.TextMessage {
-			t.Error("Host received non-text message")
-		}
-
-		// Interpret message as JSON
 		var j UserListPacket
-		err = json.Unmarshal(m, &j)
-		if err != nil {
-			t.Error(err)
-		}
+		getTextPacket(host, &j, t)
 
 		// Test JSON contents against expected results
 		if j.Event != "updateusers" {
@@ -130,21 +141,8 @@ func TestTwoPlayerGame(t *testing.T) {
 
 		// Ensure both host and player receive a "begingame" event
 		// Start by reading from host
-		mt, m, err := host.ReadMessage()
-		if err != nil {
-			t.Error(err)
-		}
-		if mt != websocket.TextMessage {
-			t.Error(err)
-		}
-
-		// Attempt to interpret host's message as JSON
-		// Interpret message as JSON
 		var j_host StartGamePacket
-		err = json.Unmarshal(m, &j_host)
-		if err != nil {
-			t.Error(err)
-		}
+		getTextPacket(host, &j_host, t)
 
 		// Check expected values
 		if j_host.Event != "begingame" {
@@ -158,21 +156,8 @@ func TestTwoPlayerGame(t *testing.T) {
 		}
 
 		// Next, read from the player
-		mt, m, err = player.ReadMessage()
-		if err != nil {
-			t.Error(err)
-		}
-		if mt != websocket.TextMessage {
-			t.Error(err)
-		}
-
-		// Attempt to interpret host's message as JSON
-		// Interpret message as JSON
 		var j_player StartGamePacket
-		err = json.Unmarshal(m, &j_player)
-		if err != nil {
-			t.Error(err)
-		}
+		getTextPacket(player, &j_player, t)
 
 		// Check expected values
 		if j_player.Event != "begingame" {
@@ -183,6 +168,32 @@ func TestTwoPlayerGame(t *testing.T) {
 		}
 		if j_player.Letter != j_host.Letter {
 			t.Error("Player did not receive Letter")
+		}
+	})
+
+	t.Run("Test Round Ended Event", func(t *testing.T) {
+		// Send message as the player
+		err := player.WriteMessage(websocket.TextMessage, []byte("{\"Event\":\"endround\"}"))
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Make sure host receives the message
+		var j_host EventPacket
+		getTextPacket(host, &j_host, t)
+
+		// Verify expected event
+		if j_host.Event != "endround" {
+			t.Errorf("Host received unexpected event: %s", j_host.Event)
+		}
+
+		// Make sure player receives the message
+		var j_player EventPacket
+		getTextPacket(player, &j_player, t)
+
+		// Verify expected event
+		if j_player.Event != "endround" {
+			t.Errorf("Host received unexpected event: %s", j_player.Event)
 		}
 	})
 }
