@@ -196,4 +196,48 @@ func TestTwoPlayerGame(t *testing.T) {
 			t.Errorf("Host received unexpected event: %s", j_player.Event)
 		}
 	})
+
+	t.Run("Test Voting Ended Event", func(t *testing.T) {
+		// Send message as the player
+		err := player.WriteMessage(websocket.TextMessage, []byte("{\"Event\":\"endvoting\"}"))
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Make sure host receives the message
+		var j_host EventPacket
+		getTextPacket(host, &j_host, t)
+
+		// Verify expected event
+		if j_host.Event != "endvoting" {
+			t.Errorf("Host received unexpected event: %s", j_host.Event)
+		}
+
+		// Make sure player receives the message
+		var j_player EventPacket
+		getTextPacket(player, &j_player, t)
+
+		// Verify expected event
+		if j_player.Event != "endvoting" {
+			t.Errorf("Host received unexpected event: %s", j_player.Event)
+		}
+	})
+
+	t.Run("Handle Unexpected Event With Echo", func(t *testing.T) {
+		// Write unexpected event to the world
+		m_expected := []byte("{\"Event\":\"boo!\"}")
+		err := host.WriteMessage(websocket.TextMessage, m_expected)
+		if err != nil {
+			t.Error(err)
+		}
+
+		// Ensure that host got an echo response
+		mt, m, err := host.ReadMessage()
+		if mt != websocket.TextMessage {
+			t.Error("Host got non-text response")
+		}
+		if !reflect.DeepEqual(m_expected, m) {
+			t.Errorf("Host got non-echo response %s", string(m))
+		}
+	})
 }
