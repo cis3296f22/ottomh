@@ -26,7 +26,7 @@ export const LobbyPage = () => {
                     setStage("scores");
                     break;
                 case "getscore":
-                    setScorelist(packetObject.Scorelist);
+                    setScorelist(packetObject.Scores);
                     break;
                 case "updateusers":
                     setUserlist(packetObject.List);

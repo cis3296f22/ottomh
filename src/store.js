@@ -9,7 +9,7 @@ export const useStore = create(
             lobbyId: '',
             socket: '',
             userlist: [],
-            scorelist: [],
+            scorelist: '',
             setHostname: (name) => set(() => ({ hostname: name })),
             setUsername: (name) => set(() => ({ username: name })),
             setLobbyId: (id) => set(() => ({ lobbyId: id })),
@@ -22,7 +22,7 @@ export const useStore = create(
                     username: "",
                     lobbyId: "",
                     socket: "",
-                    scorelist: [],
+                    scorelist: "",
                 }
             )),
         })
