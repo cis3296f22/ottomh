@@ -125,7 +125,7 @@ func TestTwoPlayerGame(t *testing.T) {
 			t.Error("Lobby stores incorrect host")
 		}
 		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) {
-			t.Error("Lobby stores incorrect user list")
+			t.Error("Lobby stores incorrect user list; got", j.List, "but expected", []string{"testhost", "testplayer"})
 		}
 
 		// Ignore player self-connection message
