@@ -19,12 +19,11 @@ export const Scores = ({id, onReplay}) => {
     const scorelist = useStore((state) => state.scorelist);
     const clearStore = useStore((state) => state.clearStore);
 
-    let toPrint = [];
-    for (const [key, value] of scorelist) {
-        console.log(`${key}: ${value}`);
-        toPrint.push(`${key}: ${value}; `);
-    }
-    
+
+
+    //or (const [key, value] of scorelist) {
+        //console.log(`${key}: ${value}`);
+    //}
     
 
     //resetting the userwordsmap when we reach score page 
@@ -48,7 +47,13 @@ export const Scores = ({id, onReplay}) => {
             </h2>
             <div class="scores-box">
 
-                <p class="bronze">{toPrint}</p>
+                <div>
+                    {Object.keys(scorelist).map(key => (
+                        <div key={key}>
+                            {key} <Badge>{scorelist[key]}</Badge>
+                        </div>
+                    ))}
+                </div>
                 <p class="gold">{playerName}<img class="crown" src={crown}/> <Badge>{getRandomInt(10)}</Badge></p>
                 <p class="silver">"Player 2" <Badge>0</Badge></p>
             </div>

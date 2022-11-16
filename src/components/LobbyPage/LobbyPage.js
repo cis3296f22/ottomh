@@ -27,7 +27,7 @@ export const LobbyPage = () => {
                     ws.send(JSON.stringify({Event: "getscores"}));
                     break;
                 case "getscores":
-                    setScorelist(Object.entries(packetObject.Scores));
+                    setScorelist(packetObject.Scores);
                     break;
                 case "updateusers":
                     setUserlist(packetObject.List);
