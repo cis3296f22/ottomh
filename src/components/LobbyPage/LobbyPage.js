@@ -24,8 +24,9 @@ export const LobbyPage = () => {
                     break;
                 case "endvoting":
                     setStage("scores");
+                    ws.send(JSON.stringify({Event: "getscores"}));
                     break;
-                case "getscore":
+                case "getscores":
                     setScorelist(packetObject.Scores);
                     break;
                 case "updateusers":
