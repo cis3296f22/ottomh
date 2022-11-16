@@ -13,7 +13,7 @@ type ScoreList struct {
 
 func CreateScores() *ScoreList {
 	mapDemo := map[string][]string{
-		"user1": {"one", "two", "three", "four", "five"},
+		"user1": {"one", "two", "three", "four", "five", "six"},
 		"user2": {"one", "two", "three", "four", "five"},
 		"user3": {"one", "two"},
 	}

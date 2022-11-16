@@ -78,12 +78,11 @@ func (l *Lobby) lifecycle() {
 						})
 						l.userList.MessageAll(packetOut)
 					case "getscores":
-						//sm := CreateScores()
-						//scorelist := sm.scorem
-						demoTest := "helloworld"
+						sm := CreateScores()
+						scorelist := sm.scorem
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event":  "getscores",
-							"Scores": demoTest,
+							"Scores": scorelist,
 						})
 						l.userList.MessageAll(packetOut)
 					default:
