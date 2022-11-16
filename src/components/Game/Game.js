@@ -17,6 +17,11 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    //responding to word submissions
+    const [goodResponse, setGoodResponse] = useState(false)
+    const [badResponse, setBadResponse] = useState(false)
+    const [word, setWord] = useState("")
+
     const setLoading = (loading) => {
         // If the timer has ended
         if (!loading) {
@@ -34,7 +39,7 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         let answer = document.getElementById("input-answer").value;
         //send answer here
         document.getElementById("input-answer").value = '';
-
+        
         //send recieved answers along with user and lobbyId to backend for processing 
         let url;
         if (window.location.protocol === 'https:') {
@@ -52,11 +57,18 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         })
         if (response.status === 200) {
             let all_answers = await response.json();
-
+            setWord(answer)
             if(all_answers["Submissions"] === true) {
-                console.log(`Accepted; Word submitted: [\"${answer}\"]`);   
-            }  else{
-                console.log(`Rejected: Word ["${answer}"] already given`); 
+                setGoodResponse(true)
+                setTimeout(() => {
+                    setGoodResponse(false)
+                  }, "700")
+
+            }  else {
+                setBadResponse(true)
+                setTimeout(() => {
+                    setBadResponse(false)
+                  }, "1500")
             }
         }
              
@@ -67,6 +79,7 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
     return(
         <div className="game">
             <div>
+            
                 <Button variant="outline-info" onClick={handleShow}>
                     How to Play!
                 </Button>
@@ -74,7 +87,7 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
                 <h2 className="title-h">
                     {cat} <Badge bg="secondary">{letter}</Badge>
                 </h2>
-
+                
                 <Modal className="instruction-popup" show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>INFO</Modal.Title>
@@ -101,6 +114,18 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
                             Submit Answer
                     </Button>
                 </Form>
+                <Modal className="answer-good" show={goodResponse} onHide={() => setGoodResponse(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title> Accepted! Good Job! </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body> Word submitted: ["{word}"]</Modal.Body>
+                </Modal>
+                <Modal className="answer-bad" show={badResponse} onHide={() => setBadResponse(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title> Rejected! Try Another Answer! </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body> Word submitted: ["{word}"]</Modal.Body>
+                </Modal>
             </div>
             <div>
                 <br/>
@@ -111,7 +136,7 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         
                 <Button variant="primary" id ="directToVote" type="button" onClick={onTimeover} hidden></Button>
 
-
+     
             </div>
             <div>
                 <h3>Players:</h3>
