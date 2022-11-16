@@ -17,6 +17,7 @@ var ErrDuplicateUser error = errors.New("User with given username already exists
 type Lobby struct {
 	ID          string
 	userList    UserList
+	userWords	*userWordsMap
 	roundEnded  bool
 	votingEnded bool
 	lobbyEnded  bool
@@ -32,9 +33,15 @@ func makeLobby(ID string) *Lobby {
 		userList: UserList{
 			sockets: make(map[string]*WebSocket),
 		},
+		userWords: New(),	// create new userWordsMap
 	}
+<<<<<<< HEAD
 	go l.lifecycle()
 	return l
+=======
+	go l.lifecycle()	// sets the values for roundedEnded and votingEnded
+	return l, nil
+>>>>>>> 0f04b1bcd44478a9b97b425352a404da06c972e4
 }
 
 // This forever-loop continuosly checks WebSockets for messages from
@@ -48,10 +55,52 @@ func (l *Lobby) lifecycle() {
 				var packetIn WSPacket
 				json.Unmarshal(m, &packetIn)
 
+<<<<<<< HEAD
 				// Handle messages here!
 				switch packetIn.Event {
 				case "endround":
 					if !l.roundEnded {
+=======
+					// Handle messages here!
+					switch packetIn.Event {
+					case "checkword":
+						var word WordPacket // WordPacket type struct declared in userWords.go
+						var isDup bool // if word submitted by user already exists in the user words map
+
+						json.Unmarshal([]byte(packetIn.Data), &word) // convert json object from packetIn.Data into a WordPacket type
+						isDup = l.userWords.UserWords(word) // check if word is a duplicate
+
+						// send isDup boolean result back to the frontend
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event": "checkword",
+							"CheckWord": isDup,
+						})
+						socket.WriteMessage(packetOut)
+					case "endround":
+						if !l.roundEnded {
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "endround",
+							})
+							l.userList.MessageAll(packetOut)
+							l.roundEnded = true
+						}
+					case "endvoting":
+						if !l.votingEnded {
+							packetOut, _ := json.Marshal(map[string]interface{}{
+								"Event": "endvoting",
+							})
+							l.userList.MessageAll(packetOut)
+							l.votingEnded = true
+						}
+					case "begingame":
+						// Select a random category and letter
+						cat_i := rand.Intn(len(config.Categories))
+						category := config.Categories[cat_i]
+						// Recall that A has a byte value of 65, and there are 26 letters
+						letter := string(byte(rand.Intn(26) + 65))
+
+						// Tell all sockets to start the game
+>>>>>>> 0f04b1bcd44478a9b97b425352a404da06c972e4
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
 						})

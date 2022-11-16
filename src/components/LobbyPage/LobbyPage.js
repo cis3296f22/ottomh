@@ -19,6 +19,9 @@ export const LobbyPage = () => {
             const packet = event.data;
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
+                case "checkword":
+                    console.log(`checkword: ${packetObject.CheckWord}`);
+                    break;
                 case "endround":
                     setStage("voting");
                     break;

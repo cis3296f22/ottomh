@@ -41,12 +41,11 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         document.getElementById("input-answer").value = '';
         
         //send recieved answers along with user and lobbyId to backend for processing 
-        let url;
-        if (window.location.protocol === 'https:') {
-            url = `https://${window.location.host}/GetAnswers`;
-        } else {
-            url = `http://${window.location.host}/GetAnswers`;
-        }
+        ws.send(JSON.stringify({
+            CurrentPlayer: currentPlayer,
+            Answer: answer,
+            LobbyId: lobbyId
+        }));
 
         let response = await fetch(url, {
             method: "POST",

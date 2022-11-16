@@ -1,13 +1,13 @@
 package types
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
+	// "encoding/json"
+	// "io/ioutil"
+	// "net/http"
 	"strings"
 	"sync"
 
-	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 	"golang.org/x/exp/slices"
 )
 
@@ -46,12 +46,14 @@ func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
 	
 }
 
-func (v *userWordsMap) UserWords(c *gin.Context) {
-	info, _ := ioutil.ReadAll(c.Request.Body) //captures body of json post
+func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
+	// info, _ := ioutil.ReadAll(c.Request.Body) //captures body of json post
 
 	//tokenizing information sent from frontend
-	var packetIn WordPacket
-	json.Unmarshal(info, &packetIn)
+	// var packetIn WordPacket
+	// json.Unmarshal(data, &packetIn)
+
+	var result bool
 
 	username := packetIn.CurrentPlayer
 	answer := packetIn.Answer
@@ -63,29 +65,31 @@ func (v *userWordsMap) UserWords(c *gin.Context) {
 		v.clearMapLobbyId(lobbyId)
 	} else {
 
-	//result will return False if we find duplicate submission in map
-	result := true
-	v.Mu.RLock()
-	returnedMap := v.m
-	for k, element := range returnedMap {
-		id := strings.Split(k, ":")
-		for i := range element {
-			if lobbyId == id[0] && answer == element[i] {
-				result = false
+		//result will return False if we find duplicate submission in map
+		result = true
+		v.Mu.RLock()
+		returnedMap := v.m
+		for k, element := range returnedMap {
+			id := strings.Split(k, ":")
+			for i := range element {
+				if lobbyId == id[0] && answer == element[i] {
+					result = false
+				}
 			}
 		}
-	}
-	v.Mu.RUnlock()
+		v.Mu.RUnlock()
 
-	if result {
-		//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted
-		v.mapSetter(lobbyUser, answer)
-	}
+		if result {
+			//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted
+			v.mapSetter(lobbyUser, answer)
+		}
 
-	c.JSON(http.StatusOK, gin.H{
-		"Submissions": result,
-	})
+		// c.JSON(http.StatusOK, gin.H{
+		// 	"Submissions": result,
+		// })
 	
 	}
+
+	return result
 
 }
