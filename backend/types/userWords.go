@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/exp/slices"
 )
 
 type userWordsMap struct {
@@ -33,6 +34,18 @@ func (s *userWordsMap) mapSetter(someKey string, someValue string) {
 	s.Mu.Unlock()
 }
 
+func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
+	s.Mu.Lock()
+	for k, _ := range s.m {
+		id := strings.Split(k, ":")
+			if lobbyId == id[0] {
+				s.m[k] = slices.Delete(s.m[k], 0, len(s.m[k]))
+			}
+		}
+	s.Mu.Unlock()
+	
+}
+
 func (v *userWordsMap) UserWords(c *gin.Context) {
 	info, _ := ioutil.ReadAll(c.Request.Body) //captures body of json post
 
@@ -44,6 +57,11 @@ func (v *userWordsMap) UserWords(c *gin.Context) {
 	answer := packetIn.Answer
 	lobbyId := packetIn.LobbyID
 	lobbyUser := lobbyId + ":" + username
+
+	//on score page, clear list associated with lobbyId, if username equals delete101x and answer equals delete101x
+	if (username == "delete101x" && answer == "delete101x"){
+		v.clearMapLobbyId(lobbyId)
+	} else {
 
 	//result will return False if we find duplicate submission in map
 	result := true
@@ -67,5 +85,7 @@ func (v *userWordsMap) UserWords(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"Submissions": result,
 	})
+	
+	}
 
 }

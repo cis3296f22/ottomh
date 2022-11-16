@@ -3,12 +3,18 @@ import { Container, Row, ListGroup, Badge } from 'react-bootstrap';
 import { GamePageTimer } from '../';
 import { useState } from 'react';
 import { useStore } from "../../store";
+import Button from 'react-bootstrap/Button';
 
-export const Voting = ({ onTimeover, words, cat, letter }) => {
+
+export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
+    const [isLoading, _setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
 
-    let onTimerStop = (_) => {
-        ws.send(JSON.stringify({ Event: "endvoting" }))
+    const setLoading = (loading) => {
+        if (!loading){
+            ws.send(JSON.stringify({ Event: "endvoting" }))
+            }
+        _setLoading(loading);
     }
 
     // Create an array of boolean that stores whether or not a word is crossed
@@ -31,7 +37,7 @@ export const Voting = ({ onTimeover, words, cat, letter }) => {
             {crossed[index] && <del>{word}</del>}
 
         </ListGroup.Item>);
-
+if (isLoading) {
     return (
         <Container fluid className='m-5 w-auto text-center'
             style={{ 'height': '95vh' }}>
@@ -47,8 +53,17 @@ export const Voting = ({ onTimeover, words, cat, letter }) => {
                 </ListGroup>
             </Row>
             <Row className='h-25 align-items-center'>
-                {GamePageTimer(onTimerStop)}
+                {GamePageTimer(setLoading, time_picked)}
+                <Button variant="primary" id ="directToScore" type="button" onClick={onTimeover} hidden></Button>
+
             </Row>
         </Container>
     );
 }
+
+else { 
+    document.getElementById('directToScore').click()
+  }
+
+};
+

@@ -10,6 +10,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var ErrEmptyQueue error = errors.New("No message in queue")
+var ErrClosedWebSocket error = errors.New("WebSocket is closed")
+
 // This struct is used to hold data recieved over web sockets
 type WSPacket struct {
 	Event string
@@ -32,6 +35,10 @@ type WebSocket struct {
 
 func (ws *WebSocket) Close() {
 	ws.muAlive.Lock()
+	// Do not close a WebSocket twice
+	if !ws.isAlive {
+		return
+	}
 	ws.isAlive = false
 	ws.muAlive.Unlock()
 	close(ws.r)
@@ -63,21 +70,25 @@ func (ws *WebSocket) readCycle() {
 }
 
 // Try to read a message from the web socket. If no message is available,
-// it returns an error.
+// it returns an error. Confirms that the WebSocket is still alive.
 func (ws *WebSocket) ReadMessage() ([]byte, error) {
-	select {
-	case m := <-ws.r:
-		return m, nil
-	default:
-		return []byte(""), errors.New("No message in queue")
+	if ws.IsAlive() {
+		select {
+		case m := <-ws.r:
+			return m, nil
+		default:
+			return nil, ErrEmptyQueue
+		}
+	} else {
+		return nil, ErrClosedWebSocket
 	}
 }
 
 // Confirms that the WebSocket is still alive.
 // Before using a WebSocket, the user should make sure it is alive.
 func (ws *WebSocket) IsAlive() bool {
-	ws.muAlive.Lock()
-	defer ws.muAlive.Unlock()
+	// ws.muAlive.Lock()
+	// defer ws.muAlive.Unlock()
 	return ws.isAlive
 }
 
@@ -94,9 +105,11 @@ func (ws *WebSocket) WriteMessage(m []byte) error {
 // The readCycle will detect a missed Pong, and close the socket accordingly.
 func (ws *WebSocket) Ping() {
 	// We only ping if the time since the last ping is long enough
-	if ws.lastPing.Sub(time.Now()) >= pingDelay {
+	now := time.Now()
+	if now.Sub(ws.lastPing) >= pingDelay {
 		ws.writeLock.Lock()
 		defer ws.writeLock.Unlock()
+		ws.lastPing = now
 		ws.ws.WriteMessage(websocket.PingMessage, []byte("keepalive"))
 	}
 }
@@ -106,6 +119,10 @@ func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.H
 	if err != nil {
 		return nil, err
 	}
+
+	g_ws.SetPongHandler(func(msg string) error {
+		return nil
+	})
 
 	ws := &WebSocket{
 		ws:        g_ws,
