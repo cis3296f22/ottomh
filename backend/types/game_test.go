@@ -124,7 +124,7 @@ func TestTwoPlayerGame(t *testing.T) {
 		if j.Host != "testhost" {
 			t.Error("Lobby stores incorrect host")
 		}
-		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) {
+		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) && !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) {
 			t.Error("Lobby stores incorrect user list; got", j.List, "but expected", []string{"testhost", "testplayer"})
 		}
 
