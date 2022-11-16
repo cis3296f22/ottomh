@@ -19,3 +19,9 @@
 .instruction-popup{
     color: black;
 }
+.answer-good{
+    color: green;
+}
+.answer-bad{
+    color: red;
+}
