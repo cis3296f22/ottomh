@@ -20,10 +20,15 @@ export const Scores = ({id, onReplay}) => {
     const clearStore = useStore((state) => state.clearStore);
 
 
+    //Turn scorelist into array and sort
+    let sortedScores = [];
+    for (var username in scorelist) {
+        sortedScores.push([username, scorelist[username]]);
+    }
 
-    //or (const [key, value] of scorelist) {
-        //console.log(`${key}: ${value}`);
-    //}
+    sortedScores.sort(function(a, b) {
+        return b[1] - a[1];
+    });
     
 
     //resetting the userwordsmap when we reach score page 
@@ -48,9 +53,9 @@ export const Scores = ({id, onReplay}) => {
             <div class="scores-box">
 
                 <div>
-                    {Object.keys(scorelist).map(key => (
-                        <div key={key}>
-                            {key} <Badge>{scorelist[key]}</Badge>
+                    {sortedScores.map(item => (
+                        <div item={item}>
+                            {item[0]} <Badge>{item[1]}</Badge>
                         </div>
                     ))}
                 </div>
