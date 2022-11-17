@@ -78,7 +78,15 @@ func (l *Lobby) lifecycle() {
 						})
 						l.userList.MessageAll(packetOut)
 					case "getscores":
-						sm := CreateScores()
+						//here should take map from voted page
+						mapDemo := map[string][]string{
+							"user7": {"one", "two", "three", "four", "five", "six"},
+							"user2": {"one", "two", "three", "four", "five"},
+							"user1": {"one", "two"},
+							"user4": {"one", "two", "three", "four", "five", "six"},
+							"user5": {"one", "two", "three", "four", "five", "six", "seven"},
+						}
+						sm := CreateScores(mapDemo)
 						scorelist := sm.scorem
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event":  "getscores",
