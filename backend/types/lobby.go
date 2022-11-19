@@ -85,6 +85,7 @@ func (l *Lobby) lifecycle() {
 							"user1": {"one", "two"},
 							"user4": {"one", "two", "three", "four", "five", "six"},
 							"user5": {"one", "two", "three", "four", "five", "six", "seven"},
+							"a":     {"one", "two", "three", "four", "five", "six"},
 						}
 						sm := CreateScores(mapDemo)
 						scorelist := sm.scorem

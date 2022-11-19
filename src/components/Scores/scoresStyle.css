@@ -11,12 +11,10 @@
     border-color: white;
     border-radius: 0.5rem;
 }
-.gold{
+.player-score{
     font-size: 3rem;
 }
-.silver{
-    font-size: 2rem;
-}
+
 .winner-box{
     margin-top: 1rem;
 }

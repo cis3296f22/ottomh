@@ -1,7 +1,8 @@
 import './scoresStyle.css';
 import Button from 'react-bootstrap/Button';
-import Badge from 'react-bootstrap/Badge';
+import { ListGroup, Badge } from 'react-bootstrap';
 import crown from './crown.png';
+import {useState } from "react";
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,13 +13,9 @@ export const Scores = ({id, onReplay}) => {
 
     const playerName = useStore((state) => state.username);
     const lobbyId = useStore((state) => state.lobbyId);
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
     const navigate = useNavigate();
     const scorelist = useStore((state) => state.scorelist);
     const clearStore = useStore((state) => state.clearStore);
-
 
     //Turn scorelist into array and sort
     let sortedScores = [];
@@ -29,7 +26,6 @@ export const Scores = ({id, onReplay}) => {
     sortedScores.sort(function(a, b) {
         return b[1] - a[1];
     });
-    
 
     //resetting the userwordsmap when we reach score page 
     let url;
@@ -50,23 +46,8 @@ export const Scores = ({id, onReplay}) => {
             <h2>
                 Final Scores
             </h2>
-            <div class="scores-box">
-
-                <div>
-                    {sortedScores.map(item => (
-                        <div item={item}>
-                            {item[0]} <Badge>{item[1]}</Badge>
-                        </div>
-                    ))}
-                </div>
-                <p class="gold">{playerName}<img class="crown" src={crown}/> <Badge>{getRandomInt(10)}</Badge></p>
-                <p class="silver">"Player 2" <Badge>0</Badge></p>
-            </div>
             <div class="winner-box">
-                <h3>Winner: {playerName}</h3>
-            </div>
-            <div>
-                <h4>Most Voted off: "Player 2"</h4>
+                <h3>Winner: {sortedScores[0]}</h3>
             </div>
             <div>
                 <Button variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
@@ -76,6 +57,19 @@ export const Scores = ({id, onReplay}) => {
                     Replay game
                 </Button>
             </div>
+            <ListGroup class="scores-box">
+                <img class="crown" src={crown}></img>
+                {sortedScores.map(item => (
+                    <ListGroup.Item item={item} style={{ fontSize: `2rem` }}>
+                        {item[0]} <Badge>{item[1]}</Badge>
+                        {reduceFontSize()}
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
+            <div>
+                <h4>Most Voted off: "still in development"</h4>
+            </div>
+            
         </div>
     );
 };
