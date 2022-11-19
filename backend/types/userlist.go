@@ -42,6 +42,11 @@ func (ul *UserList) ContainsUser(name string) bool {
 	ul.mu.Lock()
 	defer ul.mu.Unlock()
 	_, exists := ul.sockets[name]
+	if exists == true {
+		if !ul.sockets[name].isAlive {
+				exists = false
+				}
+		}
 	return exists
 }
 
