@@ -88,6 +88,12 @@ func (l *Lobby) lifecycle() {
 						"Scores": scorelist,
 					})
 					l.userList.MessageAll(packetOut)
+				case "waitingRoom":
+					packetOut, _ := json.Marshal(map[string]interface{}{
+						"Event":    "waitingRoom",
+					})
+					l.userList.MessageAll(packetOut)
+
 				default:
 					log.Print("Recieved message from WebSocket: ", m)
 					if err := socket.WriteMessage(m); err != nil {
