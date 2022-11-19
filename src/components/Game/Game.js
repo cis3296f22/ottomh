@@ -38,12 +38,13 @@ export const Game = ({onTimeover, cat, letter, time_picked}) => {
         e.preventDefault();
         let answer = document.getElementById("input-answer").value;
         function letterCheck(word){
-            return word.charAt(0) === letter
+            return word.charAt(0) === letter.toLowerCase();
         }
         //send answer here
         document.getElementById("input-answer").value = '';
-        
+        answer = answer.toLowerCase();
         if (letterCheck(answer)){
+            
             //send recieved answers along with user and lobbyId to backend for processing 
             let url;
             if (window.location.protocol === 'https:') {

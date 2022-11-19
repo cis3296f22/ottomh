@@ -31,6 +31,7 @@ export const Join = ({ isCreate, onBackClick }) => {
         if (isCreate) { // get lobby id from server
             let fetchUrl;
             username = inputHostNameRef.current.value;
+            username = username.toLowerCase()
             setHostname(username);
             setUsername(username);
             // send a request to the server to create a new lobby
@@ -54,6 +55,7 @@ export const Join = ({ isCreate, onBackClick }) => {
         } else { // get lobby id from input box
             lobbyId = inputCodeRef.current.value;
             username = inputNameRef.current.value;
+            username = username.toLowerCase()
             setUsername(username);
         }
 
