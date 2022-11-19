@@ -2,9 +2,9 @@ package types
 
 type ScoreList struct {
 	scorem map[string]int
-	Key    string
-	Value  int
 }
+
+var totalScores = make(map[string]int)
 
 func CreateScores(wm map[string][]string) *ScoreList {
 
@@ -15,5 +15,18 @@ func CreateScores(wm map[string][]string) *ScoreList {
 		s.scorem[key] = len(element)
 	}
 
+	for key := range s.scorem {
+		totalScores[key] += s.scorem[key]
+	}
+
 	return s
+}
+
+func MakeTotalScores(sm map[string]int) map[string]int {
+
+	for key := range sm {
+		totalScores[key] += sm[key]
+	}
+
+	return totalScores
 }
