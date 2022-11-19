@@ -19,6 +19,7 @@ export const Scores = ({id, onReplay}) => {
     const scorelist = useStore((state) => state.scorelist);
     const clearStore = useStore((state) => state.clearStore);
 
+    const [hostUser, username] = useStore(state => [state.hostname, state.username])
 
 
     //or (const [key, value] of scorelist) {
@@ -67,9 +68,10 @@ export const Scores = ({id, onReplay}) => {
                 <Button variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Back to Main
                 </Button>
+                {hostUser === username ?
                 <Button variant="primary" type="button" onClick={ onReplay }>
-                    Replay game
-                </Button>
+                    Return to Lobby
+                </Button> : null }
             </div>
         </div>
     );

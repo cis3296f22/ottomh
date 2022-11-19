@@ -39,6 +39,9 @@ export const LobbyPage = () => {
                     setLetter(packetObject.Letter)
                     setStage("playGame");
                     break;
+                case "waitingRoom":
+                    setStage("waitingRoom")
+                    break;
                 default:
                     console.log(`Received data from backend: ${event.data}`);
             }
@@ -63,6 +66,11 @@ export const LobbyPage = () => {
         ws.send(JSON.stringify({Event: "begingame"}));
     }
     
+    const onReplay = () => {
+        ws.send(JSON.stringify({Event: "waitingRoom"}));
+    }
+    
+    //change timer to 00:60 on deployment to heroku
     const time_picked = "00:30"
 
 
@@ -77,7 +85,7 @@ export const LobbyPage = () => {
                         'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
                         'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter} time_picked= {time_picked}/>}
 
-            {stage === "scores" && <Scores onReplay={() => setStage("waitingRoom")} id={lobbyId}/>}
+            {stage === "scores" && <Scores onReplay={onReplay} id={lobbyId}/>}
         </div>
     );
 };
