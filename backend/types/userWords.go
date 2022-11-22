@@ -47,12 +47,6 @@ func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
 }
 
 func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
-	// info, _ := ioutil.ReadAll(c.Request.Body) //captures body of json post
-
-	//tokenizing information sent from frontend
-	// var packetIn WordPacket
-	// json.Unmarshal(data, &packetIn)
-
 	var result bool
 
 	username := packetIn.CurrentPlayer
@@ -83,13 +77,7 @@ func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
 			//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted
 			v.mapSetter(lobbyUser, answer)
 		}
-
-		// c.JSON(http.StatusOK, gin.H{
-		// 	"Submissions": result,
-		// })
-	
 	}
 
 	return result
-
 }

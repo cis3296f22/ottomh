@@ -35,13 +35,8 @@ func makeLobby(ID string) *Lobby {
 		},
 		userWords: New(),	// create new userWordsMap
 	}
-<<<<<<< HEAD
 	go l.lifecycle()
 	return l
-=======
-	go l.lifecycle()	// sets the values for roundedEnded and votingEnded
-	return l, nil
->>>>>>> 0f04b1bcd44478a9b97b425352a404da06c972e4
 }
 
 // This forever-loop continuosly checks WebSockets for messages from
@@ -55,52 +50,35 @@ func (l *Lobby) lifecycle() {
 				var packetIn WSPacket
 				json.Unmarshal(m, &packetIn)
 
-<<<<<<< HEAD
 				// Handle messages here!
 				switch packetIn.Event {
+				case "checkword":
+					var word WordPacket // WordPacket type struct declared in userWords.go
+					var isDup bool // if word submitted by user already exists in the user words map
+					// var jsonObject string = `{"CurrentPlayer": "Username", "Answer": "blueberry", "LobbyId": "12345"}`
+
+					// convert json object from packetIn.Data into a WordPacket type
+					log.Print("m: ", string(m))
+					log.Print("packetIn.Event: ", packetIn.Event)
+					log.Print("packetIn.Data ", string(packetIn.Data))
+					err := json.Unmarshal([]byte(packetIn.Data), &word)
+					if err != nil {
+						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
+					}
+					log.Print("converted json WordPacket: ", word)
+
+					// check if word is a duplicate
+					isDup = l.userWords.UserWords(word)
+
+					// send isDup boolean result back to the frontend
+					packetOut, _ := json.Marshal(map[string]interface{}{
+						"Event": "checkword",
+						"isDupWord": isDup,
+						"Word": word.Answer,
+					})
+					socket.WriteMessage(packetOut)
 				case "endround":
 					if !l.roundEnded {
-=======
-					// Handle messages here!
-					switch packetIn.Event {
-					case "checkword":
-						var word WordPacket // WordPacket type struct declared in userWords.go
-						var isDup bool // if word submitted by user already exists in the user words map
-
-						json.Unmarshal([]byte(packetIn.Data), &word) // convert json object from packetIn.Data into a WordPacket type
-						isDup = l.userWords.UserWords(word) // check if word is a duplicate
-
-						// send isDup boolean result back to the frontend
-						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event": "checkword",
-							"CheckWord": isDup,
-						})
-						socket.WriteMessage(packetOut)
-					case "endround":
-						if !l.roundEnded {
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "endround",
-							})
-							l.userList.MessageAll(packetOut)
-							l.roundEnded = true
-						}
-					case "endvoting":
-						if !l.votingEnded {
-							packetOut, _ := json.Marshal(map[string]interface{}{
-								"Event": "endvoting",
-							})
-							l.userList.MessageAll(packetOut)
-							l.votingEnded = true
-						}
-					case "begingame":
-						// Select a random category and letter
-						cat_i := rand.Intn(len(config.Categories))
-						category := config.Categories[cat_i]
-						// Recall that A has a byte value of 65, and there are 26 letters
-						letter := string(byte(rand.Intn(26) + 65))
-
-						// Tell all sockets to start the game
->>>>>>> 0f04b1bcd44478a9b97b425352a404da06c972e4
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
 						})
@@ -122,13 +100,13 @@ func (l *Lobby) lifecycle() {
 					// Recall that A has a byte value of 65, and there are 26 letters
 					letter := string(byte(rand.Intn(26) + 65))
 
-					// Tell all sockets to start the game
-					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event":    "begingame",
-						"Category": category,
-						"Letter":   letter,
-					})
-					l.userList.MessageAll(packetOut)
+				// Tell all sockets to start the game
+				packetOut, _ := json.Marshal(map[string]interface{}{
+					"Event":    "begingame",
+					"Category": category,
+					"Letter":   letter,
+				})
+				l.userList.MessageAll(packetOut)
 				case "getscores":
 					//sm := CreateScores()
 					//scorelist := sm.scorem
