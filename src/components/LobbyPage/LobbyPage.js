@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
 import { WaitState, Game, Scores, Voting } from "../";
@@ -8,12 +8,16 @@ export const LobbyPage = () => {
     const [stage, setStage] = useState("waitingRoom");
     const [cat, setCat] = useState("");
     const [letter, setLetter] = useState("");
-    const [ws, username, hostname, setHostname, setUserlist, setScorelist, clearStore] = useStore(
-        (state) => [state.socket, state.username, state.hostname, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
+    const [isDupWord, setIsDupWord] = useState(null);
+    const [wordsArr, setWordsArr] = useState(null);
+    const [ws, setHostname, setUserlist, setScorelist, clearStore] = useStore(
+        (state) => [state.socket, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
     const navigate = useNavigate();
+    // let tempWordsArr = [];
 
-    ws.onopen = (_) => {
-        alert("websocket is open now");
+    useEffect(() => {
+        ws.onopen = (_) => {
+            alert("websocket is open now");
 
         ws.onmessage = (event) => {
             const packet = event.data;
@@ -24,9 +28,8 @@ export const LobbyPage = () => {
                     break;
                 case "endvoting":
                     setStage("scores");
-                    ws.send(JSON.stringify({Event: "getscores"}));
                     break;
-                case "getscores":
+                case "getscore":
                     setScorelist(packetObject.Scores);
                     break;
                 case "updateusers":
@@ -39,53 +42,47 @@ export const LobbyPage = () => {
                     setLetter(packetObject.Letter)
                     setStage("playGame");
                     break;
-                case "waitingRoom":
-                    setStage("waitingRoom")
-                    break;
                 default:
                     console.log(`Received data from backend: ${event.data}`);
             }
         }
-
-        // If we have the hostname, inform the WebSocket
-        if (hostname) {
-            ws.send(JSON.stringify({Event: "addhost", Data: hostname}));
-        }
-    }
+    });
 
     ws.onclose = (event) => {
         alert(`websocket is closed now: ${event}`);
 
-        // prevent users from joining a lobby that doesn't
+        // prevent users from joining a lobby that doesn't exist
         clearStore();
         navigate("/");
     }
 
     // Action for pressing the "Start" button while on the Waiting Page
     const onStart = () => {
-        ws.send(JSON.stringify({Event: "begingame"}));
+        ws.send(JSON.stringify({ Event: "begingame" }));
     }
     
-    const onReplay = () => {
-        ws.send(JSON.stringify({Event: "waitingRoom"}));
-    }
-    
-    //change timer to 00:60 on deployment to heroku
-    const time_picked = "00:30"
+    const time_picked = "00:3"
 
 
     return (
         <div className="container-fluid h-100">
+            <div>stage: {stage}</div>
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
-            {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} time_picked= {time_picked}/>}
+            {stage === "playGame" &&
+                <Game
+                    onTimeover={() => setStage("voting")}
+                    cat={cat}
+                    letter={letter}
+                    time_picked={time_picked}
+                    isDupWord={isDupWord}
+                />
+            }
 
-            {stage === "voting" && <Voting onTimeover={() => setStage("scores")} 
-                words={['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',
-                        'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
-                        'here', 'I', 'am', 'manually', 'extending', 'it']} cat={cat} letter={letter} time_picked= {time_picked}/>}
+            {stage === "voting" && <Voting onTimeover={() => setStage("scores")}
+                words={wordsArr} cat={cat} letter={letter} time_picked={time_picked} />}
 
-            {stage === "scores" && <Scores onReplay={onReplay} id={lobbyId}/>}
+            {stage === "scores" && <Scores onReplay={() => setStage("waitingRoom")} id={lobbyId}/>}
         </div>
     );
 };

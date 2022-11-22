@@ -17,6 +17,7 @@ var ErrDuplicateUser error = errors.New("User with given username already exists
 type Lobby struct {
 	ID          string
 	userList    UserList
+	userWords	*userWordsMap
 	roundEnded  bool
 	votingEnded bool
 	lobbyEnded  bool
@@ -32,6 +33,7 @@ func makeLobby(ID string) *Lobby {
 		userList: UserList{
 			sockets: make(map[string]*WebSocket),
 		},
+		userWords: New(),	// create new userWordsMap
 	}
 	go l.lifecycle()
 	return l
@@ -50,10 +52,36 @@ func (l *Lobby) lifecycle() {
 
 				// Handle messages here!
 				switch packetIn.Event {
+				case "checkword":
+					var word WordPacket // WordPacket type struct declared in userWords.go
+					var isDup bool // if word submitted by user already exists in the user words map
+
+					// convert the stringified json object from packetIn.Data into a WordPacket type
+					err := json.Unmarshal([]byte(packetIn.Data), &word)
+					if err != nil {
+						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
+					}
+
+					// check if word is a duplicate
+					isDup = l.userWords.UserWords(word)
+
+					// send isDup boolean result back to the frontend
+					packetOut, _ := json.Marshal(map[string]interface{}{
+						"Event": "checkword",
+						"isDupWord": isDup,
+						"Word": word.Answer,
+					})
+					socket.WriteMessage(packetOut)
 				case "endround":
 					if !l.roundEnded {
+						// get all words in the database
+						var wordList []string = l.userWords.getWordsArr() // a list of all the user words that were entered
+						log.Print("wordList: ", wordList)
+
+						// send wordList array back to the frontend
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
+							"WordList": wordList,
 						})
 						l.userList.MessageAll(packetOut)
 						l.roundEnded = true
@@ -73,13 +101,13 @@ func (l *Lobby) lifecycle() {
 					// Recall that A has a byte value of 65, and there are 26 letters
 					letter := string(byte(rand.Intn(26) + 65))
 
-					// Tell all sockets to start the game
-					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event":    "begingame",
-						"Category": category,
-						"Letter":   letter,
-					})
-					l.userList.MessageAll(packetOut)
+				// Tell all sockets to start the game
+				packetOut, _ := json.Marshal(map[string]interface{}{
+					"Event":    "begingame",
+					"Category": category,
+					"Letter":   letter,
+				})
+				l.userList.MessageAll(packetOut)
 				case "getscores":
 					sm := CreateScores()
 					scorelist := sm.scorem
@@ -95,7 +123,7 @@ func (l *Lobby) lifecycle() {
 					l.userList.MessageAll(packetOut)
 
 				default:
-					log.Print("Recieved message from WebSocket: ", m)
+					log.Print("Recieved message from WebSocket: ", string(m))
 					if err := socket.WriteMessage(m); err != nil {
 						log.Print("Error writing message to WebSocket: ", err)
 					}
