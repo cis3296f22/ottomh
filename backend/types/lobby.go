@@ -55,17 +55,12 @@ func (l *Lobby) lifecycle() {
 				case "checkword":
 					var word WordPacket // WordPacket type struct declared in userWords.go
 					var isDup bool // if word submitted by user already exists in the user words map
-					// var jsonObject string = `{"CurrentPlayer": "Username", "Answer": "blueberry", "LobbyId": "12345"}`
 
-					// convert json object from packetIn.Data into a WordPacket type
-					log.Print("m: ", string(m))
-					log.Print("packetIn.Event: ", packetIn.Event)
-					log.Print("packetIn.Data ", string(packetIn.Data))
+					// convert the stringified json object from packetIn.Data into a WordPacket type
 					err := json.Unmarshal([]byte(packetIn.Data), &word)
 					if err != nil {
 						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
 					}
-					log.Print("converted json WordPacket: ", word)
 
 					// check if word is a duplicate
 					isDup = l.userWords.UserWords(word)
@@ -79,8 +74,14 @@ func (l *Lobby) lifecycle() {
 					socket.WriteMessage(packetOut)
 				case "endround":
 					if !l.roundEnded {
+						// get all words in the database
+						var wordList []string = l.userWords.getWordsArr() // a list of all the user words that were entered
+						log.Print("wordList: ", wordList)
+
+						// send wordList array back to the frontend
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
+							"WordList": wordList,
 						})
 						l.userList.MessageAll(packetOut)
 						l.roundEnded = true
@@ -117,7 +118,7 @@ func (l *Lobby) lifecycle() {
 					})
 					l.userList.MessageAll(packetOut)
 				default:
-					log.Print("Recieved message from WebSocket: ", m)
+					log.Print("Recieved message from WebSocket: ", string(m))
 					if err := socket.WriteMessage(m); err != nil {
 						log.Print("Error writing message to WebSocket: ", err)
 					}

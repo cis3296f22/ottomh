@@ -3,6 +3,7 @@ package types
 import (
 	// "encoding/json"
 	// "io/ioutil"
+	// "log"
 	// "net/http"
 	"strings"
 	"sync"
@@ -46,6 +47,19 @@ func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
 	
 }
 
+func (v *userWordsMap) getWordsArr() []string {
+	var wordList []string
+
+	returnedMap := v.m
+	for _, value := range returnedMap {
+		for _, element := range value {
+			wordList = append(wordList, element)
+		}
+	}
+
+	return wordList
+}
+
 func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
 	var result bool
 
@@ -64,7 +78,7 @@ func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
 		v.Mu.RLock()
 		returnedMap := v.m
 		for k, element := range returnedMap {
-			id := strings.Split(k, ":")
+			id := strings.Split(k, ":") // id is an array with this order: [lobbyId, username]
 			for i := range element {
 				if lobbyId == id[0] && answer == element[i] {
 					result = false

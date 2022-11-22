@@ -61,13 +61,13 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
     // show modal for good word and bad word based on response from backend
     useEffect(() => {
         if (isDupWord !== null) { // make sure we don't render initial null state
-            console.log(`isDupWord in game: ${isDupWord}`);
+            // console.log(`isDupWord in game: ${isDupWord}`);
             if (isDupWord === true) {
                 setGoodResponse(true);
-                setTimeout(() => setGoodResponse(false), "1000");
+                setTimeout(() => setGoodResponse(false), "700");
             } else {
                 setBadResponse(true);
-                setTimeout(() => setBadResponse(false), "1000");
+                setTimeout(() => setBadResponse(false), "900");
             }
         }
     }, [isDupWord]);
