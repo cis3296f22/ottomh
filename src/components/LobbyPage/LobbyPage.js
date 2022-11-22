@@ -23,8 +23,14 @@ export const LobbyPage = () => {
                 const packet = event.data;
                 const packetObject = JSON.parse(packet);
                 switch (packetObject.Event) {
+                    case "checkword":
+                        setIsDupWord(packetObject.isDupWord);
+                        // console.log("received from backend:", "\n", packetObject);
+                        break;
                     case "endround":
-                        setStage("voting");
+                        setWordsArr(packetObject.WordList);
+                        // tempWordsArr = packetObject.WordList;
+                        // setStage("voting")
                         break;
                     case "endvoting":
                         setStage("scores");
@@ -45,9 +51,9 @@ export const LobbyPage = () => {
                     default:
                         console.log(`Received data from backend: ${event.data}`);
                 }
-            } // end ws.onmessage
-        } // end ws.open
-    }); // end useEffect
+            }
+        }
+    });
 
     ws.onclose = (event) => {
         alert(`websocket is closed now: ${event}`);
@@ -62,7 +68,7 @@ export const LobbyPage = () => {
         ws.send(JSON.stringify({ Event: "begingame" }));
     }
 
-    const time_picked = "00:3"
+    const time_picked = "00:10"
 
 
     return (
