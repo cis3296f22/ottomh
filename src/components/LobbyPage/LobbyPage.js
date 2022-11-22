@@ -19,34 +19,35 @@ export const LobbyPage = () => {
         ws.onopen = (_) => {
             alert("websocket is open now");
 
-        ws.onmessage = (event) => {
-            const packet = event.data;
-            const packetObject = JSON.parse(packet);
-            switch (packetObject.Event) {
-                case "endround":
-                    setStage("voting");
-                    break;
-                case "endvoting":
-                    setStage("scores");
-                    break;
-                case "getscore":
-                    setScorelist(packetObject.Scores);
-                    break;
-                case "updateusers":
-                    setUserlist(packetObject.List);
-                    setHostname(packetObject.Host);
-                    break;
-                case "begingame":
-                    // 3 state sets, one re-render by React batching
-                    setCat(packetObject.Category);
-                    setLetter(packetObject.Letter)
-                    setStage("playGame");
-                    break;
-                default:
-                    console.log(`Received data from backend: ${event.data}`);
-            }
-        }
-    });
+            ws.onmessage = (event) => {
+                const packet = event.data;
+                const packetObject = JSON.parse(packet);
+                switch (packetObject.Event) {
+                    case "endround":
+                        setStage("voting");
+                        break;
+                    case "endvoting":
+                        setStage("scores");
+                        break;
+                    case "getscore":
+                        setScorelist(packetObject.Scores);
+                        break;
+                    case "updateusers":
+                        setUserlist(packetObject.List);
+                        setHostname(packetObject.Host);
+                        break;
+                    case "begingame":
+                        // 3 state sets, one re-render by React batching
+                        setCat(packetObject.Category);
+                        setLetter(packetObject.Letter)
+                        setStage("playGame");
+                        break;
+                    default:
+                        console.log(`Received data from backend: ${event.data}`);
+                }
+            } // end ws.onmessage
+        } // end ws.open
+    }); // end useEffect
 
     ws.onclose = (event) => {
         alert(`websocket is closed now: ${event}`);
@@ -60,7 +61,7 @@ export const LobbyPage = () => {
     const onStart = () => {
         ws.send(JSON.stringify({ Event: "begingame" }));
     }
-    
+
     const time_picked = "00:3"
 
 
@@ -82,7 +83,7 @@ export const LobbyPage = () => {
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")}
                 words={wordsArr} cat={cat} letter={letter} time_picked={time_picked} />}
 
-            {stage === "scores" && <Scores onReplay={() => setStage("waitingRoom")} id={lobbyId}/>}
+            {stage === "scores" && <Scores onReplay={() => setStage("waitingRoom")} id={lobbyId} />}
         </div>
     );
 };
