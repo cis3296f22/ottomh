@@ -91,6 +91,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
                             <Button variant="secondary" onClick={handleClose}>
                                 Close
                             </Button>
+                        </Modal.Footer>
                     </Modal>
 
                     <h2 className="title-h">
