@@ -62,7 +62,6 @@ export const Scores = ({id, onReplay}) => {
                 {sortedScores.map(item => (
                     <ListGroup.Item item={item} style={{ fontSize: `2rem` }}>
                         {item[0]} <Badge>{item[1]}</Badge>
-                        {reduceFontSize()}
                     </ListGroup.Item>
                 ))}
             </ListGroup>

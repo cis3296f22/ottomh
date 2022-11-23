@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -16,6 +17,7 @@ type Lobby struct {
 	userList    UserList
 	roundEnded  bool
 	votingEnded bool
+	totalScores map[string]int
 }
 
 // Initializes a new Lobby with a unique ID
@@ -36,6 +38,7 @@ func makeLobby(ID string) (*Lobby, error) {
 // This forever-loop continuosly checks WebSockets for messages from
 // the client, and responds to those messages.
 func (l *Lobby) lifecycle() {
+	l.totalScores = make(map[string]int)
 	// Loop over sockets, checking each for messages
 	for {
 		for _, socket := range l.userList.GetSocketList() {
@@ -87,11 +90,19 @@ func (l *Lobby) lifecycle() {
 							"user5": {"one", "two", "three", "four", "five", "six", "seven"},
 							"a":     {"one", "two", "three", "four", "five", "six"},
 						}
+						//return a map [string]int username:score
 						sm := CreateScores(mapDemo)
-						scorelist := sm.scorem
+						fmt.Println("sm: ", sm)
+						fmt.Println("l.totalScores(before): ", l.totalScores)
+						for key := range sm.scorem {
+							l.totalScores[key] += sm.scorem[key]
+						}
+						fmt.Println("l.totalScores(after): ", l.totalScores)
+
+						//scorelist := sm.scorem
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event":  "getscores",
-							"Scores": scorelist,
+							"Scores": l.totalScores,
 						})
 						l.userList.MessageAll(packetOut)
 					default:
