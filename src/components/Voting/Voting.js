@@ -7,16 +7,11 @@ import Button from 'react-bootstrap/Button';
 
 
 export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
-    const [isLoading, _setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
+    const [myArray, updateMyArray] = useState([]);
 
-    const setLoading = (loading) => {
-        if (!loading){
-            ws.send(JSON.stringify({ Event: "endvoting" }))
-            }
-        _setLoading(loading);
-    }
-
+    
     // Create an array of boolean that stores whether or not a word is crossed
     let [crossed, setCrossed] = useState(
         Array.from(Array(words.length)).map((_) => false) // Construct array of falses
@@ -27,6 +22,12 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
             onClick={() => setCrossed((crossed) => {
                 let newCrossed = crossed.slice(0);
                 newCrossed[index] = !newCrossed[index];
+                if (crossed[index] === false){
+                    updateMyArray( arr => [...arr, word]);
+                }
+                else {
+                    updateMyArray(myArray.filter(item => item !== word))
+                }
                 return newCrossed;
             })}
             key={word + crossed[index]}
@@ -63,6 +64,9 @@ if (isLoading) {
 
 else { 
     document.getElementById('directToScore').click()
+    let crossedWords = myArray.toString(); 
+    console.log(crossedWords, "these are the crossedwords");
+    ws.send(JSON.stringify({ Event: "endvoting", Data: crossedWords}))
   }
 
 };

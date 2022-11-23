@@ -9,6 +9,7 @@ import (
 
 	"github.com/cis3296f22/ottomh/backend/config"
 	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 var ErrDuplicateUser error = errors.New("User with given username already exists")
@@ -43,6 +44,10 @@ func makeLobby(ID string) *Lobby {
 // This forever-loop continuosly checks WebSockets for messages from
 // the client, and responds to those messages.
 func (l *Lobby) lifecycle() {
+	userPresent := 0 //number of user present to compare when sending crossed out words to userWordMap
+	numReceived := 0
+
+	crossedWordsMap := make(map[string]int)
 	l.totalScores = make(map[string]int)
 	// Loop over sockets, checking each for messages
 	for {
@@ -55,6 +60,7 @@ func (l *Lobby) lifecycle() {
 				// Handle messages here!
 				switch packetIn.Event {
 				case "endround":
+					userPresent += 1
 					if !l.roundEnded {
 						// get all words submitted by every user
 						var totalWordsArr []string = l.userWords.genWordsArr(packetIn.Data) // a list of all the user words that were entered
@@ -68,14 +74,35 @@ func (l *Lobby) lifecycle() {
 						l.roundEnded = true
 					}
 				case "endvoting":
-					if !l.votingEnded {
+					//break the crossed words to store in map
+					str := strings.Split(packetIn.Data, ",")
+					for _, s := range str {
+						if s != "" {
+							if _, ok := crossedWordsMap[s]; ok {
+								crossedWordsMap[s] += 1
+							} else {
+								crossedWordsMap[s] = 1
+							}
+						}
+					}
+
+					// We only want to signal users to move to the next stage after
+					// all users have signaled that they are ready to move on.
+					numReceived += 1
+					if numReceived == userPresent && !l.votingEnded {
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endvoting",
 						})
+
 						l.userList.MessageAll(packetOut)
 						l.votingEnded = true
+						l.userWords.removingCrossedWords(crossedWordsMap, userPresent)
+
 					}
 				case "begingame":
+					userPresent = 0                        //reset userpresent to 0 when user decides to reset game:::::
+					numReceived = 0
+					crossedWordsMap = make(map[string]int) // reset dictionary when game reset:::::
 					// This is a new round, so we have not previously ended any stage
 					l.roundEnded = false
 					l.votingEnded = false
