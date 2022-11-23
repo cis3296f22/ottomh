@@ -9,8 +9,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 export const Scores = ({id, onReplay}) => {
-    //const ws = useStore((state) => state.socket);
-    //ws.send(JSON.stringify({Event: "getscores"}));
 
     const playerName = useStore((state) => state.username);
     const lobbyId = useStore((state) => state.lobbyId);

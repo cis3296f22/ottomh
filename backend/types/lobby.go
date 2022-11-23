@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -96,14 +95,10 @@ func (l *Lobby) lifecycle() {
 						}
 						//return a map [string]int username:score
 						sm := CreateScores(mapDemo)
-						fmt.Println("sm: ", sm)
-						fmt.Println("l.totalScores(before): ", l.totalScores)
 						//merge score map into total score map
 						for key := range sm.scorem {
 							l.totalScores[key] += sm.scorem[key]
 						}
-						fmt.Println("l.totalScores(after): ", l.totalScores)
-
 						//scorelist := sm.scorem
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event":  "getscores",
