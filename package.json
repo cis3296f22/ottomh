@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.27.1"
+    "@playwright/test": "^1.27.1",
+    "jsdoc": "^4.0.0"
   }
 }
