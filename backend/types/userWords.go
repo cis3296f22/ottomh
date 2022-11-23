@@ -48,10 +48,11 @@ func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
 	
 }
 
-func (v *userWordsMap) genWordsArr(lobbyId string) []string {
+func (s *userWordsMap) genWordsArr(lobbyId string) []string {
 	var wordList []string
 
-	returnedMap := v.m
+	s.Mu.Lock()
+	returnedMap := s.m
 	for key, value := range returnedMap {
 		id := strings.Split(key, ":")
 		for _, element := range value {
@@ -60,6 +61,7 @@ func (v *userWordsMap) genWordsArr(lobbyId string) []string {
 			}
 		}
 	}
+	s.Mu.Unlock()
 
 	return wordList
 }

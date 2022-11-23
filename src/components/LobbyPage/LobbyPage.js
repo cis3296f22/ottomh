@@ -81,7 +81,7 @@ export const LobbyPage = () => {
     }
 
     //change timer to 00:60 on deployment to heroku
-    const time_picked = "00:35"
+    const time_picked = "00:05"
 
 
     return (
