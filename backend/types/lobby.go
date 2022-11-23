@@ -67,6 +67,10 @@ func (l *Lobby) lifecycle() {
 							l.votingEnded = true
 						}
 					case "begingame":
+						// This is a new round, so we have not previously ended any stage
+						l.roundEnded = false
+						l.votingEnded = false
+
 						// Select a random category and letter
 						cat_i := rand.Intn(len(config.Categories))
 						category := config.Categories[cat_i]
