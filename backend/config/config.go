@@ -8,4 +8,10 @@ var Categories []string = []string{
 	"Places",
 	"Sports",
 	"Movies",
+	"Cities",
+	"Countires",
+	"Places to hangout",
+	"Store names",
+	"Foreign words used in English",
+	"Objects"
 }
