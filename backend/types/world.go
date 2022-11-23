@@ -1,3 +1,7 @@
+/*
+	The types package declares the primary objects used to represent the game.
+*/
+
 package types
 
 import (

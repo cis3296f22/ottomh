@@ -44,9 +44,9 @@ func (ul *UserList) ContainsUser(name string) bool {
 	_, exists := ul.sockets[name]
 	if exists == true {
 		if !ul.sockets[name].isAlive {
-				exists = false
-				}
+			exists = false
 		}
+	}
 	return exists
 }
 
@@ -72,10 +72,8 @@ func (ul *UserList) GetSocketList() []*WebSocket {
 	return socketList
 }
 
-func (ul *UserList) SetInactive(index int) {
-
-}
-
+// Sends the message contained in `m` to all WebSockets.
+// This is a blocking method call.
 func (ul *UserList) MessageAll(m []byte) {
 	for _, socket := range ul.GetSocketList() {
 		socket.WriteMessage(m)

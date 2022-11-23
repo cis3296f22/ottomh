@@ -114,6 +114,9 @@ func (ws *WebSocket) Ping() {
 	}
 }
 
+// Makes a new WebSocket instance from the given HTTP request fields.
+// An error is returned in the event that the WebSocket connection is
+// not successfully created.
 func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*WebSocket, error) {
 	g_ws, err := upgrader.Upgrade(w, r, responseHeader)
 	if err != nil {
