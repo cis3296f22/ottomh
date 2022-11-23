@@ -47,13 +47,16 @@ func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
 	
 }
 
-func (v *userWordsMap) getWordsArr() []string {
+func (v *userWordsMap) genWordsArr(lobbyId string) []string {
 	var wordList []string
 
 	returnedMap := v.m
-	for _, value := range returnedMap {
+	for key, value := range returnedMap {
+		id := strings.Split(key, ":")
 		for _, element := range value {
-			wordList = append(wordList, element)
+			if lobbyId == id[0] {
+				wordList = append(wordList, element)
+			}
 		}
 	}
 

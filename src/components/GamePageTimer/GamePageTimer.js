@@ -65,10 +65,12 @@ export const GamePageTimer = (setLoading, time_picked ) => {
     }
 
 
+    // keep the 2nd argument as an empty array!!
+    // or else the timer will break
     useEffect(() => {
 
         clearTimer(getDeadTime());      
-    
+    // eslint-disable-next-line
     }, []);
 
     

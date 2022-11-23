@@ -55,7 +55,7 @@ export const Scores = ({id, onReplay}) => {
                         </div>
                     ))}
                 </div>
-                <p class="gold">{playerName}<img class="crown" src={crown}/> <Badge>{getRandomInt(10)}</Badge></p>
+                <p class="gold">{playerName}<img class="crown" src={crown} alt="a crown for the winner"/> <Badge>{getRandomInt(10)}</Badge></p>
                 <p class="silver">"Player 2" <Badge>0</Badge></p>
             </div>
             <div class="winner-box">

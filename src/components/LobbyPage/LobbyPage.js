@@ -24,6 +24,8 @@ export const LobbyPage = () => {
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
                 case "endround":
+                    console.log("TotalWordsArr: ", packetObject.TotalWordsArr);
+                    setWordsArr(packetObject.TotalWordsArr);
                     setStage("voting");
                     break;
                 case "endvoting":

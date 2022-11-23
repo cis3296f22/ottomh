@@ -13,9 +13,11 @@ import { useParams } from "react-router-dom";
 export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
     const [isLoading, _setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
+    const currentPlayer = useStore(state => state.username);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const { lobbyId } = useParams();
 
     //responding to word submissions
     const [goodResponse, setGoodResponse] = useState(false)
@@ -25,14 +27,14 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
     const setLoading = (loading) => {
         // If the timer has ended
         if (!loading) {
-            ws.send(JSON.stringify({ Event: 'endround' }));
+            ws.send(JSON.stringify({ 
+                Event: 'endround',
+                Data: lobbyId
+            }));
         }
 
         _setLoading(loading);
-
     }
-    const currentPlayer = useStore(state => state.username)
-    const { lobbyId } = useParams();
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -65,7 +67,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
         } // end if-else statement
 
 
-    } // end handleSubmit()\
+    } // end handleSubmit()
 
     // show modal for good word and bad word based on response from backend
     useEffect(() => {
@@ -75,12 +77,12 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                 setGoodResponse(true);
                 setTimeout(() => {
                     setGoodResponse(false)
-                }, "700");
+                }, "300");
             } else {
                 setBadResponse(true);
                 setTimeout(() => {
                     setBadResponse(false)
-                }, "1500");
+                }, "500");
             }
         }
     }, [isUniqueWord]);

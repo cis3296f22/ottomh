@@ -4,7 +4,7 @@ import { useStore } from '../../store';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 
 export const Join = ({ isCreate, onBackClick }) => {
     const navigate = useNavigate();
@@ -15,11 +15,6 @@ export const Join = ({ isCreate, onBackClick }) => {
         [state.setLobbyId, state.setUsername, state.setHostname, 
             state.socket, state.setSocket]
     ));
-    // when the component loads, immediately focus on the lobby code input box so that user can type immediately
-    // useEffect(() => {
-    //     inputNameRef.current.focus();
-    // });
-
     
     async function handleSubmit(e) {
         e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
