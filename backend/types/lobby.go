@@ -17,10 +17,11 @@ var ErrDuplicateUser error = errors.New("User with given username already exists
 type Lobby struct {
 	ID          string
 	userList    UserList
-	userWords	*userWordsMap
+	userWords   *userWordsMap
 	roundEnded  bool
 	votingEnded bool
 	lobbyEnded  bool
+	totalScores map[string]int
 }
 
 // Initializes a new Lobby with a unique ID
@@ -33,7 +34,7 @@ func makeLobby(ID string) *Lobby {
 		userList: UserList{
 			sockets: make(map[string]*WebSocket),
 		},
-		userWords: New(),	// create new userWordsMap
+		userWords: New(), // create new userWordsMap
 	}
 	go l.lifecycle()
 	return l
@@ -42,6 +43,7 @@ func makeLobby(ID string) *Lobby {
 // This forever-loop continuosly checks WebSockets for messages from
 // the client, and responds to those messages.
 func (l *Lobby) lifecycle() {
+	l.totalScores = make(map[string]int)
 	// Loop over sockets, checking each for messages
 	for {
 		for _, socket := range l.userList.GetSocketList() {
@@ -83,21 +85,35 @@ func (l *Lobby) lifecycle() {
 					})
 					l.userList.MessageAll(packetOut)
 				case "getscores":
-					sm := CreateScores()
-					scorelist := sm.scorem
+					//here should take map from voted page
+					mapDemo := map[string][]string{
+						"user7": {"one", "two", "three", "four", "five", "six"},
+						"user2": {"one", "two", "three", "four", "five"},
+						"user1": {"one", "two"},
+						"user4": {"one", "two", "three", "four", "five", "six"},
+						"user5": {"one", "two", "three", "four", "five", "six", "seven"},
+						"a":     {"one", "two", "three", "four", "five", "six"},
+					}
+					//return a map [string]int username:score
+					sm := CreateScores(mapDemo)
+					//merge score map into total score map
+					for key := range sm.scorem {
+						l.totalScores[key] += sm.scorem[key]
+					}
+					//scorelist := sm.scorem
 					packetOut, _ := json.Marshal(map[string]interface{}{
 						"Event":  "getscores",
-						"Scores": scorelist,
+						"Scores": l.totalScores,
 					})
 					l.userList.MessageAll(packetOut)
 				case "waitingRoom":
 					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event":    "waitingRoom",
+						"Event": "waitingRoom",
 					})
 					l.userList.MessageAll(packetOut)
 				case "checkword":
 					var word WordPacket // WordPacket type struct declared in userWords.go
-					var isUnique bool // if word submitted by user already exists in the user words map
+					var isUnique bool   // if word submitted by user already exists in the user words map
 
 					// convert the stringified json object from packetIn.Data into a WordPacket type
 					err := json.Unmarshal([]byte(packetIn.Data), &word)
@@ -113,9 +129,9 @@ func (l *Lobby) lifecycle() {
 
 					// send isDup boolean result back to the frontend
 					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event": "checkword",
+						"Event":        "checkword",
 						"isUniqueWord": isUnique,
-						"Word": word.Answer,
+						"Word":         word.Answer,
 					})
 					socket.WriteMessage(packetOut)
 				default:
