@@ -112,6 +112,11 @@ func (l *Lobby) lifecycle() {
 					// Recall that A has a byte value of 65, and there are 26 letters
 					letter := string(byte(rand.Intn(26) + 65))
 
+					// Clear all word submitted from previous round
+					log.Print("userWordsMap: ", l.userWords.m)
+					l.userWords.clearMapLobbyId(packetIn.Data)
+					log.Print("aftering clearing the map: ", l.userWords.m)
+
 					// Tell all sockets to start the game
 					packetOut, _ := json.Marshal(map[string]interface{}{
 						"Event":    "begingame",

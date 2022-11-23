@@ -73,7 +73,7 @@ export const LobbyPage = () => {
 
     // Action for pressing the "Start" button while on the Waiting Page
     const onStart = () => {
-        ws.send(JSON.stringify({ Event: "begingame" }));
+        ws.send(JSON.stringify({ Event: "begingame", Data: lobbyId }));
     }
 
     const onReplay = () => {
