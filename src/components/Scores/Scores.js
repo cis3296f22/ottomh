@@ -1,6 +1,7 @@
 import './scoresStyle.css';
 import Button from 'react-bootstrap/Button';
-import { ListGroup, Badge } from 'react-bootstrap';
+import {Badge } from 'react-bootstrap';
+import Table from 'react-bootstrap/Table';
 import crown from './crown.png';
 import {useState } from "react";
 import { useStore } from '../../store';
@@ -28,6 +29,9 @@ export const Scores = ({id, onReplay}) => {
     });
 
     console.log(sortedScores)
+    let forwinnerdisplay = [].concat(...sortedScores);
+
+    let rank = 0;
 
     //resetting the userwordsmap when we reach score page 
     let url;
@@ -45,15 +49,15 @@ export const Scores = ({id, onReplay}) => {
     })
     return(
         <div class="scores">
-            <h2>
-                Final Scores
-            </h2>
+            <h1 class="scoreheader">
+                Scoreboard
+            </h1>
             <img class="crown" src={crown}></img>
             <div class="winner-box">
-                <h3>Winner: {sortedScores[0]}</h3>
+                <h3>Winner: {forwinnerdisplay[0]}</h3>
             </div>
             <div>
-                <Button className='me-2' variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
+                <Button className='me-2' variant="secondary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Back to Main
                 </Button>
                 <Button variant="primary" type="button" onClick={ onReplay }>
@@ -63,13 +67,22 @@ export const Scores = ({id, onReplay}) => {
             <div class="note">
                 <p>*Scores are calucuted cumulatively</p>
             </div>
-            <ListGroup className='mt-2'>
+            <Table className='mt-2'>
+                <thead>
+                    <tr style={{ fontSize: `2.5rem` }}>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Scores</th>
+                    </tr>
+                </thead>
+                <tbody>
                 {sortedScores.map(item => (
-                    <ListGroup.Item item={item} style={{ fontSize: `2rem` }}>
-                        {item[0]} <Badge bg="info">{item[1]}</Badge>
-                    </ListGroup.Item>
+                    <tr item={item} style={{ fontSize: `2rem` }}>
+                        <td>{rank+=1}</td> <td>{item[0]}</td> <td><Badge bg="primary">{item[1]}</Badge></td>
+                    </tr>
                 ))}
-            </ListGroup>
+                </tbody>
+            </Table>
             
         </div>
     );

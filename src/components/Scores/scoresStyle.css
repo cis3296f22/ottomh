@@ -1,6 +1,16 @@
 .scores{
     margin-top: 5rem;
     text-align: center;
+    background-color: white;
+}
+
+.scoreheader{
+    border: solid;
+    background-color: #3399FF;
+}
+
+.winner-box{
+    color:black;
 }
 
 .player-score{
@@ -11,9 +21,12 @@
     text-align: left;
 }
 
-.winner-box{
-    margin-top: 1rem;
+.table{
+    color:white;
+    background-color: #FF6633;
 }
+
 .crown{
-    width: 5rem;
+    width: 4rem;
+    margin-left: 6rem;
 }
