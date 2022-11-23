@@ -94,6 +94,7 @@ func (l *Lobby) lifecycle() {
 						sm := CreateScores(mapDemo)
 						fmt.Println("sm: ", sm)
 						fmt.Println("l.totalScores(before): ", l.totalScores)
+						//merge score map into total score map
 						for key := range sm.scorem {
 							l.totalScores[key] += sm.scorem[key]
 						}
