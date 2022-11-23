@@ -46,4 +46,4 @@ By default, the server listens on port 8080. If you would like to use another po
 
 ## Generating Documentation
 
-To generate documentation for the backend, go to the application root, and run `godoc -http=:6060`. You can then visit the go docs at localhost:6060. Here, search for the section labeled "ottomh".
+To generate documentation for the backend, start by installing godoc by running `go install golang.org/x/tools/cmd/godoc@latest`. Then go to the application root, and run `godoc -http=:6060`. You can then visit the go docs at localhost:6060. Here, search for the section labeled "ottomh".
