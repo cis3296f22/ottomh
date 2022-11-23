@@ -63,8 +63,9 @@ func (l *Lobby) lifecycle() {
 					userPresent += 1
 					if !l.roundEnded {
 						// get all words submitted by every user
-						var totalWordsArr []string = l.userWords.genWordsArr(packetIn.Data) // a list of all the user words that were entered
+						var totalWordsArr []string = l.userWords.genWordsArr() // a list of all the user words that were entered
 						log.Print("total words entered in lobby ", packetIn.Data, ": ", totalWordsArr)
+						log.Print("total users: ", l.userWords.m)
 
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
@@ -113,9 +114,9 @@ func (l *Lobby) lifecycle() {
 					letter := string(byte(rand.Intn(26) + 65))
 
 					// Clear all word submitted from previous round
-					log.Print("userWordsMap: ", l.userWords.m)
-					l.userWords.clearMapLobbyId(packetIn.Data)
-					log.Print("aftering clearing the map: ", l.userWords.m)
+					// log.Print("userWordsMap: ", l.userWords.m)
+					l.userWords.clearAllWords()
+					// log.Print("aftering clearing the map: ", l.userWords.m)
 
 					// Tell all sockets to start the game
 					packetOut, _ := json.Marshal(map[string]interface{}{

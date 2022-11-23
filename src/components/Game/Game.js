@@ -17,7 +17,6 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const { lobbyId } = useParams();
 
     //responding to word submissions
     const [goodResponse, setGoodResponse] = useState(false)
@@ -27,10 +26,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
     const setLoading = (loading) => {
         // If the timer has ended
         if (!loading) {
-            ws.send(JSON.stringify({ 
-                Event: 'endround',
-                Data: lobbyId
-            }));
+            ws.send(JSON.stringify({ Event: 'endround' }));
         }
 
         _setLoading(loading);
@@ -54,10 +50,9 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
             let dataString = JSON.stringify({
                 CurrentPlayer: currentPlayer,
                 Answer: answer,
-                LobbyId: lobbyId
             });
 
-            //send recieved answers along with user and lobbyId to backend for processing 
+            //send recieved answers with username for backend processing
             ws.send(JSON.stringify({
                 Event: "checkword",
                 Data: dataString
@@ -77,7 +72,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                 setGoodResponse(true);
                 setTimeout(() => {
                     setGoodResponse(false)
-                }, "300");
+                }, "500");
             } else {
                 setBadResponse(true);
                 setTimeout(() => {

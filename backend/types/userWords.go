@@ -1,14 +1,7 @@
 package types
 
 import (
-	// "encoding/json"
-	// "io/ioutil"
-	// "log"
-	// "net/http"
-	"strings"
 	"sync"
-
-	// "github.com/gin-gonic/gin"
 	"golang.org/x/exp/slices"
 	
 )
@@ -21,7 +14,6 @@ type userWordsMap struct {
 type WordPacket struct {
 	CurrentPlayer string
 	Answer        string
-	LobbyID       string
 }
 
 func New() *userWordsMap {
@@ -36,29 +28,24 @@ func (s *userWordsMap) mapSetter(someKey string, someValue string) {
 	s.Mu.Unlock()
 }
 
-func (s *userWordsMap) clearMapLobbyId(lobbyId string) {
+func (s *userWordsMap) clearAllWords() {
 	s.Mu.Lock()
 	for k, _ := range s.m {
-		id := strings.Split(k, ":")
-			if lobbyId == id[0] {
-				s.m[k] = slices.Delete(s.m[k], 0, len(s.m[k]))
-			}
-		}
+		s.m[k] = slices.Delete(s.m[k], 0, len(s.m[k]))
+	}
 	s.Mu.Unlock()
 	
 }
 
-func (s *userWordsMap) genWordsArr(lobbyId string) []string {
+func (s *userWordsMap) genWordsArr() []string {
 	var wordList []string
 
 	s.Mu.Lock()
 	returnedMap := s.m
-	for key, value := range returnedMap {
-		id := strings.Split(key, ":")
+	for _, value := range returnedMap {
+		// id := strings.Split(key, ":")
 		for _, element := range value {
-			if lobbyId == id[0] {
-				wordList = append(wordList, element)
-			}
+			wordList = append(wordList, element)
 		}
 	}
 	s.Mu.Unlock()
@@ -96,27 +83,24 @@ func (s *userWordsMap) removingCrossedWords(cm map[string]int, userPresent int) 
 		
 	}
 
-func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
+func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 	var result bool
 
-	username := packetIn.CurrentPlayer
-	answer := packetIn.Answer
-	lobbyId := packetIn.LobbyID
-	lobbyUser := lobbyId + ":" + username
+	username := wordPacket.CurrentPlayer
+	answer := wordPacket.Answer
 
-	//on score page, clear list associated with lobbyId, if username equals delete101x and answer equals delete101x
-	if (username == "delete101x" && answer == "delete101x"){
-		v.clearMapLobbyId(lobbyId)
-	} else {
+	// //on score page, clear list associated with lobbyId, if username equals delete101x and answer equals delete101x
+	// if (username == "delete101x" && answer == "delete101x"){
+	// 	v.clearMapLobbyId(lobbyId)
+	// } else {
 
 		//result will return False if we find duplicate submission in map
 		result = true
 		v.Mu.RLock()
 		returnedMap := v.m
-		for k, element := range returnedMap {
-			id := strings.Split(k, ":") // id is an array with this order: [lobbyId, username]
+		for _, element := range returnedMap {
 			for i := range element {
-				if lobbyId == id[0] && answer == element[i] {
+				if answer == element[i] {
 					result = false
 				}
 			}
@@ -124,10 +108,10 @@ func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
 		v.Mu.RUnlock()
 
 		if result {
-			//key/val insert in map --> key will hold "lobbyid":"user"; val holds  "answer" submitted
-			v.mapSetter(lobbyUser, answer)
+			//key/val insert in map --> key will hold "user"; val holds  "answer" submitted
+			v.mapSetter(username, answer)
 		}
-	}
+	// }
 
 	return result
 }
