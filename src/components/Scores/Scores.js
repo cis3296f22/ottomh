@@ -1,14 +1,14 @@
 import './scoresStyle.css';
 import Button from 'react-bootstrap/Button';
-import {Badge } from 'react-bootstrap';
+import { Badge } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import crown from './crown.png';
-import {useState } from "react";
+import { useState } from "react";
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
 
-export const Scores = ({id, onReplay}) => {
+export const Scores = ({ id, onReplay }) => {
 
     const playerName = useStore((state) => state.username);
     const lobbyId = useStore((state) => state.lobbyId);
@@ -22,7 +22,7 @@ export const Scores = ({id, onReplay}) => {
         sortedScores.push([un, scorelist[un]]);
     }
 
-    sortedScores.sort(function(a, b) {
+    sortedScores.sort(function (a, b) {
         return b[1] - a[1];
     });
 
@@ -43,14 +43,15 @@ export const Scores = ({id, onReplay}) => {
         body: JSON.stringify({
             CurrentPlayer: "delete101x",
             Answer: "delete101x",
-            LobbyId: lobbyId })
+            LobbyId: lobbyId
+        })
     })
-    return(
+    return (
         <div class="scores">
             <h1 class="scoreheader">
                 Scoreboard
             </h1>
-            <img class="crown" src={crown}></img>
+            <img class="crown" src={crown} alt="a crown for the winner"></img>
             <div class="winner-box">
                 <h3>Winner: {forwinnerdisplay[0]}</h3>
             </div>
@@ -59,9 +60,9 @@ export const Scores = ({id, onReplay}) => {
                     Back to Main
                 </Button>
                 {hostUser === username ?
-                <Button variant="primary" type="button" onClick={ onReplay }>
-                    Return to Lobby
-                </Button> : null }
+                    <Button variant="primary" type="button" onClick={onReplay}>
+                        Return to Lobby
+                    </Button> : null}
             </div>
             <div class="note">
                 <p>*Scores are calucuted cumulatively</p>
@@ -69,20 +70,20 @@ export const Scores = ({id, onReplay}) => {
             <Table className='mt-2'>
                 <thead>
                     <tr style={{ fontSize: `2.5rem` }}>
-                    <th>#</th>
-                    <th>Username</th>
-                    <th>Scores</th>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Scores</th>
                     </tr>
                 </thead>
                 <tbody>
-                {sortedScores.map(item => (
-                    <tr item={item} style={{ fontSize: `2rem` }}>
-                        <td>{rank+=1}</td> <td>{item[0]}</td> <td><Badge bg="primary">{item[1]}</Badge></td>
-                    </tr>
-                ))}
+                    {sortedScores.map(item => (
+                        <tr item={item} style={{ fontSize: `2rem` }}>
+                            <td>{rank += 1}</td> <td>{item[0]}</td> <td><Badge bg="primary">{item[1]}</Badge></td>
+                        </tr>
+                    ))}
                 </tbody>
             </Table>
-            
+
         </div>
     );
 };

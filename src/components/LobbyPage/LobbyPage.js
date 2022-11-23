@@ -24,6 +24,7 @@ export const LobbyPage = () => {
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
                 case "endround":
+                    setWordsArr(packetObject.TotalWordsArr);
                     setStage("voting");
                     break;
                 case "endvoting":
@@ -48,7 +49,6 @@ export const LobbyPage = () => {
                     break;
                 case "checkword":
                     setIsUniqueWord(packetObject.isUniqueWord);
-                    console.log("received from backend:", packetObject);
                     break;
                 default:
                     console.log(`Received data from backend: ${event.data}`);

@@ -56,8 +56,13 @@ func (l *Lobby) lifecycle() {
 				switch packetIn.Event {
 				case "endround":
 					if !l.roundEnded {
+						// get all words submitted by every user
+						var totalWordsArr []string = l.userWords.genWordsArr(packetIn.Data) // a list of all the user words that were entered
+						log.Print("totalWordsArr: ", totalWordsArr)
+
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
+							"TotalWordsArr": totalWordsArr,
 						})
 						l.userList.MessageAll(packetOut)
 						l.roundEnded = true
@@ -128,7 +133,7 @@ func (l *Lobby) lifecycle() {
 					isUnique = l.userWords.UserWords(word)
 
 					// debugging
-					log.Print("packetIn: ", packetIn, " | word: ", word, " | isUnique: ", isUnique)
+					// log.Print("packetIn: ", packetIn, " | word: ", word, " | isUnique: ", isUnique)
 
 					// send isDup boolean result back to the frontend
 					packetOut, _ := json.Marshal(map[string]interface{}{
