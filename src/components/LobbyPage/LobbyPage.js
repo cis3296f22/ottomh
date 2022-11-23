@@ -9,9 +9,8 @@ export const LobbyPage = () => {
     const [cat, setCat] = useState("");
     const [letter, setLetter] = useState("");
     const [isUniqueWord, setIsUniqueWord] = useState(null);
-    const [wordsArr, setWordsArr] = useState(['Lorem', 'Ipsum', 'is', 'simply', 'dummy', 'text', 'of', 'the', 'printing', 'and', 'typesetting',
-        'industry', 'The', 'first', 'list', 'was', 'too', 'short', 'for', 'testing', 'scroll', 'so',
-        'here', 'I', 'am', 'manually', 'extending', 'it']);
+    const [wordsArr, setWordsArr] = useState(['Not', 'a', 'single', 'one', 'of', 'you', 'entered', 'a', 
+        'valid', 'word', 'how', 'dare', 'you', 'slack', 'off']);
     const [ws, hostname, setHostname, setUserlist, setScorelist, clearStore] = useStore(
         (state) => [state.socket, state.hostname, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
     const navigate = useNavigate();
@@ -24,8 +23,14 @@ export const LobbyPage = () => {
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
                 case "endround":
+<<<<<<< Updated upstream
                     console.log("TotalWordsArr: ", packetObject.TotalWordsArr);
                     setWordsArr(packetObject.TotalWordsArr);
+=======
+                    if(packetObject.TotalWordsArr.length !== 0) {
+                        setWordsArr(packetObject.TotalWordsArr);
+                    }
+>>>>>>> Stashed changes
                     setStage("voting");
                     break;
                 case "endvoting":
