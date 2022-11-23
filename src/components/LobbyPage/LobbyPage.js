@@ -9,8 +9,7 @@ export const LobbyPage = () => {
     const [cat, setCat] = useState("");
     const [letter, setLetter] = useState("");
     const [isUniqueWord, setIsUniqueWord] = useState(null);
-    const [wordsArr, setWordsArr] = useState(['Not', 'a', 'single', 'one', 'of', 'you', 'entered', 'a', 
-        'valid', 'word', 'how', 'dare', 'you']);
+    const [wordsArr, setWordsArr] = useState(['no words were entered collectively']);
     const [ws, hostname, setHostname, setUserlist, setScorelist, clearStore] = useStore(
         (state) => [state.socket, state.hostname, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
     const navigate = useNavigate();

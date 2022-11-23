@@ -13,5 +13,5 @@ var Categories []string = []string{
 	"Places to hangout",
 	"Store names",
 	"Foreign words used in English",
-	"Objects"
+	"Objects",
 }

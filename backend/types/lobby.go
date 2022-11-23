@@ -58,7 +58,7 @@ func (l *Lobby) lifecycle() {
 					if !l.roundEnded {
 						// get all words submitted by every user
 						var totalWordsArr []string = l.userWords.genWordsArr(packetIn.Data) // a list of all the user words that were entered
-						log.Print("totalWordsArr: ", totalWordsArr)
+						log.Print("total words entered in lobby ", packetIn.Data, ": ", totalWordsArr)
 
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
@@ -120,6 +120,7 @@ func (l *Lobby) lifecycle() {
 					})
 					l.userList.MessageAll(packetOut)
 				case "checkword":
+					// declare reusable variables for this locality
 					var word WordPacket // WordPacket type struct declared in userWords.go
 					var isUnique bool   // if word submitted by user already exists in the user words map
 
