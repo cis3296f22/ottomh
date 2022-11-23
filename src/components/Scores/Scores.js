@@ -27,6 +27,8 @@ export const Scores = ({id, onReplay}) => {
         return b[1] - a[1];
     });
 
+    console.log(sortedScores)
+
     //resetting the userwordsmap when we reach score page 
     let url;
     if (window.location.protocol === 'https:') {
@@ -46,28 +48,28 @@ export const Scores = ({id, onReplay}) => {
             <h2>
                 Final Scores
             </h2>
+            <img class="crown" src={crown}></img>
             <div class="winner-box">
                 <h3>Winner: {sortedScores[0]}</h3>
             </div>
             <div>
-                <Button variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
+                <Button className='me-2' variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Back to Main
                 </Button>
                 <Button variant="primary" type="button" onClick={ onReplay }>
                     Replay game
                 </Button>
             </div>
-            <ListGroup class="scores-box">
-                <img class="crown" src={crown}></img>
+            <div class="note">
+                <p>*Scores are calucuted cumulatively</p>
+            </div>
+            <ListGroup className='mt-2'>
                 {sortedScores.map(item => (
                     <ListGroup.Item item={item} style={{ fontSize: `2rem` }}>
-                        {item[0]} <Badge>{item[1]}</Badge>
+                        {item[0]} <Badge bg="info">{item[1]}</Badge>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
-            <div>
-                <h4>Most Voted off: "still in development"</h4>
-            </div>
             
         </div>
     );

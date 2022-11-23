@@ -2,17 +2,13 @@
     margin-top: 5rem;
     text-align: center;
 }
-.scores-box{
-    height: 30rem;
-    margin-top: 1rem;
-    font-size: 1.3rem;
-    text-align: center;
-    border-style: solid;
-    border-color: white;
-    border-radius: 0.5rem;
-}
+
 .player-score{
     font-size: 3rem;
+}
+
+.note{
+    text-align: left;
 }
 
 .winner-box{
