@@ -155,7 +155,6 @@ func (l *Lobby) lifecycle() {
 					if err != nil {
 						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
 					}
-
 					// check if word is a duplicate
 					isUnique = l.userWords.UserWords(word)
 
@@ -169,6 +168,14 @@ func (l *Lobby) lifecycle() {
 						"Word":         word.Answer,
 					})
 					socket.WriteMessage(packetOut)
+				case "deletemap":
+					var word WordPacket
+					err := json.Unmarshal([]byte(packetIn.Data), &word)
+					if err != nil {
+						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
+					}
+					l.userWords.UserWords(word)
+
 				default:
 					log.Print("Recieved message from WebSocket: ", string(m))
 					if err := socket.WriteMessage(m); err != nil {

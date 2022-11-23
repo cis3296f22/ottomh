@@ -90,9 +90,9 @@ func (s *userWordsMap) removingCrossedWords(cm map[string]int, userPresent int) 
 			}
 		}
 			
-
-		
 	}
+
+
 
 func (v *userWordsMap) UserWords(packetIn WordPacket) bool {
 	var result bool
