@@ -1,8 +1,11 @@
 package config
 
 var Categories []string = []string{
-	"Food",
-	"Animal",
-	"Game",
-	"Tech",
+	"Foods",
+	"Animals",
+	"Celebrity",
+	"Song",
+	"Places",
+	"Sports",
+	"Movies",
 }
