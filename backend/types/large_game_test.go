@@ -26,6 +26,12 @@ type updateUsersPacket struct {
 	List  []string
 }
 
+type beginGamePacket struct {
+	Event    string
+	Category string
+	Letter   string
+}
+
 // A helper function to read messages from a WebSocket and place
 // them in a go channel
 func readCycle(t *testing.T, ws *websocket.Conn, c chan []byte) {
@@ -160,6 +166,42 @@ func TestLargeGame(t *testing.T) {
 			sort.Strings(packet.List)
 			if !reflect.DeepEqual(expected_list, packet.List) {
 				t.Error(i+1, "'updateusers' list is not correct. Expected actual:", expected_list, packet.List)
+			}
+		}
+	})
+
+	t.Run("Test First Game Start", func(t *testing.T) {
+		// Signal the backend to start the first game round
+		wss[0].WriteMessage(websocket.TextMessage, []byte("{\"Event\":\"begingame\"}"))
+
+		// Ensure that all WebSockets have received a start message
+		// and confirm that the categories and letters align
+		var cat string = ""
+		var letter string = ""
+		for i := 0; i < num_users; i += 1 {
+			m := <-ws_chans[i]
+
+			var packet beginGamePacket
+			err := json.Unmarshal(m, &packet)
+			if err != nil {
+				t.Error(i+1, "Error unmarshaling 'begingame' package:", err)
+			}
+
+			// If this is the first socket we have checked
+			if cat == "" {
+				if packet.Category == "" || packet.Letter == "" {
+					t.Error(i+1, "'begingame' message contains a blank Category and Letter")
+				}
+				cat = packet.Category
+				letter = packet.Letter
+			} else {
+				if cat != packet.Category {
+					t.Error(i+1, "'begingame' messages contain conflicting categories")
+				}
+
+				if letter != packet.Letter {
+					t.Error(i+1, "'begingame' messages contain conflicting letters")
+				}
 			}
 		}
 	})
