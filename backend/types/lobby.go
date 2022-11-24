@@ -47,6 +47,7 @@ func makeLobby(ID string) *Lobby {
 func (l *Lobby) lifecycle() {
 	userPresent := 0 //number of user present to compare when sending crossed out words to userWordMap
 	numReceived := 0
+	scoresCalculated := true
 
 	crossedWordsMap := make(map[string]int)
 	l.totalScores = make(map[string]int)
@@ -103,6 +104,7 @@ func (l *Lobby) lifecycle() {
 				case "begingame":
 					userPresent = 0 //reset userpresent to 0 when user decides to reset game:::::
 					numReceived = 0
+					scoresCalculated = true
 					crossedWordsMap = make(map[string]int) // reset dictionary when game reset:::::
 					// This is a new round, so we have not previously ended any stage
 					l.roundEnded = false
@@ -124,20 +126,23 @@ func (l *Lobby) lifecycle() {
 					})
 					l.userList.MessageAll(packetOut)
 				case "getscores":
-					//here should take map from voted page
-					votedMap := l.userWords.mapGetter()
-					//return a map [string]int username:score
-					sm := CreateScores(votedMap)
-					//merge score map into total score map
-					for key := range sm.scorem {
-						l.totalScores[key] += sm.scorem[key]
+					if scoresCalculated {
+						//here should take map from voted page
+						votedMap := l.userWords.mapGetter()
+						//return a map [string]int username:score
+						sm := CreateScores(votedMap)
+						//merge score map into total score map
+						for key := range sm.scorem {
+							l.totalScores[key] += sm.scorem[key]
+						}
+						//scorelist := sm.scorem
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event":  "getscores",
+							"Scores": l.totalScores,
+						})
+						l.userList.MessageAll(packetOut)
 					}
-					//scorelist := sm.scorem
-					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event":  "getscores",
-						"Scores": l.totalScores,
-					})
-					l.userList.MessageAll(packetOut)
+					scoresCalculated = false
 				case "waitingRoom":
 					packetOut, _ := json.Marshal(map[string]interface{}{
 						"Event": "waitingRoom",
