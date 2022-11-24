@@ -73,7 +73,7 @@ export const LobbyPage = () => {
 
     // Action for pressing the "Start" button while on the Waiting Page
     const onStart = () => {
-        ws.send(JSON.stringify({ Event: "begingame", Data: lobbyId }));
+        ws.send(JSON.stringify({ Event: "begingame" }));
     }
 
     const onReplay = () => {
@@ -93,7 +93,7 @@ export const LobbyPage = () => {
             {stage === "voting" && <Voting onTimeover={() => setStage("scores")}
                 words={wordsArr} cat={cat} letter={letter} time_picked={time_picked} />}
 
-            {stage === "scores" && <Scores onReplay={onReplay} id={lobbyId} />}
+            {stage === "scores" && <Scores onReplay={onReplay} />}
         </div>
     );
 };

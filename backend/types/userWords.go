@@ -43,7 +43,6 @@ func (s *userWordsMap) genWordsArr() []string {
 	s.Mu.Lock()
 	returnedMap := s.m
 	for _, value := range returnedMap {
-		// id := strings.Split(key, ":")
 		for _, element := range value {
 			wordList = append(wordList, element)
 		}
@@ -87,29 +86,23 @@ func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 	username := wordPacket.CurrentPlayer
 	answer := wordPacket.Answer
 
-	// //on score page, clear list associated with lobbyId, if username equals delete101x and answer equals delete101x
-	// if (username == "delete101x" && answer == "delete101x"){
-	// 	v.clearMapLobbyId(lobbyId)
-	// } else {
-
-		//result will return False if we find duplicate submission in map
-		result = true
-		v.Mu.RLock()
-		returnedMap := v.m
-		for _, element := range returnedMap {
-			for i := range element {
-				if answer == element[i] {
-					result = false
-				}
+	//result will return False if we find duplicate submission in map
+	result = true
+	v.Mu.RLock()
+	returnedMap := v.m
+	for _, element := range returnedMap {
+		for i := range element {
+			if answer == element[i] {
+				result = false
 			}
 		}
-		v.Mu.RUnlock()
+	}
+	v.Mu.RUnlock()
 
-		if result {
-			//key/val insert in map --> key will hold "user"; val holds  "answer" submitted
-			v.mapSetter(username, answer)
-		}
-	// }
-
+	if result {
+		//key/val insert in map --> key will hold "user"; val holds  "answer" submitted
+		v.mapSetter(username, answer)
+	}
+	
 	return result
 }

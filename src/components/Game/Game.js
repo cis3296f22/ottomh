@@ -8,7 +8,6 @@ import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import { useState, useEffect } from "react";
 import { useStore } from "../../store";
-import { useParams } from "react-router-dom";
 
 export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
     const [isLoading, _setLoading] = useState(true);
