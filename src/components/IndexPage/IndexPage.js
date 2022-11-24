@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import logo from '../../images/logo.png';
-
 import { Join } from '../';
 
 export const IndexPage = () => {
@@ -16,10 +15,10 @@ export const IndexPage = () => {
             {menu === "home" &&
                 <>
                     <div className="d-grid gap-2">
-                        <Button variant="primary" type="button" size="lg" onClick={() => setMenu("create")} className="mb-3">
+                        <Button className="gameStyle-button mb-3" variant="primary" type="button" size="lg" onClick={() => setMenu("create")}>
                             Create new lobby
                         </Button>
-                        <Button variant="primary" type="button" size="lg" onClick={() => setMenu("join")}>
+                        <Button className="gameStyle-button" variant="primary" type="button" size="lg" onClick={() => setMenu("join")}>
                             Join lobby
                         </Button>
                     </div>

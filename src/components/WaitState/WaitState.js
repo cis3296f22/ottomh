@@ -33,22 +33,24 @@ export const WaitState = ({ id, onStart }) => {
             <img src={logo} width="200" alt="brain logo" className="mb-2" />
             <h1 className="display-1">OTTOMH</h1>
 
-            <div className="d-flex justify-content-center align-items-center gap-3">
-                <h2>Code: {id = 1234}</h2>
-                <Button className="copy-button" onClick={() => copyToClipBoard(id)} variant="primary">
-                    <i className="fa-solid fa-copy"></i>
+            <div className="d-flex gap-3 align-items-center justify-content-center">
+                <h2>Code: {id}</h2>
+                <Button className="copy-button" onClick={() => copyToClipBoard(id)}>
+                    <i className="fa-solid fa-clipboard"></i>
                 </Button>
             </div>
-            
+
             <div className="mt-5">
                 <h2>Players joined:</h2>
                 <PlayerList />
             </div>
-            
-            <div className="d-flex justify-content flex-column align-items-center gap-3">
+
+            <div className="d-flex justify-content flex-row align-items-center gap-3">
                 {hostUser === username ?
-                    <Button autoFocus className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button> : null}
-                <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
+                    <Button autoFocus className="d-block gameStyle-button" variant="primary" type="submit" onClick={onStart}>
+                        Start Game
+                    </Button> : null}
+                <Button className="d-block gameStyle-button" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>
             </div>

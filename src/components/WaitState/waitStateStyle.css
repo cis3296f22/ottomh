@@ -10,6 +10,14 @@
 
 .copy-button {
     background-color: transparent !important;
+    /* border: 1px solid #A3BAC3 !important; */
+    border: none !important;
+    padding: 0 !important;
+}
+
+.fa-clipboard {
+    color: #A3BAC3;
+    font-size: 1.7rem;
 }
 
 .copy-modal {

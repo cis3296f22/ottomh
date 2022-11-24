@@ -80,13 +80,13 @@ export const Join = ({ isCreate, onBackClick }) => {
                     {isCreate && <Form.Control ref={inputHostNameRef} type="text" placeholder="Username" autoFocus /> }
                     {isCreate === false && <Form.Control ref={inputNameRef} type="text" placeholder="Username" autoFocus  required />}
                     {isCreate === false && <Form.Control ref={inputCodeRef} type="text" placeholder="Lobby code" required />}
-                    <Button variant="primary" type="submit">
+                    <Button className="gameStyle-button" size="md" variant="primary" type="submit">
                         Submit
                     </Button>
                 </Form>
             </div>
 
-            <Button type="button" size="sm" onClick={onBackClick}>
+            <Button className="gameStyle-button" type="button" size="sm" onClick={onBackClick}>
                 Back
             </Button>
         </>

@@ -72,7 +72,7 @@ export const LobbyPage = () => {
             // prevent users from joining a lobby that doesn't
             clearStore();
             navigate("/");
-        }, "1500");
+        }, "3000");
     }
 
     // Action for pressing the "Start" button while on the Waiting Page

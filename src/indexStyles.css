@@ -16,3 +16,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* #4D92AA */
+
+.gameStyle-button {
+  font-weight: bold !important;
+  padding: 1rem !important;
+  background-color: #282C34 !important;
+  color: #A3BAC3 !important;
+  box-shadow: 0 .2em #A3BAC3 !important;
+  cursor: pointer !important;
+  border: 1px solid #A3BAC3 !important;
+}
+
+.gameStyle-button:active {
+  box-shadow: none !important;
+  position: relative !important;
+  top: .2em !important;
+}

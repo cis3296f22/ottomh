@@ -107,7 +107,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                                 autoFocus
                             />
                         </InputGroup>
-                        <Button className="input-button" variant="primary" id="submit-answer" type="submit">
+                        <Button className="input-button gameStyle-button" variant="primary" id="submit-answer" type="submit">
                             Submit Answer
                         </Button>
                     </Form>
