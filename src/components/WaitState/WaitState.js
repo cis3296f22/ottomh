@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { PlayerList } from '../';
+import logo from '../../images/logo.png';
+
 
 export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
@@ -10,15 +12,16 @@ export const WaitState = ({ id, onStart }) => {
 
 
     const copyToClipBoard = async copyMe => {
-          await navigator.clipboard.writeText(copyMe);
-          alert("Code Copied to clipboard");
-      };
-    
+        await navigator.clipboard.writeText(copyMe);
+        alert("Code Copied to clipboard");
+    };
+
     const [hostUser, username] = useStore(state => [state.hostname, state.username])
 
-    return(
+    return (
         <div className="waitState">
-            <h1>OTTOMH</h1>
+            <img src={logo} width="200" alt="brain logo" class="mb-2" />
+            <h1 class="display-1">OTTOMH</h1>
             <div>
                 <h2>Code:</h2>
                 {id}
@@ -31,8 +34,8 @@ export const WaitState = ({ id, onStart }) => {
                 <PlayerList />
             </div>
             <div className="d-flex justify-content flex-column align-items-center gap-3">
-            {hostUser === username ?
-                <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button> : null }
+                {hostUser === username ?
+                    <Button className="d-block" variant="primary" type="submit" onClick={onStart}>Start</Button> : null}
                 <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>

@@ -15,7 +15,7 @@ export const LobbyPage = () => {
     const navigate = useNavigate();
 
     ws.onopen = (_) => {
-        alert("websocket is open now");
+        // alert("websocket is open now");
 
         ws.onmessage = (event) => {
             const packet = event.data;
