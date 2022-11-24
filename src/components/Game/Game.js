@@ -18,7 +18,6 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
     const handleShow = () => setShow(true);
 
     //responding to word submissions
-    const [goodResponse, setGoodResponse] = useState(false)
     const [badResponse, setBadResponse] = useState(false)
     const [word, setWord] = useState("")
 
@@ -66,13 +65,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
     // show modal for good word and bad word based on response from backend
     useEffect(() => {
         if (isUniqueWord !== null) { // make sure we don't render initial null state
-            // console.log(`isUniqueWord in game: ${isUniqueWord}`);
-            if (isUniqueWord === true) {
-                setGoodResponse(true);
-                setTimeout(() => {
-                    setGoodResponse(false)
-                }, "500");
-            } else {
+            if (isUniqueWord !== true) {
                 setBadResponse(true);
                 setTimeout(() => {
                     setBadResponse(false)
@@ -118,12 +111,6 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                             Submit Answer
                         </Button>
                     </Form>
-                    <Modal className="answer-good" show={goodResponse} onHide={() => setGoodResponse(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title> Accepted! Good Job! </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body> Word submitted: ["{word}"]</Modal.Body>
-                    </Modal>
                     <Modal className="answer-bad" show={badResponse} onHide={() => setBadResponse(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title> Rejected! Try Another Answer! </Modal.Title>
