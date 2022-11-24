@@ -2,8 +2,8 @@ package types
 
 import (
 	"sync"
+
 	"golang.org/x/exp/slices"
-	
 )
 
 type userWordsMap struct {
@@ -34,7 +34,7 @@ func (s *userWordsMap) clearAllWords() {
 		s.m[k] = slices.Delete(s.m[k], 0, len(s.m[k]))
 	}
 	s.Mu.Unlock()
-	
+
 }
 
 func (s *userWordsMap) genWordsArr() []string {
@@ -53,32 +53,32 @@ func (s *userWordsMap) genWordsArr() []string {
 }
 
 func (s *userWordsMap) removingCrossedWords(cm map[string]int, userPresent int) {
-		//we will care if the map value is higher than half the user present in lobby so 10/2 we will need 5 votes to rule an answer out
-	
-		slice := make([]string, 20)
-		
-		majority := userPresent/2
-	
-		//append words from map that contain >= majority to list
-		for key, val := range cm {
-				if val >= majority{
-					slice = append(slice, key)
-				}
-	
-			}
-		
-		//remove from userwords map 
-		for _, ele := range slice{
-			for key, _ := range s.m {
-	
-				idx := slices.Index(s.m[key], ele)
-				if idx != -1 {
-					s.m[key] = slices.Delete(s.m[key], idx, idx+1)
-					}		
+	//we will care if the map value is higher than half the user present in lobby so 10/2 we will need 5 votes to rule an answer out
+
+	slice := make([]string, 20)
+
+	majority := userPresent / 2
+
+	//append words from map that contain >= majority to list
+	for key, val := range cm {
+		if val >= majority {
+			slice = append(slice, key)
+		}
+
+	}
+
+	//remove from userwords map
+	for _, ele := range slice {
+		for key, _ := range s.m {
+
+			idx := slices.Index(s.m[key], ele)
+			if idx != -1 {
+				s.m[key] = slices.Delete(s.m[key], idx, idx+1)
 			}
 		}
-			
 	}
+
+}
 
 func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 	var result bool
@@ -105,4 +105,8 @@ func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 	}
 	
 	return result
+}
+
+func (s *userWordsMap) mapGetter() map[string][]string {
+	return s.m
 }
