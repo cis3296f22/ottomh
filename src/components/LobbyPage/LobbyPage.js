@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
 import { WaitState, Game, Scores, Voting } from "../";
+import Modal from "react-bootstrap/Modal";
 
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
@@ -10,20 +11,19 @@ export const LobbyPage = () => {
     const [letter, setLetter] = useState("");
     const [isUniqueWord, setIsUniqueWord] = useState(null);
     const [wordsArr, setWordsArr] = useState(['no words were entered collectively']);
+    const [showModal, setShowModal] = useState(false);
     const [ws, hostname, setHostname, setUserlist, setScorelist, clearStore] = useStore(
         (state) => [state.socket, state.hostname, state.setHostname, state.setUserlist, state.setScorelist, state.clearStore]);
     const navigate = useNavigate();
 
     ws.onopen = (_) => {
-        // alert("websocket is open now");
-
         ws.onmessage = (event) => {
             const packet = event.data;
             const packetObject = JSON.parse(packet);
             switch (packetObject.Event) {
                 case "endround":
-                    if(packetObject.TotalWordsArr !== null) {
-                        if(packetObject.TotalWordsArr.length !== 0) {
+                    if (packetObject.TotalWordsArr !== null) {
+                        if (packetObject.TotalWordsArr.length !== 0) {
                             setWordsArr(packetObject.TotalWordsArr);
                         }
                     }
@@ -64,11 +64,15 @@ export const LobbyPage = () => {
     }
 
     ws.onclose = (event) => {
-        alert(`websocket is closed now: ${event}`);
+        setShowModal(true);
+        setTimeout(() => {
+            // show modal popup letting user know that the lobby is closed
+            setShowModal(false);
 
-        // prevent users from joining a lobby that doesn't
-        clearStore();
-        navigate("/");
+            // prevent users from joining a lobby that doesn't
+            clearStore();
+            navigate("/");
+        }, "1500");
     }
 
     // Action for pressing the "Start" button while on the Waiting Page
@@ -86,6 +90,10 @@ export const LobbyPage = () => {
 
     return (
         <div className="container-fluid h-100">
+            <Modal style={{color: "black"}} show={showModal}>
+                <Modal.Body>Lobby code '{lobbyId}'' doesn't exist.</Modal.Body>
+            </Modal>
+
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
             {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} time_picked={time_picked} isUniqueWord={isUniqueWord} />}
