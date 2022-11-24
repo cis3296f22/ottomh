@@ -1,0 +1,88 @@
+title OTTOMH (Opening and joining a lobby)
+
+actor Host
+actor Player2
+actor Player3
+participant Join1
+participant Join2
+participant Join3
+participant world
+participant userlist
+participant LobbyPage
+
+participant WaitState
+participant Game
+
+activate Host
+Host->*Join1: Create 
+activate Join1
+note over Host,Join1: Each Join is on a different client that each\n player would have a seperate Join page
+Join1->world:setWs
+activate world
+note over Join1,world:Create lobbypage request
+Join1<--world:lobby ID
+deactivate world
+
+Join1->world:setWs
+activate world
+note over Join1,world:Host will request to join lobby after creation
+world->*LobbyPage:CreateLobby
+activate LobbyPage
+note over world,LobbyPage:Users join lobby
+note over LobbyPage:Lobby has the ability to maintain all stages under the lobbypage
+Join1<--world: websocket
+deactivate world
+Join1->userlist:setUsername()
+activate userlist
+note over Join1,userlist:Send username to server
+Join1-->Host: Created Lobby and Joined game
+deactivate Join1
+
+activate Player2
+Player2->*Join2: Create
+activate Join2
+Join2->world:setWs
+note over Join2,world:User request to join lobby
+activate world
+world ->LobbyPage:CreateLobby
+activate LobbyPage
+Join2<--world: websocket
+deactivate world
+Join2->userlist:setUsername()
+Join2-->Host: Joined lobby
+deactivate Join2
+
+
+activate Player3
+Player3->*Join3: Create
+activate Join3
+Join3->world:setWs
+activate world
+world ->LobbyPage:CreateLobby
+activate LobbyPage
+Join3<--world: websocket
+deactivate world
+Join3->userlist:setUsername()
+Join3-->Host: Joined lobby
+deactivate Join3
+
+
+LobbyPage->*WaitState:useState("waitingRoom")
+activate WaitState
+note over LobbyPage,WaitState:Lobby setStage to WaitState
+
+LobbyPage->WaitState:useState("waitingRoom")
+activate WaitState
+
+LobbyPage->WaitState:useState("waitingRoom")
+activate WaitState
+
+
+WaitState --> LobbyPage: onStart
+deactivate WaitState
+deactivate WaitState
+deactivate WaitState
+
+LobbyPage->*Game:setStage("playGame")
+activate Game
+note over LobbyPage,Game:Lobby setStage to Game
