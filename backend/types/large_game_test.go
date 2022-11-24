@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -17,7 +18,7 @@ import (
 )
 
 // Adjust the number of concurrent websockets that are tested
-const num_users int = 4
+const num_users int = 20
 
 type updateUsersPacket struct {
 	Event string
@@ -94,25 +95,23 @@ func TestLargeGame(t *testing.T) {
 
 		// Create num_users WebSockets
 		for i := 0; i < num_users; i += 1 {
-			ws, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:%s/sockets/%s?username=user%d&host=%s", port, id, i+1, expected_host), nil)
+			go func(index int) {
+				ws, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:%s/sockets/%s?username=user%d&host=%s", port, id, index+1, expected_host), nil)
 
-			if err != nil {
-				t.Error("Error creating WebSocket:", nil)
-			}
+				if err != nil {
+					t.Error("Error creating WebSocket:", nil)
+				}
 
-			wss[i] = ws
+				wss[index] = ws
 
-			// Create a read go thread that just puts messages in the channel
-			go readCycle(t, wss[i], ws_chans[i])
+				// Create a read go thread that just puts messages in the channel
+				go readCycle(t, wss[index], ws_chans[index])
+			}(i)
 		}
 
 		// Ensure that each user has an accurate user list and host
 		// Wait for all WebSockets to receive all messages
-		for i := 0; i < num_users; i += 1 {
-			for len(ws_chans[i]) < num_users-i {
-				time.Sleep(time.Millisecond)
-			}
-		}
+		time.Sleep(time.Second)
 
 		// Initialize our list of expected hosts
 		expected_list := make([]string, num_users)
@@ -120,6 +119,16 @@ func TestLargeGame(t *testing.T) {
 			expected_list[i] = fmt.Sprintf("user%d", i+1)
 		}
 		sort.Strings(expected_list)
+
+		// Start by checking that the list contained on the backend is accurate
+		backend_list := make([]string, 0)
+		for key := range lob.Lobbies[id].userList.sockets {
+			backend_list = append(backend_list, key)
+		}
+		sort.Strings(backend_list)
+		if !reflect.DeepEqual(expected_list, backend_list) {
+			t.Error("Backend has an inaccurate list of users. Expected actual:", expected_list, backend_list)
+		}
 
 		// Get the most up-to-date list from each user, sort it, and
 		// compare to the expected user list.
@@ -130,6 +139,7 @@ func TestLargeGame(t *testing.T) {
 				select {
 				case m := <-ws_chans[i]:
 					l = m
+					log.Print("From user message:", i+1, string(m))
 				default:
 					goto exit_loop
 				}
@@ -139,17 +149,17 @@ func TestLargeGame(t *testing.T) {
 			var packet updateUsersPacket
 			err := json.Unmarshal(l, &packet)
 			if err != nil {
-				t.Error("Error unmarshaling 'updateusers' packet:", err)
+				t.Error(i+1, "Error unmarshaling 'updateusers' packet:", err)
 			}
 
 			// Confirm the underlying data equals the expected data
 			if expected_host != packet.Host {
-				t.Error("'updateusers' includes unexpected hostname. Expected actual:", expected_host, packet.Host)
+				t.Error(i+1, "'updateusers' includes unexpected hostname. Expected actual:", expected_host, packet.Host)
 			}
 
 			sort.Strings(packet.List)
 			if !reflect.DeepEqual(expected_list, packet.List) {
-				t.Error("'updateusers' list is not correct. Expected actual:", expected_list, packet.List)
+				t.Error(i+1, "'updateusers' list is not correct. Expected actual:", expected_list, packet.List)
 			}
 		}
 	})

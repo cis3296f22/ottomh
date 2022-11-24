@@ -22,19 +22,22 @@ type UserList struct {
 // that there has been a new user added.
 func (ul *UserList) AddSocket(username string, ws *WebSocket, host string) {
 	ul.mu.Lock()
+	defer ul.mu.Unlock()
 	ul.sockets[username] = ws
 	if len(host) != 0 { // If we have been given a new hostname
 		ul.host = host
 	}
-	ul.mu.Unlock()
 
 	// Inform all sockets a new user has been added
 	packetOut, _ := json.Marshal(map[string]interface{}{
 		"Event": "updateusers",
-		"List":  ul.GetUsernameList(),
+		"List":  ul.getUsernameList(),
 		"Host":  ul.host,
 	})
-	ul.MessageAll(packetOut)
+
+	for _, socket := range ul.getSocketList() {
+		socket.WriteMessage(packetOut)
+	}
 }
 
 // Returns true if the UserList already contains an active user with `name`
@@ -50,10 +53,8 @@ func (ul *UserList) ContainsUser(name string) bool {
 	return exists
 }
 
-// Gets a list of current usernames
-func (ul *UserList) GetUsernameList() []string {
-	ul.mu.Lock()
-	defer ul.mu.Unlock()
+// Internal: Gets a list of current usernames without blocking
+func (ul *UserList) getUsernameList() []string {
 	unameList := make([]string, 0)
 	for username := range ul.sockets {
 		unameList = append(unameList, username)
@@ -61,15 +62,20 @@ func (ul *UserList) GetUsernameList() []string {
 	return unameList
 }
 
-// Gets a list of current sockets
-func (ul *UserList) GetSocketList() []*WebSocket {
-	ul.mu.Lock()
-	defer ul.mu.Unlock()
+// Internal, non-blocking equivalent of GetSocketList
+func (ul *UserList) getSocketList() []*WebSocket {
 	socketList := make([]*WebSocket, 0)
 	for _, socket := range ul.sockets {
 		socketList = append(socketList, socket)
 	}
 	return socketList
+}
+
+// Gets a list of current sockets
+func (ul *UserList) GetSocketList() []*WebSocket {
+	ul.mu.Lock()
+	defer ul.mu.Unlock()
+	return ul.getSocketList()
 }
 
 func (ul *UserList) SetInactive(index int) {
