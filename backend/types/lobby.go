@@ -64,8 +64,7 @@ func (l *Lobby) lifecycle() {
 					if !l.roundEnded {
 						// get all words submitted by every user
 						var totalWordsArr []string = l.userWords.genWordsArr() // a list of all the user words that were entered
-						log.Print("total words entered in lobby ", packetIn.Data, ": ", totalWordsArr)
-						log.Print("total users: ", l.userWords.m)
+						log.Print("Total words submitted: ", totalWordsArr)
 
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endround",
@@ -114,9 +113,7 @@ func (l *Lobby) lifecycle() {
 					letter := string(byte(rand.Intn(26) + 65))
 
 					// Clear all word submitted from previous round
-					// log.Print("userWordsMap: ", l.userWords.m)
 					l.userWords.clearAllWords()
-					// log.Print("aftering clearing the map: ", l.userWords.m)
 
 					// Tell all sockets to start the game
 					packetOut, _ := json.Marshal(map[string]interface{}{
@@ -165,9 +162,6 @@ func (l *Lobby) lifecycle() {
 
 					// check if word is a duplicate
 					isUnique = l.userWords.UserWords(word)
-
-					// debugging
-					// log.Print("packetIn: ", packetIn, " | word: ", word, " | isUnique: ", isUnique)
 
 					// send isDup boolean result back to the frontend
 					packetOut, _ := json.Marshal(map[string]interface{}{
