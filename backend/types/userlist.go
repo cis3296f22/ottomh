@@ -24,7 +24,7 @@ func (ul *UserList) AddSocket(username string, ws *WebSocket, host string) {
 	ul.mu.Lock()
 	ul.sockets[username] = ws
 	if len(host) != 0 { // If we have been given a new hostname
-		ul.host = username
+		ul.host = host
 	}
 	ul.mu.Unlock()
 
@@ -44,9 +44,9 @@ func (ul *UserList) ContainsUser(name string) bool {
 	_, exists := ul.sockets[name]
 	if exists == true {
 		if !ul.sockets[name].isAlive {
-				exists = false
-				}
+			exists = false
 		}
+	}
 	return exists
 }
 
