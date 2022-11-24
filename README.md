@@ -6,7 +6,7 @@
     />
 </p>
 
-<h1 align="center">OTTOM: A Party-Thinking Game for The Web</h1>
+<h1 align="center">OTTOMH: A Party-Thinking Game for The Web</h1>
 
 OTTOMH (On The Top Of My Head) is a web-based party trivia game that challenges players to come up with as many words that start with a certain letter and belong to a certain category in a set amount of time while competing against other players.
 
@@ -15,10 +15,10 @@ Unlike physical board games, OTTOMH is easier to setup and can be played by geog
 Play the game here: https://ottomh.herokuapp.com/
 
 ## How to play
-* Invite people! The game can comfortably handle 30 players at once.
-* You have 60 seconds to ubmit as many words as you can think of at top of your head that begins with the given letter and matches with given category!
-* Vote off words and earn points for the words that make it through the round!
-* Play as many rounds as you want!
+* Invite people! Copy the lobby code and send it to your teammates.
+* You have 60 seconds to submit as many words as you can think of at top of your head that begins with the given letter and matches the given category!
+* Vote off words that don't match and earn points for the words that make it through the round!
+* Replay the game with the same people!
 
 ## Contribution
 
@@ -32,8 +32,6 @@ git clone https://github.com/cis3296f22/ottomh.git
 ```
 
 ### Building
-
-This repo has been tested on MacOS 12.1 with go 1.18.2, node 16.14.2, and NPM 8.5.0.
 
 To run the project:
 
