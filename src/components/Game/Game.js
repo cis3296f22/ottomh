@@ -6,6 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Modal from 'react-bootstrap/Modal';
 import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import { useStore } from "../../store";
 import { useParams } from "react-router-dom";
@@ -13,6 +14,16 @@ import { useParams } from "react-router-dom";
 export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
     const [isLoading, _setLoading] = useState(true);
     const [ws, currentPlayer] = useStore((state) => [state.socket, state.username]);
+=======
+import { useState, useEffect } from "react";
+import { useStore } from "../../store";
+import { useParams } from "react-router-dom";
+
+export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
+    const [isLoading, _setLoading] = useState(true);
+    const ws = useStore((state) => state.socket);
+    const currentPlayer = useStore(state => state.username);
+>>>>>>> lobby-frontend
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -30,11 +41,11 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
         }
 
         _setLoading(loading);
-
     }
 
     function handleSubmit(e) {
         e.preventDefault();
+<<<<<<< HEAD
 
         let answer, dataString;
 
@@ -71,6 +82,55 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
             }
         }
     }, [isDupWord]);
+=======
+        let answer = document.getElementById("input-answer").value;
+        function letterCheck(word) {
+            return word.charAt(0) === letter.toLowerCase();
+        }
+        //send answer here
+        document.getElementById("input-answer").value = '';
+        answer = answer.toLowerCase();
+        if (letterCheck(answer)) {
+            // show this word in the modal
+            setWord(answer);
+
+            // prep the data object to be sent over websocket
+            // turn the data object into a string
+            let dataString = JSON.stringify({
+                CurrentPlayer: currentPlayer,
+                Answer: answer,
+            });
+
+            //send recieved answers with username for backend processing
+            ws.send(JSON.stringify({
+                Event: "checkword",
+                Data: dataString
+            }));
+        } else {
+            handleShow()
+        } // end if-else statement
+
+
+    } // end handleSubmit()
+
+    // show modal for good word and bad word based on response from backend
+    useEffect(() => {
+        if (isUniqueWord !== null) { // make sure we don't render initial null state
+            // console.log(`isUniqueWord in game: ${isUniqueWord}`);
+            if (isUniqueWord === true) {
+                setGoodResponse(true);
+                setTimeout(() => {
+                    setGoodResponse(false)
+                }, "500");
+            } else {
+                setBadResponse(true);
+                setTimeout(() => {
+                    setBadResponse(false)
+                }, "500");
+            }
+        }
+    }, [isUniqueWord]);
+>>>>>>> lobby-frontend
 
     if (isLoading) {
         return (
@@ -94,6 +154,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
                         </Modal.Footer>
                     </Modal>
 
+<<<<<<< HEAD
                     <h2 className="title-h">
                         {cat} <Badge bg="secondary">{letter}</Badge>
                     </h2>
@@ -110,6 +171,8 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
                         </Modal.Footer>
                     </Modal>
 
+=======
+>>>>>>> lobby-frontend
                     <Form onSubmit={handleSubmit}>
                         <InputGroup>
                             <Form.Control
@@ -118,6 +181,10 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isDupWord }) => {
                                 placeholder="Enter Answer Here"
                                 aria-label="Enter Answer"
                                 aria-describedby="submit-answer"
+<<<<<<< HEAD
+=======
+                                autoFocus
+>>>>>>> lobby-frontend
                             />
                         </InputGroup>
                         <Button className="input-button" variant="primary" id="submit-answer" type="submit">

@@ -7,8 +7,9 @@ import Button from 'react-bootstrap/Button';
 
 
 export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
-    const [isLoading, _setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
+<<<<<<< HEAD
     const [crossed, setCrossed] = useState(null)
     let wordList;
 
@@ -19,6 +20,11 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
         _setLoading(loading);
     }
 
+=======
+    const [myArray, updateMyArray] = useState([]);
+
+    
+>>>>>>> lobby-frontend
     // Create an array of boolean that stores whether or not a word is crossed
     useEffect(() => {
         console.log("I made it to voting");
@@ -30,6 +36,7 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
         }
     }, [words]);
 
+<<<<<<< HEAD
     if (words !== null) {
         wordList = words.map((word, index) =>
             <ListGroup.Item action
@@ -40,6 +47,23 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
                 })}
                 key={word + crossed[index]}
                 variant={crossed[index] ? 'danger' : ''}>
+=======
+    let wordList = words.map((word, index) =>
+        <ListGroup.Item action
+            onClick={() => setCrossed((crossed) => {
+                let newCrossed = crossed.slice(0);
+                newCrossed[index] = !newCrossed[index];
+                if (crossed[index] === false){
+                    updateMyArray( arr => [...arr, word]);
+                }
+                else {
+                    updateMyArray(myArray.filter(item => item !== word))
+                }
+                return newCrossed;
+            })}
+            key={word + crossed[index]}
+            variant={crossed[index] ? 'danger' : ''}>
+>>>>>>> lobby-frontend
 
                 {!crossed[index] && word}
 
@@ -72,9 +96,18 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
         );
     }
 
+<<<<<<< HEAD
     else {
         document.getElementById('directToScore').click()
     }
+=======
+else { 
+    document.getElementById('directToScore').click()
+    let crossedWords = myArray.toString(); 
+    console.log(crossedWords, "these are the crossedwords");
+    ws.send(JSON.stringify({ Event: "endvoting", Data: crossedWords}))
+  }
+>>>>>>> lobby-frontend
 
 };
 
