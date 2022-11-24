@@ -1,11 +1,22 @@
-# OTTOMH: A Party-Thinking Game for The Web
+<h1 align="center">
+    OTTOMH 
+    <br>A Party-Thinking Game for The Web
+</h1>
 
-FOR social game players WHO are looking for a web-based thinking game to play over the internet. THE OTTOMH game is a web-based party trivia game THAT challenges players to come up with as many words that start with a certain letter and belong to a certain category in a set amount of time while competing against other players.  
+<h2 align="center">
+    <a href="https://ottomh.herokuapp.com">Website</a>
+</h2>
+
+For social game players who are looking for a web-based thinking game to play over the internet. 
+
+OTTOMH is a web-based party trivia game that challenges players to come up with as many words that start with a certain letter and belong to a certain category in a set amount of time while competing against other players.  
   
-UNLIKE physical board games, OTTOMH is easier to setup and can be played by geographically distributed players. OUR PRODUCT provides a user-friendly, web-based experience similar to the popular board game Scattegories, allowing players to exercise their brains while having a good time.
+Unlike physical board games, OTTOMH is easier to setup and can be played by geographically distributed players. It also provides a user-friendly, web-based experience similar to the popular board game Scattegories, allowing players to exercise their brains while having a good time.
 
-## Live Demo
-[https://ottomh.herokuapp.com](https://ottomh.herokuapp.com)
+***
+## Table of Contents
+
+***
 
 ## Installing
 ```bash
