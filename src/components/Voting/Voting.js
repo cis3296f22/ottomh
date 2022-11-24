@@ -46,7 +46,7 @@ if (isLoading) {
                 <h1>
                     {cat} <Badge bg="secondary">{letter}</Badge>
                 </h1>
-                <h2 className='m-0'>Cross off words that don't fit!</h2>
+                <h2 className='m-0'>Cross off <del>words</del> that don't fit!</h2>
             </Row>
             <Row className='h-50 overflow-auto'>
                 <ListGroup>
