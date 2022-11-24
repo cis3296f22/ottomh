@@ -17,10 +17,11 @@ Play the game here: https://ottomh.herokuapp.com/
 ## How to play
 * Invite people! Copy the lobby code and send it to your teammates.
 * You have 60 seconds to submit as many words as you can think of at top of your head that begins with the given letter and matches the given category!
+* Compete against time and other players! Words can only be submitted ONCE, and the first person takes the credit for it.
 * Vote off words that don't match and earn points for the words that make it through the round!
 * Replay the game with the same people!
 
-## Contribution
+## Contributing
 
 ### Installing
 
