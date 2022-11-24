@@ -13,6 +13,7 @@ export const Scores = ({ id, onReplay }) => {
     const playerName = useStore((state) => state.username);
     const lobbyId = useStore((state) => state.lobbyId);
     const navigate = useNavigate();
+    const ws = useStore((state) => state.socket);
     const scorelist = useStore((state) => state.scorelist);
     const clearStore = useStore((state) => state.clearStore);
     const [hostUser, username] = useStore(state => [state.hostname, state.username])
@@ -32,20 +33,24 @@ export const Scores = ({ id, onReplay }) => {
     let rank = 0;
 
     //resetting the userwordsmap when we reach score page 
-    let url;
-    if (window.location.protocol === 'https:') {
-        url = `https://${window.location.host}/GetAnswers`;
-    } else {
-        url = `http://${window.location.host}/GetAnswers`;
+    async function handleDelete(e) {
+        e.preventDefault();
+
+        //resetting the userwordsmap when we reach score page 
+        
+        
+        let dataString = JSON.stringify({
+                CurrentPlayer: "delete101x",
+                Answer: "delete101x",
+                LobbyId: lobbyId 
+            })
+        ws.send(JSON.stringify({
+            Event: "deletemap",
+            Data: dataString
+        }));
+            
+        onReplay()
     }
-    fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-            CurrentPlayer: "delete101x",
-            Answer: "delete101x",
-            LobbyId: lobbyId
-        })
-    })
     return (
         <div class="scores">
             <h1 class="scoreheader">
@@ -60,7 +65,7 @@ export const Scores = ({ id, onReplay }) => {
                     Back to Main
                 </Button>
                 {hostUser === username ?
-                    <Button variant="primary" type="button" onClick={onReplay}>
+                    <Button variant="primary" type="button" onClick={handleDelete}>
                         Return to Lobby
                     </Button> : null}
             </div>
