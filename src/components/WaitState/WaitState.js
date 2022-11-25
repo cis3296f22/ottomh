@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store';
 import { PlayerList } from '../';
 import logo from '../../images/logo.png';
+import Sharer from '../Share/Share';
 
 
 export const WaitState = ({ id, onStart }) => {
@@ -39,6 +40,7 @@ export const WaitState = ({ id, onStart }) => {
                 <Button className="d-block" variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Leave Lobby
                 </Button>
+                <small> <Sharer label="Share" /> </small>
             </div>
         </div >
     );
