@@ -3,7 +3,6 @@ package types
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -19,6 +18,7 @@ import (
 
 // Adjust the number of concurrent websockets that are tested
 const num_users int = 20
+const num_submits int = 100
 
 type updateUsersPacket struct {
 	Event string
@@ -117,7 +117,7 @@ func TestLargeGame(t *testing.T) {
 
 		// Ensure that each user has an accurate user list and host
 		// Wait for all WebSockets to receive all messages
-		time.Sleep(time.Second)
+		time.Sleep(time.Second / 4)
 
 		// Initialize our list of expected hosts
 		expected_list := make([]string, num_users)
@@ -145,7 +145,6 @@ func TestLargeGame(t *testing.T) {
 				select {
 				case m := <-ws_chans[i]:
 					l = m
-					log.Print("From user message:", i+1, string(m))
 				default:
 					goto exit_loop
 				}
@@ -203,6 +202,54 @@ func TestLargeGame(t *testing.T) {
 					t.Error(i+1, "'begingame' messages contain conflicting letters")
 				}
 			}
+		}
+	})
+
+	t.Run("Test Answer Submission", func(t *testing.T) {
+		// To test the answer submission, the general procedure is to have each
+		// socket submit a lot of answers. Each WebSocket will keep track of
+		// the answers it gets correct / incorrect.
+		// We will then compare the records each WebSocket has with the records
+		// on the backend.
+
+		// Have each WebSocket submit many answers
+		a_chan := make(chan bool, num_users)
+		for i := 0; i < num_users; i += 1 {
+			go func(t *testing.T, ws *websocket.Conn, c chan bool, username int) {
+				for j := 0; j < num_submits; j += 1 {
+					ws.WriteMessage(
+						websocket.TextMessage,
+						[]byte(fmt.Sprintf(
+							`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
+							username+1, j+1)))
+				}
+				c <- true
+			}(t, wss[i], a_chan, i)
+		}
+
+		// Wait for all WebSockets to finish submitting
+		num_users_done := 0
+		for range a_chan {
+			num_users_done += 1
+			if num_users_done == num_users {
+				break
+			}
+		}
+
+		// Give the backend sufficient time to handle the messages
+		time.Sleep(time.Second / 4)
+
+		// First, make sure that all answers are in the map
+		expected_words := make([]string, 0)
+		for i := 0; i < num_submits; i += 1 {
+			expected_words = append(expected_words, fmt.Sprintf("answer%d", i+1))
+		}
+		sort.Strings(expected_words)
+
+		actual_words := lob.Lobbies[id].userWords.genWordsArr()
+		sort.Strings(actual_words)
+		if !reflect.DeepEqual(expected_words, actual_words) {
+			t.Error("The list of words on the backend is incorrect. Expected, actual:", expected_words, actual_words)
 		}
 	})
 }
