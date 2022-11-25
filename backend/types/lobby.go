@@ -7,8 +7,6 @@ import (
 	"math/rand"
 	"time"
 
-	"strings"
-
 	"github.com/cis3296f22/ottomh/backend/config"
 	"github.com/gin-gonic/gin"
 )
@@ -77,16 +75,40 @@ func (l *Lobby) lifecycle() {
 					}
 				case "endvoting":
 					//break the crossed words to store in map
-					str := strings.Split(packetIn.Data, ",")
-					for _, s := range str {
-						if s != "" {
-							if _, ok := crossedWordsMap[s]; ok {
-								crossedWordsMap[s] += 1
-							} else {
-								crossedWordsMap[s] = 1
+					var crossedWordsRaw interface{}
+					log.Print(packetIn.Data)
+					err := json.Unmarshal([]byte(packetIn.Data), &crossedWordsRaw)
+					if err != nil {
+						log.Print("Error unmarshaling crossedWords on an 'endvoting' message:", err)
+						break
+					}
+					switch crossedWordsRaw.(type) {
+					case []interface{}:
+						for _, r := range crossedWordsRaw.([]interface{}) {
+							s := r.(string)
+							if s != "" {
+								if _, ok := crossedWordsMap[s]; ok {
+									crossedWordsMap[s] += 1
+								} else {
+									crossedWordsMap[s] = 1
+								}
 							}
 						}
+					default:
+						log.Print("Data in 'endvoting' packet is not a slice")
+						break
 					}
+
+					// str := strings.Split(packetIn.Data, ",")
+					// for _, s := range str {
+					// 	if s != "" {
+					// 		if _, ok := crossedWordsMap[s]; ok {
+					// 			crossedWordsMap[s] += 1
+					// 		} else {
+					// 			crossedWordsMap[s] = 1
+					// 		}
+					// 	}
+					// }
 
 					// We only want to signal users to move to the next stage after
 					// all users have signaled that they are ready to move on.
@@ -168,7 +190,6 @@ func (l *Lobby) lifecycle() {
 						"Word":         word.Answer,
 					})
 					socket.WriteMessage(packetOut)
-				
 
 				default:
 					log.Print("Recieved message from WebSocket: ", string(m))
