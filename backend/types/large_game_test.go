@@ -32,6 +32,12 @@ type beginGamePacket struct {
 	Letter   string
 }
 
+type checkWordPacket struct {
+	Event        string
+	Word         string
+	IsUniqueWord bool
+}
+
 // A helper function to read messages from a WebSocket and place
 // them in a go channel
 func readCycle(t *testing.T, ws *websocket.Conn, c chan []byte) {
@@ -93,7 +99,7 @@ func TestLargeGame(t *testing.T) {
 	wss := make([]*websocket.Conn, num_users)
 	ws_chans := make([]chan []byte, num_users)
 	for i := 0; i < num_users; i += 1 {
-		ws_chans[i] = make(chan []byte, num_users*2)
+		ws_chans[i] = make(chan []byte, num_submits+1)
 	}
 
 	t.Run("Test User Connection", func(t *testing.T) {
@@ -213,18 +219,37 @@ func TestLargeGame(t *testing.T) {
 		// on the backend.
 
 		// Have each WebSocket submit many answers
+		// We select the list of answers each user submits carefully
+		// so that there is some overlap, but each user also submits
+		// some unique words.
+		step_size := num_users
 		a_chan := make(chan bool, num_users)
 		for i := 0; i < num_users; i += 1 {
-			go func(t *testing.T, ws *websocket.Conn, c chan bool, username int) {
-				for j := 0; j < num_submits; j += 1 {
+			go func(t *testing.T, ws *websocket.Conn, c chan bool, username int, step_size int) {
+				for j := username*2 + 1; j < num_submits-1; j += step_size {
+					ws.WriteMessage(
+						websocket.TextMessage,
+						[]byte(fmt.Sprintf(
+							`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
+							username+1, j)))
 					ws.WriteMessage(
 						websocket.TextMessage,
 						[]byte(fmt.Sprintf(
 							`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
 							username+1, j+1)))
+					ws.WriteMessage(
+						websocket.TextMessage,
+						[]byte(fmt.Sprintf(
+							`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
+							username+1, j+2)))
 				}
+				ws.WriteMessage(
+					websocket.TextMessage,
+					[]byte(fmt.Sprintf(
+						`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
+						username+1, 100)))
 				c <- true
-			}(t, wss[i], a_chan, i)
+			}(t, wss[i], a_chan, i, step_size)
 		}
 
 		// Wait for all WebSockets to finish submitting
@@ -250,6 +275,41 @@ func TestLargeGame(t *testing.T) {
 		sort.Strings(actual_words)
 		if !reflect.DeepEqual(expected_words, actual_words) {
 			t.Error("The list of words on the backend is incorrect. Expected, actual:", expected_words, actual_words)
+		}
+
+		// Next, allow each user to construct their own list of accepted
+		// answers, and ensure it agrees with the list on the backend.
+		for i := 0; i < num_users; i += 1 {
+			// Read all responses, and track those answers that were accepted
+			accepted := make([]string, 0)
+
+			for {
+				select {
+				case m := <-ws_chans[i]:
+					var packet checkWordPacket
+					err := json.Unmarshal(m, &packet)
+					if err != nil {
+						t.Error(i+1, "Error unmarshaling 'checkword' packet:", err)
+					}
+
+					if packet.IsUniqueWord {
+						accepted = append(accepted, packet.Word)
+					}
+				default:
+					goto exit_loop
+				}
+			}
+
+		exit_loop:
+			// Compare the list of accepted words stored locally to those accepted by the backend
+			sort.Strings(accepted)
+			backend_list := lob.Lobbies[id].userWords.mapGetter()[fmt.Sprintf("user%d", i+1)]
+			sort.Strings(backend_list)
+
+			// reflect.DeepEqual does not handle the case of two empty lists
+			if !(len(backend_list) == 0 && len(accepted) == 0) && !reflect.DeepEqual(backend_list, accepted) {
+				t.Error(i+1, "List of accepted words on backend and frontend differ. Backend frontend:", backend_list, accepted)
+			}
 		}
 	})
 }
