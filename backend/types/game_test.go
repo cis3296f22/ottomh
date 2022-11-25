@@ -199,7 +199,7 @@ func TestTwoPlayerGame(t *testing.T) {
 
 	t.Run("Test Voting Ended Event", func(t *testing.T) {
 		// Send message as the player
-		err := player.WriteMessage(websocket.TextMessage, []byte("{\"Event\":\"endvoting\"}"))
+		err := player.WriteMessage(websocket.TextMessage, []byte(`{"Event":"endvoting","Data":"[\"xylophone\",\"xee\",\"xree\"]"}`))
 		if err != nil {
 			t.Error(err)
 		}

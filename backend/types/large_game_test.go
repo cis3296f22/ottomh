@@ -20,6 +20,10 @@ import (
 const num_users int = 20
 const num_submits int = 100
 
+type genericPacket struct {
+	Event string
+}
+
 type updateUsersPacket struct {
 	Event string
 	Host  string
@@ -369,6 +373,97 @@ func TestLargeGame(t *testing.T) {
 				default:
 					t.Error(i+1, "WebSocket did not receive message to move to voting page")
 				}
+			}
+		})
+
+		t.Run("Test Endvoting With Crossed Words", func(t *testing.T) {
+			// The general scheme is that any words with even numbers will
+			// be crossed out by 1/4 of the users, and words with numbers
+			// that are multiples of 10 will be crossed out by an additional
+			// 1/4 of users, and words with numbers that are multiples of 20 will
+			// be crossed out by an additional 1/4 of users.
+			var wg sync.WaitGroup
+			for i := 0; i < num_users; i += 1 {
+				wg.Add(1)
+				go func(i int) {
+					defer wg.Done()
+
+					// Build a list of words that have been voted off
+					crossed_words := make([]string, 0)
+					for j := 1; j <= num_submits; j += 1 {
+						if i < 5 && j%2 == 0 {
+							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
+						} else if i < 10 && j%10 == 0 {
+							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
+						} else if i < 15 && j%20 == 0 {
+							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
+						}
+					}
+
+					// Convert the list of words to a JSON array
+					words, err := json.Marshal(crossed_words)
+					if err != nil {
+						t.Error(i+1, "error marshalong slice of words:", err)
+					}
+
+					// Create the 'endvoting' message
+					m, err := json.Marshal(map[string]interface{}{
+						"Event": "endvoting",
+						"Data":  string(words),
+					})
+					if err != nil {
+						t.Error(i+1, "error marshaling 'endvoting' event:", err)
+					}
+
+					err = wss[i].WriteMessage(websocket.TextMessage, m)
+					if err != nil {
+						t.Error(i+1, "error writing 'endvoting' event to WebSocket:", err)
+					}
+				}(i)
+			}
+
+			wg.Wait()
+
+			// Allow the backend time to process the information
+			time.Sleep(time.Second / 4)
+
+			// Ensure that each WebSocket received the 'endvoting' event
+			for i := 0; i < 20; i += 1 {
+				wg.Add(1)
+				go func(i int) {
+					defer wg.Done()
+					select {
+					case m := <-ws_chans[i]:
+						var packet genericPacket
+						err := json.Unmarshal(m, &packet)
+						if err != nil {
+							t.Error(i+1, "error unmarshaling 'endvoting' event")
+						}
+
+						if packet.Event != "endvoting" {
+							t.Error(i+1, "unexpected event: ", packet.Event)
+						}
+					default:
+						t.Error(i+1, "did not receive 'endvoting' message")
+					}
+				}(i)
+			}
+
+			wg.Wait()
+
+			// Ensure that the expected words have been removed
+			expected_words := make([]string, 0)
+			for j := 1; j <= num_submits; j += 1 {
+				if j%10 != 0 {
+					expected_words = append(expected_words, fmt.Sprintf("answer%d", j))
+				}
+			}
+			sort.Strings(expected_words)
+
+			actual_words := lob.Lobbies[id].userWords.genWordsArr()
+			sort.Strings(actual_words)
+			if !reflect.DeepEqual(expected_words, actual_words) {
+				t.Error("Incorrect words removed from backend. Expected actual:", expected_words, actual_words)
 			}
 		})
 	})
