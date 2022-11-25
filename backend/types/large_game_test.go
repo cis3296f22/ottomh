@@ -38,6 +38,11 @@ type checkWordPacket struct {
 	IsUniqueWord bool
 }
 
+type endRoundPacket struct {
+	Event         string
+	TotalWordsArr []string
+}
+
 // A helper function to read messages from a WebSocket and place
 // them in a go channel
 func readCycle(t *testing.T, ws *websocket.Conn, c chan []byte) {
@@ -226,6 +231,10 @@ func TestLargeGame(t *testing.T) {
 		a_chan := make(chan bool, num_users)
 		for i := 0; i < num_users; i += 1 {
 			go func(t *testing.T, ws *websocket.Conn, c chan bool, username int, step_size int) {
+				// Each WebSocket sends words in blocks of 3 essentially,
+				// where the first and last words will be sent by
+				// another socket, and the middle word is unique to that
+				// socket.
 				for j := username*2 + 1; j < num_submits-1; j += step_size {
 					ws.WriteMessage(
 						websocket.TextMessage,
@@ -311,5 +320,56 @@ func TestLargeGame(t *testing.T) {
 				t.Error(i+1, "List of accepted words on backend and frontend differ. Backend frontend:", backend_list, accepted)
 			}
 		}
+
+		t.Run("Test Endgame Event", func(t *testing.T) {
+			// Ensure that all WebSockets are able to start a move safely
+			var wg sync.WaitGroup
+			// Loop over all WebSockets, sending the move message over each
+			for i := 0; i < num_users; i += 1 {
+				wg.Add(1)
+				go func(i int) {
+					defer wg.Done()
+					err := wss[i].WriteMessage(websocket.TextMessage, []byte(`{"Event": "endround"}`))
+					if err != nil {
+						t.Error(i+1, "Error writing to WebSocket:", err)
+					}
+
+				}(i)
+			}
+			wg.Wait()
+
+			// Give the backend sufficient time to send messages
+			time.Sleep(time.Second / 4)
+
+			// Ensure that all WebSockets received the event to move,
+			// and that they all received an accurate list of words
+			expected_words := make([]string, 0)
+			for i := 0; i < num_submits; i += 1 {
+				expected_words = append(expected_words, fmt.Sprintf("answer%d", i+1))
+			}
+			sort.Strings(expected_words)
+
+			// Check each WebSocket channel to make sure it received the
+			// message to move to voting, with an accurate word list.
+			for i := 0; i < num_users; i += 1 {
+				select {
+				case m := <-ws_chans[i]:
+					// Parse the JSON message
+					var packet endRoundPacket
+					err := json.Unmarshal(m, &packet)
+					if err != nil {
+						t.Error(i+1, "error unmarshaling 'endround' packet:", err)
+					}
+
+					// Compare the expected list of words to that found in the message
+					sort.Strings(packet.TotalWordsArr)
+					if !reflect.DeepEqual(expected_words, packet.TotalWordsArr) {
+						t.Error(i+1, "words sent over 'endround' packet are innacurate. Expected actual:", expected_words, packet.TotalWordsArr)
+					}
+				default:
+					t.Error(i+1, "WebSocket did not receive message to move to voting page")
+				}
+			}
+		})
 	})
 }
