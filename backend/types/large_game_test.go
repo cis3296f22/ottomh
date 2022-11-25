@@ -256,7 +256,7 @@ func TestLargeGame(t *testing.T) {
 					websocket.TextMessage,
 					[]byte(fmt.Sprintf(
 						`{"Event": "checkword","Data": "{\"CurrentPlayer\":\"user%d\",\"Answer\":\"answer%d\"}"}`,
-						username+1, 100)))
+						username+1, num_submits)))
 				c <- true
 			}(t, wss[i], a_chan, i, step_size)
 		}
