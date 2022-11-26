@@ -47,6 +47,11 @@ type endRoundPacket struct {
 	TotalWordsArr []string
 }
 
+type getScoresPacket struct {
+	Event  string
+	Scores map[string]int
+}
+
 // A helper function to read messages from a WebSocket and place
 // them in a go channel
 func readCycle(t *testing.T, ws *websocket.Conn, c chan []byte) {
@@ -324,147 +329,190 @@ func TestLargeGame(t *testing.T) {
 				t.Error(i+1, "List of accepted words on backend and frontend differ. Backend frontend:", backend_list, accepted)
 			}
 		}
+	})
 
-		t.Run("Test Endgame Event", func(t *testing.T) {
-			// Ensure that all WebSockets are able to start a move safely
-			var wg sync.WaitGroup
-			// Loop over all WebSockets, sending the move message over each
-			for i := 0; i < num_users; i += 1 {
-				wg.Add(1)
-				go func(i int) {
-					defer wg.Done()
-					err := wss[i].WriteMessage(websocket.TextMessage, []byte(`{"Event": "endround"}`))
-					if err != nil {
-						t.Error(i+1, "Error writing to WebSocket:", err)
+	t.Run("Test Endgame Event", func(t *testing.T) {
+		// Ensure that all WebSockets are able to start a move safely
+		var wg sync.WaitGroup
+		// Loop over all WebSockets, sending the move message over each
+		for i := 0; i < num_users; i += 1 {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+				err := wss[i].WriteMessage(websocket.TextMessage, []byte(`{"Event": "endround"}`))
+				if err != nil {
+					t.Error(i+1, "Error writing to WebSocket:", err)
+				}
+
+			}(i)
+		}
+		wg.Wait()
+
+		// Give the backend sufficient time to send messages
+		time.Sleep(time.Second / 4)
+
+		// Ensure that all WebSockets received the event to move,
+		// and that they all received an accurate list of words
+		expected_words := make([]string, 0)
+		for i := 0; i < num_submits; i += 1 {
+			expected_words = append(expected_words, fmt.Sprintf("answer%d", i+1))
+		}
+		sort.Strings(expected_words)
+
+		// Check each WebSocket channel to make sure it received the
+		// message to move to voting, with an accurate word list.
+		for i := 0; i < num_users; i += 1 {
+			select {
+			case m := <-ws_chans[i]:
+				// Parse the JSON message
+				var packet endRoundPacket
+				err := json.Unmarshal(m, &packet)
+				if err != nil {
+					t.Error(i+1, "error unmarshaling 'endround' packet:", err)
+				}
+
+				// Compare the expected list of words to that found in the message
+				sort.Strings(packet.TotalWordsArr)
+				if !reflect.DeepEqual(expected_words, packet.TotalWordsArr) {
+					t.Error(i+1, "words sent over 'endround' packet are innacurate. Expected actual:", expected_words, packet.TotalWordsArr)
+				}
+			default:
+				t.Error(i+1, "WebSocket did not receive message to move to voting page")
+			}
+		}
+	})
+
+	t.Run("Test Endvoting With Crossed Words", func(t *testing.T) {
+		// The general scheme is that any words with even numbers will
+		// be crossed out by 1/4 of the users, and words with numbers
+		// that are multiples of 10 will be crossed out by an additional
+		// 1/4 of users, and words with numbers that are multiples of 20 will
+		// be crossed out by an additional 1/4 of users.
+		var wg sync.WaitGroup
+		for i := 0; i < num_users; i += 1 {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
+
+				// Build a list of words that have been voted off
+				crossed_words := make([]string, 0)
+				for j := 1; j <= num_submits; j += 1 {
+					if i < 5 && j%2 == 0 {
+						crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
+					} else if i < 10 && j%10 == 0 {
+						crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
+					} else if i < 15 && j%20 == 0 {
+						crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
 					}
+				}
 
-				}(i)
-			}
-			wg.Wait()
+				// Convert the list of words to a JSON array
+				words, err := json.Marshal(crossed_words)
+				if err != nil {
+					t.Error(i+1, "error marshalong slice of words:", err)
+				}
 
-			// Give the backend sufficient time to send messages
-			time.Sleep(time.Second / 4)
+				// Create the 'endvoting' message
+				m, err := json.Marshal(map[string]interface{}{
+					"Event": "endvoting",
+					"Data":  string(words),
+				})
+				if err != nil {
+					t.Error(i+1, "error marshaling 'endvoting' event:", err)
+				}
 
-			// Ensure that all WebSockets received the event to move,
-			// and that they all received an accurate list of words
-			expected_words := make([]string, 0)
-			for i := 0; i < num_submits; i += 1 {
-				expected_words = append(expected_words, fmt.Sprintf("answer%d", i+1))
-			}
-			sort.Strings(expected_words)
+				err = wss[i].WriteMessage(websocket.TextMessage, m)
+				if err != nil {
+					t.Error(i+1, "error writing 'endvoting' event to WebSocket:", err)
+				}
+			}(i)
+		}
 
-			// Check each WebSocket channel to make sure it received the
-			// message to move to voting, with an accurate word list.
-			for i := 0; i < num_users; i += 1 {
+		wg.Wait()
+
+		// Allow the backend time to process the information
+		time.Sleep(time.Second / 4)
+
+		// Ensure that each WebSocket received the 'endvoting' event
+		for i := 0; i < 20; i += 1 {
+			wg.Add(1)
+			go func(i int) {
+				defer wg.Done()
 				select {
 				case m := <-ws_chans[i]:
-					// Parse the JSON message
-					var packet endRoundPacket
+					var packet genericPacket
 					err := json.Unmarshal(m, &packet)
 					if err != nil {
-						t.Error(i+1, "error unmarshaling 'endround' packet:", err)
+						t.Error(i+1, "error unmarshaling 'endvoting' event")
 					}
 
-					// Compare the expected list of words to that found in the message
-					sort.Strings(packet.TotalWordsArr)
-					if !reflect.DeepEqual(expected_words, packet.TotalWordsArr) {
-						t.Error(i+1, "words sent over 'endround' packet are innacurate. Expected actual:", expected_words, packet.TotalWordsArr)
+					if packet.Event != "endvoting" {
+						t.Error(i+1, "unexpected event: ", packet.Event)
 					}
 				default:
-					t.Error(i+1, "WebSocket did not receive message to move to voting page")
+					t.Error(i+1, "did not receive 'endvoting' message")
+				}
+			}(i)
+		}
+
+		wg.Wait()
+
+		// Ensure that the expected words have been removed
+		expected_words := make([]string, 0)
+		for j := 1; j <= num_submits; j += 1 {
+			if j%10 != 0 {
+				expected_words = append(expected_words, fmt.Sprintf("answer%d", j))
+			}
+		}
+		sort.Strings(expected_words)
+
+		actual_words := lob.Lobbies[id].userWords.genWordsArr()
+		sort.Strings(actual_words)
+		if !reflect.DeepEqual(expected_words, actual_words) {
+			t.Error("Incorrect words removed from backend. Expected actual:", expected_words, actual_words)
+		}
+	})
+
+	t.Run("Test Score Calculation", func(t *testing.T) {
+		// Ask Lobby to send out scores
+		wss[0].WriteMessage(websocket.TextMessage, []byte(`{"Event":"getscores"}`))
+
+		// Confirm that all sockets receive the same map
+		var mp map[string]int = nil
+		for i := 0; i < num_users; i += 1 {
+			m := <-ws_chans[i]
+			var packet getScoresPacket
+			err := json.Unmarshal(m, &packet)
+			if err != nil {
+				t.Error(i+1, "error unmarshaling 'getscores' packet: ", err)
+			}
+
+			if mp == nil {
+				mp = packet.Scores
+			} else {
+				if !reflect.DeepEqual(mp, packet.Scores) {
+					t.Error(i+1, "WebSockets receive different maps. Map1 Map2:", mp, packet.Scores)
 				}
 			}
-		})
+		}
 
-		t.Run("Test Endvoting With Crossed Words", func(t *testing.T) {
-			// The general scheme is that any words with even numbers will
-			// be crossed out by 1/4 of the users, and words with numbers
-			// that are multiples of 10 will be crossed out by an additional
-			// 1/4 of users, and words with numbers that are multiples of 20 will
-			// be crossed out by an additional 1/4 of users.
-			var wg sync.WaitGroup
-			for i := 0; i < num_users; i += 1 {
-				wg.Add(1)
-				go func(i int) {
-					defer wg.Done()
-
-					// Build a list of words that have been voted off
-					crossed_words := make([]string, 0)
-					for j := 1; j <= num_submits; j += 1 {
-						if i < 5 && j%2 == 0 {
-							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
-						} else if i < 10 && j%10 == 0 {
-							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
-						} else if i < 15 && j%20 == 0 {
-							crossed_words = append(crossed_words, fmt.Sprintf("answer%d", j))
-						}
-					}
-
-					// Convert the list of words to a JSON array
-					words, err := json.Marshal(crossed_words)
-					if err != nil {
-						t.Error(i+1, "error marshalong slice of words:", err)
-					}
-
-					// Create the 'endvoting' message
-					m, err := json.Marshal(map[string]interface{}{
-						"Event": "endvoting",
-						"Data":  string(words),
-					})
-					if err != nil {
-						t.Error(i+1, "error marshaling 'endvoting' event:", err)
-					}
-
-					err = wss[i].WriteMessage(websocket.TextMessage, m)
-					if err != nil {
-						t.Error(i+1, "error writing 'endvoting' event to WebSocket:", err)
-					}
-				}(i)
+		// Simple score calculation check: make sure the number of
+		// allotted points equals the number of accepted answers.
+		expected_words := make([]string, 0)
+		for j := 1; j <= num_submits; j += 1 {
+			if j%10 != 0 {
+				expected_words = append(expected_words, fmt.Sprintf("answer%d", j))
 			}
+		}
+		expected_score := len(expected_words)
 
-			wg.Wait()
+		actual_score := 0
+		for key := range mp {
+			actual_score += mp[key]
+		}
 
-			// Allow the backend time to process the information
-			time.Sleep(time.Second / 4)
-
-			// Ensure that each WebSocket received the 'endvoting' event
-			for i := 0; i < 20; i += 1 {
-				wg.Add(1)
-				go func(i int) {
-					defer wg.Done()
-					select {
-					case m := <-ws_chans[i]:
-						var packet genericPacket
-						err := json.Unmarshal(m, &packet)
-						if err != nil {
-							t.Error(i+1, "error unmarshaling 'endvoting' event")
-						}
-
-						if packet.Event != "endvoting" {
-							t.Error(i+1, "unexpected event: ", packet.Event)
-						}
-					default:
-						t.Error(i+1, "did not receive 'endvoting' message")
-					}
-				}(i)
-			}
-
-			wg.Wait()
-
-			// Ensure that the expected words have been removed
-			expected_words := make([]string, 0)
-			for j := 1; j <= num_submits; j += 1 {
-				if j%10 != 0 {
-					expected_words = append(expected_words, fmt.Sprintf("answer%d", j))
-				}
-			}
-			sort.Strings(expected_words)
-
-			actual_words := lob.Lobbies[id].userWords.genWordsArr()
-			sort.Strings(actual_words)
-			if !reflect.DeepEqual(expected_words, actual_words) {
-				t.Error("Incorrect words removed from backend. Expected actual:", expected_words, actual_words)
-			}
-		})
+		if expected_score != actual_score {
+			t.Error("The total score is incorrect. Expected actual:", expected_score, actual_score)
+		}
 	})
 }
