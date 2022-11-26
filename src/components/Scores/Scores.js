@@ -33,7 +33,7 @@ export const Scores = ({ onReplay }) => {
                 Scoreboard
             </h1>
             <img class="crown" src={crown} alt="a crown for the winner"></img>
-            <div class="winner-box">
+            <div>
                 <h3>Winner: {forwinnerdisplay[0]}</h3>
             </div>
             <div>

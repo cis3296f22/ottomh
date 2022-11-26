@@ -1,16 +1,11 @@
 .scores{
     margin-top: 5rem;
     text-align: center;
-    background-color: white;
 }
 
 .scoreheader{
     border: solid;
     background-color: #3399FF;
-}
-
-.winner-box{
-    color:black;
 }
 
 .player-score{
