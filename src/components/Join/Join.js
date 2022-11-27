@@ -6,6 +6,13 @@ import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 
+/**
+ * This component moves the client to a game.
+ * @param props
+ * @param {boolean} props.isCreate true if this user is the host
+ * @param props.onBackClick callback when the user hits the back button
+ * @returns {JSX.Element}
+ */
 export const Join = ({ isCreate, onBackClick }) => {
     const navigate = useNavigate();
     const inputCodeRef = useRef(); // get HTML DOM reference to the input box for the lobby code

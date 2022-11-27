@@ -5,7 +5,16 @@ import { useState } from 'react';
 import { useStore } from "../../store";
 import Button from 'react-bootstrap/Button';
 
-
+/**
+ * This component displays the voting page.
+ * @param props
+ * @param props.onTimeover callback function when the timer runs out
+ * @param props.words a list of words to be voted off
+ * @param {string} props.cat the category for this round
+ * @param {string} props.letter the letter for this round
+ * @param {string} props.time_picked timer duration in format "minutes:seconds"
+ * @returns {JSX.Element}
+ */
 export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
     const [isLoading, setLoading] = useState(true);
     const ws = useStore((state) => state.socket);

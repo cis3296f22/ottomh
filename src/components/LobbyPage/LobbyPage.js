@@ -3,6 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
 import { WaitState, Game, Scores, Voting } from "../";
 
+/**
+ * This component wraps all components related to the currently open lobby:
+ * including the waiting page, game page, voting page, and scores page.
+ * @returns {JSX.Element}
+ */
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
     const [stage, setStage] = useState("waitingRoom");

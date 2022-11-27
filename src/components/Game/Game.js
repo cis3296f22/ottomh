@@ -9,6 +9,17 @@ import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import { useState, useEffect } from "react";
 import { useStore } from "../../store";
 
+/**
+ * The Game component displays the current category and letter, 
+ * and a text submission box.
+ * @param props
+ * @param props.onTimeover executed when the game timer ends
+ * @param {string} props.cat the category for this game round
+ * @param {string} props.letter the letter for this game round
+ * @param {string} props.time_picked timer duration in format "minutes:seconds"
+ * @param {string} props.isUniqueWord should the duplicate answer modal be displayed.
+ * @returns {JSX.Element}
+ */
 export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
     const [isLoading, _setLoading] = useState(true);
     const ws = useStore((state) => state.socket);

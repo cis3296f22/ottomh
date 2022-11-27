@@ -5,7 +5,14 @@ import { useStore } from '../../store';
 import { PlayerList } from '../';
 import logo from '../../images/logo.png';
 
-
+/**
+ * This component displays the waiting page.
+ * @param props
+ * @param {string} props.id the id for this lobby
+ * @param props.onStart a callback function called when the host presses start;
+ * this button is visible only to the host. 
+ * @returns {JSX.Element}
+ */
 export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);

@@ -1,7 +1,12 @@
 import Button from 'react-bootstrap/Button';
 import { useState, useRef, useEffect } from 'react'
 
-
+/**
+ * The GamePageTimer counts down from `time_picked`.
+ * @param setLoading this function is called when the timer runs out
+ * @param {string} time_picked timer duration in format "minutes:seconds"
+ * @returns {JSX.Element}
+ */
 export const GamePageTimer = (setLoading, time_picked ) => {
 
     const Ref = useRef(null);

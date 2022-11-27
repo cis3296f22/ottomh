@@ -6,7 +6,12 @@ import crown from './crown.png';
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
-
+/**
+ * This component displays the score page, using the scorelist in the store.
+ * @param props
+ * @param props.onReplay a callback function when the host replay the game
+ * @returns {JSX.Element}
+ */
 export const Scores = ({ onReplay }) => {
     const navigate = useNavigate();
     const scorelist = useStore((state) => state.scorelist);
