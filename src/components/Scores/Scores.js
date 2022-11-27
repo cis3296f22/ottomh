@@ -27,7 +27,6 @@ export const Scores = ({ onReplay }) => {
         return b[1] - a[1];
     });
 
-    console.log(sortedScores)
     let forwinnerdisplay = [].concat(...sortedScores);
 
     let rank = 0;
