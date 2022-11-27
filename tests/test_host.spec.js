@@ -9,6 +9,8 @@ test('CreateAndLeaveLobby', async ({ page }) => {
   await page.goto('http://localhost:8080/');
 
   await page.getByText('OTTOMHCreate new lobbyJoin lobby').click();
+  
+  await page.getByRole('button', { name: 'Create new lobby' }).click();
 
   await page.getByPlaceholder('Username').fill('Landen');
 
@@ -60,21 +62,20 @@ test('CreateAndLeaveLobby', async ({ page }) => {
   await page.getByRole('button', { name: 'Submit' }).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8080\/lobbies\/[a-zA-Z0-9]{6}/);
   await page.getByRole('button', { name: 'Start' }).click();
+
+  const ele = await page.getByPlaceholder('theLetter').inputValue();
+
   await page.getByPlaceholder('Enter Answer Here').click();
-  await page.getByPlaceholder('Enter Answer Here').fill('testenter');
+  await page.getByPlaceholder('Enter Answer Here').fill(ele+'testenter');
   await page.getByPlaceholder('Enter Answer Here').press('Enter');
-  await page.getByPlaceholder('Enter Answer Here').fill('testsubmit');
+  await page.getByPlaceholder('Enter Answer Here').fill(ele+'testsubmit');
   await page.getByPlaceholder('Enter Answer Here').press('Enter');
-  await page.getByRole('button', { name: 'How to Play!' }).click();
-  await page.getByText('Close').click();
 
-  await page.getByRole('button', { name: 'Ipsum' }).click();
-  await page.getByRole('button', { name: 'dummy' }).click();
-  await page.getByRole('button', { name: 'too' }).click();
-  await page.getByRole('button', { name: 'too' }).click();
-  await page.getByRole('button', { name: 'dummy' }).click();
+  await page.getByRole('button', { name: ele+'testenter' }).click();
+  await page.getByRole('button', { name: ele+'testenter' }).click();
 
-  await page.getByRole('button', { name: 'Replay game' }).click();
+
+  await page.getByRole('button', { name: 'Return to Lobby' }).click();
   await page.getByRole('button', { name: 'Start' }).click();
   await page.getByPlaceholder('Enter Answer Here').click();
   await page.getByPlaceholder('Enter Answer Here').fill('gamestartsuccess');
@@ -90,7 +91,7 @@ test('CreateAndLeaveLobby', async ({ page }) => {
   });
 
   fs.writeFileSync(
-    "coverage/tmp/coverage.json",
+    "coverage678.json",
     JSON.stringify({ result: coverageWithPath }, null, 2)
   );
 });

@@ -133,6 +133,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                     <h3>Players:</h3>
                     <PlayerList />
                 </div>
+                <input placeholder='theLetter'  value={letter} hidden />
             </div>
         );
     }
