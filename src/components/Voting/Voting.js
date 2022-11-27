@@ -66,7 +66,6 @@ if (isLoading) {
 else { 
     document.getElementById('directToScore').click();
     let crossedWords = words.filter((_, index) => crossed[index] === true); 
-    console.log(crossedWords, "these are the crossedwords");
     ws.send(JSON.stringify({ Event: "endvoting", Data: JSON.stringify(crossedWords)}));
   }
 

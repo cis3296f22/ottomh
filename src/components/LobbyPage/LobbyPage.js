@@ -58,7 +58,7 @@ export const LobbyPage = () => {
                     setIsUniqueWord(packetObject.isUniqueWord);
                     break;
                 default:
-                    console.log(`Received data from backend: ${event.data}`);
+                    
             }
         }
 
