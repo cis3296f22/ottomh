@@ -91,7 +91,7 @@ test('CreateAndLeaveLobby', async ({ page }) => {
   });
 
   fs.writeFileSync(
-    "coverage678.json",
+    "coverage/tmp/coverage.json",
     JSON.stringify({ result: coverageWithPath }, null, 2)
   );
 });
