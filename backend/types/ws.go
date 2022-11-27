@@ -33,6 +33,8 @@ type WebSocket struct {
 	lastPing  time.Time
 }
 
+// Sets the WebSocket as inactive and closes
+// the underlying websocket connection.
 func (ws *WebSocket) Close() {
 	ws.muAlive.Lock()
 	// Do not close a WebSocket twice
@@ -93,7 +95,6 @@ func (ws *WebSocket) IsAlive() bool {
 }
 
 // Write a message over the web socket.
-// TODO: writes can be blocking; how do we handle writes without blocking?
 func (ws *WebSocket) WriteMessage(m []byte) error {
 	ws.writeLock.Lock()
 	defer ws.writeLock.Unlock()
@@ -114,6 +115,9 @@ func (ws *WebSocket) Ping() {
 	}
 }
 
+// Constructs a new `WebSocket` instance over the HTTP request represented
+// by `w`, `r`, and `responseHeader`.
+// Returns the same errors as upgrader.Upgrade
 func MakeWebSocket(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*WebSocket, error) {
 	g_ws, err := upgrader.Upgrade(w, r, responseHeader)
 	if err != nil {

@@ -1,5 +1,6 @@
 package types
 
+// Represents a map between a username and score for that user
 type ScoreList struct {
 	scorem map[string]int
 }

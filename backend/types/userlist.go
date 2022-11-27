@@ -78,10 +78,7 @@ func (ul *UserList) GetSocketList() []*WebSocket {
 	return ul.getSocketList()
 }
 
-func (ul *UserList) SetInactive(index int) {
-
-}
-
+// Send the message `m` to all active WebSockets
 func (ul *UserList) MessageAll(m []byte) {
 	for _, socket := range ul.GetSocketList() {
 		socket.WriteMessage(m)

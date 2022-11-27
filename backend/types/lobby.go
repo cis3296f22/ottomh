@@ -235,6 +235,7 @@ func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) er
 	return nil
 }
 
+// Marks the lobby as closed
 func (l *Lobby) Close() {
 	l.lobbyEnded = true
 }

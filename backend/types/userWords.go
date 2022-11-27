@@ -11,11 +11,13 @@ type userWordsMap struct {
 	m  (map[string][]string)
 }
 
+// Represents an answer submission
 type WordPacket struct {
 	CurrentPlayer string
 	Answer        string
 }
 
+// Initializes and empty userWordsMap
 func New() *userWordsMap {
 	s := new(userWordsMap)
 	s.m = make(map[string][]string)
@@ -103,7 +105,7 @@ func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 		//key/val insert in map --> key will hold "user"; val holds  "answer" submitted
 		v.mapSetter(username, answer)
 	}
-	
+
 	return result
 }
 
