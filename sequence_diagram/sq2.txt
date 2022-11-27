@@ -1,0 +1,57 @@
+title OTTOMH (submitting an answer and getting feedback)
+
+participant LobbyPage1
+participant LobbyPage2
+participant Game1
+participant Game2
+participant GamePageTimer
+participant userWords
+participant Vote1
+participant Vote2
+
+activate LobbyPage1
+activate LobbyPage2
+LobbyPage1 -> *Game1:setStage("playGame")
+
+activate Game1
+LobbyPage2 -> *Game2:setStage("playGame")
+activate Game2
+
+note over LobbyPage1,Game2: Set stage of Lobby to Game for all clients
+
+Game1->*GamePageTimer:GamePageTimer(setLoading)
+activate GamePageTimer
+note over Game1,GamePageTimer:A timer will start after the page is loaded
+
+Game1 -> userWords:handleSubmit()
+activate userWords
+note over Game1,userWords: Player entered answer and send to the server, the server validates and echo back
+Game1 <-- userWords: submission:result
+deactivate userWords
+Game2 -> userWords:handleSubmit()
+activate userWords
+Game2 <-- userWords: submission:result
+deactivate userWords
+Game2 -> userWords:handleSubmit()
+activate userWords
+Game2 <-- userWords: submission:result
+deactivate userWords
+Game1 -> userWords:handleSubmit()
+activate userWords
+Game1 <-- userWords: submission:result
+deactivate userWords
+
+
+Game1 <-- GamePageTimer: Timer End
+deactivate GamePageTimer
+note over LobbyPage1, GamePageTimer:The stage will switch to Voting at the end of the timer
+
+LobbyPage1 <-- Game1: onTimeover
+deactivate Game1
+LobbyPage2 <-- Game2: onTimeover
+deactivate Game2
+
+LobbyPage1 -> *Vote1:setStage("voting")
+activate Vote1
+LobbyPage2 -> *Vote2:setStage("voting")
+activate Vote2
