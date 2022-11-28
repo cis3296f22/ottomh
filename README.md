@@ -15,7 +15,17 @@ Unlike physical board games, OTTOMH is easier to setup and can be played by geog
 Play the game here: https://ottomh.herokuapp.com/
 
 ## How to play
-* Invite people! Copy the lobby code and send it to your teammates.
+
+<p float="left">
+    <img src="https://user-images.githubusercontent.com/44854928/204393382-8989f59b-30c6-4f06-a89c-5562c411beb3.png" width="200" />
+    <img src="https://user-images.githubusercontent.com/44854928/204393426-3d23e942-d573-40af-832e-08924ce6148f.png" width="200" />
+    <img src="https://user-images.githubusercontent.com/44854928/204393440-e9278ebc-3c5e-4c42-8330-35810b56c77c.png" width="200" />
+    <img src="https://user-images.githubusercontent.com/44854928/204393450-2c245d4f-dedc-47d4-bec9-9d59c9813626.png" width="200" />
+    <img src="https://user-images.githubusercontent.com/44854928/204393453-dec27bb0-4048-40d6-84c4-87db2e1b25c3.png" width="200" />
+</p>
+
+
+* Invite people! Create a new lobby, copy the lobby code, and send it to your teammates.
 * You have 60 seconds to submit as many words as you can think of at top of your head that begins with the given letter and matches the given category!
 * Compete against time and other players! Words can only be submitted ONCE, and the first person takes the credit for it.
 * Vote off words that don't match and earn points for the words that make it through the round!
