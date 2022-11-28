@@ -6,6 +6,8 @@ import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 
+import PropTypes from 'prop-types';
+
 /**
  * This component moves the client to a game.
  * @param props
@@ -99,3 +101,10 @@ export const Join = ({ isCreate, onBackClick }) => {
         </>
     );
 };
+
+Join.propTypes = {
+    /** true if this user is the host */
+    isCreate: PropTypes.bool,
+    /** callback when the user hits the back button */
+    onBackClick: PropTypes.func,
+}

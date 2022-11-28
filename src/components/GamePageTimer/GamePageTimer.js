@@ -1,5 +1,6 @@
 import Button from 'react-bootstrap/Button';
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * The GamePageTimer counts down from `time_picked`.
@@ -86,4 +87,11 @@ export const GamePageTimer = (setLoading, time_picked ) => {
 
         </div>
     )
+}
+
+GamePageTimer.propTypes = {
+    /** this function is called when the timer runs out */
+    setLoading: PropTypes.func,
+    /** timer duration in format "minutes:seconds" */
+    time_picked: PropTypes.string,
 }

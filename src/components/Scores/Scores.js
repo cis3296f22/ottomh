@@ -5,6 +5,7 @@ import Table from 'react-bootstrap/Table';
 import crown from './crown.png';
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 /**
  * This component displays the score page, using the scorelist in the store.
@@ -72,3 +73,8 @@ export const Scores = ({ onReplay }) => {
         </div>
     );
 };
+
+Scores.propTypes = {
+    /** a callback function when the host replay the game */
+    onReplay: PropTypes.func,
+}

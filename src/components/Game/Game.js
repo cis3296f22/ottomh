@@ -8,6 +8,7 @@ import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
 import { useState, useEffect } from "react";
 import { useStore } from "../../store";
+import PropTypes from 'prop-types';
 
 /**
  * The Game component displays the current category and letter, 
@@ -17,7 +18,7 @@ import { useStore } from "../../store";
  * @param {string} props.cat the category for this game round
  * @param {string} props.letter the letter for this game round
  * @param {string} props.time_picked timer duration in format "minutes:seconds"
- * @param {string} props.isUniqueWord should the duplicate answer modal be displayed.
+ * @param {string} props.isUniqueWord should the duplicate answer modal be displayed?
  * @returns {JSX.Element}
  */
 export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
@@ -152,4 +153,17 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
         document.getElementById('directToVote').click()
     }
 
+};
+
+Game.propTypes = {
+    /** executed when the game timer ends */
+    onTimeover: PropTypes.func,
+    /** the category for this game round */
+    cat: PropTypes.string,
+    /** the letter for this game round */
+    letter: PropTypes.string,
+    /** timer duration in format "minutes:seconds" */
+    time_picker: PropTypes.string,
+    /** should the duplicate answer modal be displayed? */
+    isUniqueWord: PropTypes.bool,
 };

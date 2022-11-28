@@ -4,6 +4,7 @@ import { GamePageTimer } from '../';
 import { useState } from 'react';
 import { useStore } from "../../store";
 import Button from 'react-bootstrap/Button';
+import PropTypes from 'prop-types';
 
 /**
  * This component displays the voting page.
@@ -71,3 +72,15 @@ else {
 
 };
 
+Voting.propTypes = {
+    /** callback function when the timer runs out */
+    onTimeover: PropTypes.func,
+    /** a list of words to be voted off */
+    words: PropTypes.arrayOf(PropTypes.string),
+    /** the category for this round */
+    cat: PropTypes.string,
+    /** the letter for this round */
+    letter: PropTypes.string,
+    /** timer duration in format "minutes:seconds" */
+    time_picked: PropTypes.string,
+}

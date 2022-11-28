@@ -49,4 +49,4 @@ By default, the server listens on port 8080. If you would like to use another po
 
 To generate documentation for the backend, start by installing godoc by running `go install golang.org/x/tools/cmd/godoc@latest`. Then go to the application root, and run `godoc -http=:6060`. You can then visit the go docs at localhost:6060. Here, search for the section labeled "ottomh".
 
-To generate documentation for the frontend, use the jsdoc tool. Use `npm i jsdoc --save-dev` to install jsdoc. To generate documentation for the frontend, use `jsdoc -r src`. Then you can view the documentation by opening `out/index.html`.
+To generate documentation for the frontend, use the react-styleguidist tool. Use `npm install --save-dev react-styleguidist` to install react-styleguidist. To generate documentation for the frontend, use `npx styleguidist build`. Then you can view the documentation by opening `styleguide/index.html`.
