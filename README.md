@@ -14,7 +14,7 @@ Unlike physical board games, OTTOMH is easier to setup and can be played by geog
 
 Play the game here: https://ottomh.herokuapp.com/
 
-## How to play
+## Gameplay
 
 <p float="left">
     <img src="https://user-images.githubusercontent.com/44854928/204399336-498a6483-980b-4fd4-87a1-be1497b59c37.png" width="198" />
@@ -31,11 +31,15 @@ Play the game here: https://ottomh.herokuapp.com/
 * View players' scores and rankings on the scoreboard at the end of each round!
 * Replay the game with the same people!
 
-## Contributing
+## Local installation
+
+If you prefer to play the game locally instead of on the live server at https://ottomh.herokuapp.com/, then you'll need to first install the app by either cloning the main branch of this repo or download the latest released zip files under "releases".
 
 ### Installing
 
-You can either clone the repo or get download the source code from the release page.
+To download the game for local use, clone the repo or download the source from the release page.
+
+If you're looking to contribute to this project, please read the [Contribution](#contribution) section of this README.
 
 To clone the repo:
 ```bash
@@ -53,6 +57,24 @@ To run the project:
 5. Go to [localhost:8080](http://localhost:8080/)
 
 By default, the server listens on port 8080. If you would like to use another port, set the $PORT environment variable.
+
+## Contributing
+
+All contributions are appreciated and help support the project!
+
+If you would like to contribute to this project, please fork this repo, then make a pull request explaining your changes and contribution. Before making a pull request, please make sure that all tests pass 
+
+OTTOMH is built using ReactJs and Go, so you will need the `npm` and `go` commands in order to build and run the project as well as installing the necessary dependencies. Please see the build instructions under the '[Building](#building)' section of this README.
+
+### Issues and feature requests
+
+To report any issues and/or bugs, please open an issue and include the following information so we can better understand and solve the problem:
+* State what the issue is
+* What you did to encounter this issue so that we can replicate it
+* What your browser you were using and what version is it
+* Additionally, if you're running the game on a local machine, what operating system and version were you using
+
+If you would like to make a feature request, please include in the title "Feature request:". For example, "Feature request: add light mode"
 
 ### Running Tests
 
