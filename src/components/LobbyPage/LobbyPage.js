@@ -4,6 +4,11 @@ import { useStore } from "../../store";
 import { WaitState, Game, Scores, Voting } from "../";
 import Modal from "react-bootstrap/Modal";
 
+/**
+ * This component wraps all components related to the currently open lobby:
+ * including the waiting page, game page, voting page, and scores page.
+ * @returns {JSX.Element}
+ */
 export const LobbyPage = () => {
     const { lobbyId } = useParams();
     const [stage, setStage] = useState("waitingRoom");
@@ -53,7 +58,7 @@ export const LobbyPage = () => {
                     setIsUniqueWord(packetObject.isUniqueWord);
                     break;
                 default:
-                    console.log(`Received data from backend: ${event.data}`);
+                    
             }
         }
 
@@ -85,7 +90,7 @@ export const LobbyPage = () => {
     }
 
     //change timer to 00:60 on deployment to heroku
-    const time_picked = "00:30"
+    const time_picked = "00:60"
 
 
     return (

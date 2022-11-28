@@ -4,13 +4,21 @@ import { GamePageTimer } from '../';
 import { useState } from 'react';
 import { useStore } from "../../store";
 import Button from 'react-bootstrap/Button';
+import PropTypes from 'prop-types';
 
-
+/**
+ * This component displays the voting page.
+ * @param props
+ * @param props.onTimeover callback function when the timer runs out
+ * @param props.words a list of words to be voted off
+ * @param {string} props.cat the category for this round
+ * @param {string} props.letter the letter for this round
+ * @param {string} props.time_picked timer duration in format "minutes:seconds"
+ * @returns {JSX.Element}
+ */
 export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
     const [isLoading, setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
-    const [myArray, updateMyArray] = useState([]);
-
     
     // Create an array of boolean that stores whether or not a word is crossed
     let [crossed, setCrossed] = useState(
@@ -22,12 +30,6 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
             onClick={() => setCrossed((crossed) => {
                 let newCrossed = crossed.slice(0);
                 newCrossed[index] = !newCrossed[index];
-                if (crossed[index] === false){
-                    updateMyArray( arr => [...arr, word]);
-                }
-                else {
-                    updateMyArray(myArray.filter(item => item !== word))
-                }
                 return newCrossed;
             })}
             key={word + crossed[index]}
@@ -46,7 +48,7 @@ if (isLoading) {
                 <h1>
                     {cat} <Badge bg="secondary">{letter}</Badge>
                 </h1>
-                <h2 className='m-0'>Cross off words that don't fit!</h2>
+                <h2 className='m-0'>Cross off <del>words</del> that don't fit!</h2>
             </Row>
             <Row className='h-50 overflow-auto'>
                 <ListGroup>
@@ -63,11 +65,22 @@ if (isLoading) {
 }
 
 else { 
-    document.getElementById('directToScore').click()
-    let crossedWords = myArray.toString(); 
-    console.log(crossedWords, "these are the crossedwords");
-    ws.send(JSON.stringify({ Event: "endvoting", Data: crossedWords}))
+    document.getElementById('directToScore').click();
+    let crossedWords = words.filter((_, index) => crossed[index] === true); 
+    ws.send(JSON.stringify({ Event: "endvoting", Data: JSON.stringify(crossedWords)}));
   }
 
 };
 
+Voting.propTypes = {
+    /** callback function when the timer runs out */
+    onTimeover: PropTypes.func,
+    /** a list of words to be voted off */
+    words: PropTypes.arrayOf(PropTypes.string),
+    /** the category for this round */
+    cat: PropTypes.string,
+    /** the letter for this round */
+    letter: PropTypes.string,
+    /** timer duration in format "minutes:seconds" */
+    time_picked: PropTypes.string,
+}

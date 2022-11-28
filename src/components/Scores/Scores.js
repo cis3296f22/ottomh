@@ -5,8 +5,14 @@ import Table from 'react-bootstrap/Table';
 import crown from './crown.png';
 import { useStore } from '../../store';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-
+/**
+ * This component displays the score page, using the scorelist in the store.
+ * @param props
+ * @param props.onReplay a callback function when the host replay the game
+ * @returns {JSX.Element}
+ */
 export const Scores = ({ onReplay }) => {
     const navigate = useNavigate();
     const scorelist = useStore((state) => state.scorelist);
@@ -22,7 +28,6 @@ export const Scores = ({ onReplay }) => {
         return b[1] - a[1];
     });
 
-    console.log(sortedScores)
     let forwinnerdisplay = [].concat(...sortedScores);
 
     let rank = 0;
@@ -33,7 +38,7 @@ export const Scores = ({ onReplay }) => {
                 Scoreboard
             </h1>
             <img class="crown" src={crown} alt="a crown for the winner"></img>
-            <div class="winner-box">
+            <div>
                 <h3>Winner: {forwinnerdisplay[0]}</h3>
             </div>
             <div>
@@ -68,3 +73,8 @@ export const Scores = ({ onReplay }) => {
         </div>
     );
 };
+
+Scores.propTypes = {
+    /** a callback function when the host replay the game */
+    onReplay: PropTypes.func,
+}

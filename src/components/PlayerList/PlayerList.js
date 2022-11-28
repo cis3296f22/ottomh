@@ -1,6 +1,11 @@
 import './playerListStyles.css';
 import { useStore } from '../../store';
 
+/**
+ * This components shows a list of all users present in this game,
+ * using the userlist component in the store.
+ * @returns {JSX.Element}
+ */
 export const PlayerList = () => {
     const [hostname, userlist] = useStore((state) => [state.hostname, state.userlist]);
 

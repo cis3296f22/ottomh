@@ -6,16 +6,19 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// Manages the list of users, and each users submission
 type userWordsMap struct {
-	Mu sync.RWMutex
-	m  (map[string][]string)
+	Mu sync.RWMutex          // Mutex for userWordsMap.m
+	m  (map[string][]string) // Maps username to a list of submissions
 }
 
+// Represents an answer submission
 type WordPacket struct {
 	CurrentPlayer string
 	Answer        string
 }
 
+// Initializes an empty userWordsMap
 func New() *userWordsMap {
 	s := new(userWordsMap)
 	s.m = make(map[string][]string)
@@ -103,7 +106,7 @@ func (v *userWordsMap) UserWords(wordPacket WordPacket) bool {
 		//key/val insert in map --> key will hold "user"; val holds  "answer" submitted
 		v.mapSetter(username, answer)
 	}
-	
+
 	return result
 }
 

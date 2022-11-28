@@ -6,8 +6,16 @@ import { useStore } from '../../store';
 import { useState } from 'react';
 import { PlayerList } from '../';
 import logo from '../../images/logo.png';
+import PropTypes from 'prop-types';
 
-
+/**
+ * This component displays the waiting page.
+ * @param props
+ * @param {string} props.id the id for this lobby
+ * @param props.onStart a callback function called when the host presses start;
+ * this button is visible only to the host. 
+ * @returns {JSX.Element}
+ */
 export const WaitState = ({ id, onStart }) => {
     const navigate = useNavigate();
     const clearStore = useStore((state) => state.clearStore);
@@ -54,4 +62,11 @@ export const WaitState = ({ id, onStart }) => {
             </div>
         </div >
     );
+}
+
+WaitState.propTypes = {
+    /** the id for this lobby */
+    id: PropTypes.string,
+    /** a callback function called when the host presses start; this button is visible only to the host. */
+    onStart: PropTypes.func,
 }

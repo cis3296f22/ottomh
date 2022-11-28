@@ -4,6 +4,10 @@ import logo from '../../images/logo.png';
 
 import { Join } from '../';
 
+/**
+ * This component represents the home page.
+ * @returns {JSX.Element}
+ */
 export const IndexPage = () => {
     const [menu, setMenu] = useState("home");
     const onBackClick = () => { setMenu("home") };

@@ -7,23 +7,22 @@ import (
 	"math/rand"
 	"time"
 
-	"strings"
-
 	"github.com/cis3296f22/ottomh/backend/config"
 	"github.com/gin-gonic/gin"
 )
 
+// Returned by ValidateUsername in the event that a user already exists
 var ErrDuplicateUser error = errors.New("User with given username already exists")
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	ID          string
-	userList    UserList
-	userWords   *userWordsMap
-	roundEnded  bool
-	votingEnded bool
-	lobbyEnded  bool
-	totalScores map[string]int
+	ID          string         // The unique ID representing this lobby
+	userList    UserList       // Manages the list of usernames and WebSockets
+	userWords   *userWordsMap  // Manages the list of username and submissions
+	roundEnded  bool           // "Locks" the move from round to voting
+	votingEnded bool           // "Locks" the move from voting to scores
+	lobbyEnded  bool           // true when the lobby is closed, false otherwise
+	totalScores map[string]int // maps username to score
 }
 
 // Initializes a new Lobby with a unique ID
@@ -77,16 +76,40 @@ func (l *Lobby) lifecycle() {
 					}
 				case "endvoting":
 					//break the crossed words to store in map
-					str := strings.Split(packetIn.Data, ",")
-					for _, s := range str {
-						if s != "" {
-							if _, ok := crossedWordsMap[s]; ok {
-								crossedWordsMap[s] += 1
-							} else {
-								crossedWordsMap[s] = 1
+					var crossedWordsRaw interface{}
+					log.Print(packetIn.Data)
+					err := json.Unmarshal([]byte(packetIn.Data), &crossedWordsRaw)
+					if err != nil {
+						log.Print("Error unmarshaling crossedWords on an 'endvoting' message:", err)
+						break
+					}
+					switch crossedWordsRaw.(type) {
+					case []interface{}:
+						for _, r := range crossedWordsRaw.([]interface{}) {
+							s := r.(string)
+							if s != "" {
+								if _, ok := crossedWordsMap[s]; ok {
+									crossedWordsMap[s] += 1
+								} else {
+									crossedWordsMap[s] = 1
+								}
 							}
 						}
+					default:
+						log.Print("Data in 'endvoting' packet is not a slice")
+						break
 					}
+
+					// str := strings.Split(packetIn.Data, ",")
+					// for _, s := range str {
+					// 	if s != "" {
+					// 		if _, ok := crossedWordsMap[s]; ok {
+					// 			crossedWordsMap[s] += 1
+					// 		} else {
+					// 			crossedWordsMap[s] = 1
+					// 		}
+					// 	}
+					// }
 
 					// We only want to signal users to move to the next stage after
 					// all users have signaled that they are ready to move on.
@@ -168,7 +191,6 @@ func (l *Lobby) lifecycle() {
 						"Word":         word.Answer,
 					})
 					socket.WriteMessage(packetOut)
-				
 
 				default:
 					log.Print("Recieved message from WebSocket: ", string(m))
@@ -214,6 +236,7 @@ func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) er
 	return nil
 }
 
+// Marks the lobby as closed
 func (l *Lobby) Close() {
 	l.lobbyEnded = true
 }
