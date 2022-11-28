@@ -11,9 +11,9 @@ import (
 // using GetUsernameList / GetSocketList; this allows for better
 // parallelization.
 type UserList struct {
-	mu      sync.Mutex
-	sockets map[string]*WebSocket
-	host    string
+	mu      sync.Mutex            // mutex for UserList.sockets
+	sockets map[string]*WebSocket // maps username to WebSocet
+	host    string                // the host in this list of users
 }
 
 // Adds a socket `ws` with associated username `username`.

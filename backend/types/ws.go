@@ -10,7 +10,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Returned by WebSocket.ReadMessage if there are no messages in the queue
 var ErrEmptyQueue error = errors.New("No message in queue")
+
+// Returned by multiple WebSocket methods if the WebSocket is closed
 var ErrClosedWebSocket error = errors.New("WebSocket is closed")
 
 // This struct is used to hold data recieved over web sockets
@@ -19,18 +22,21 @@ type WSPacket struct {
 	Data  string
 }
 
+// Used by gorilla websockets to open a websocket connection
 var upgrader = websocket.Upgrader{}
-var pingDelay = 5 * time.Second // Time between pings
+
+// Time between pings
+var pingDelay = 5 * time.Second
 
 // The WebSocket wrapper provides channel-based messag reading
 // from the WebSocket, and a convenient Ping / Pong.
 type WebSocket struct {
-	ws        *websocket.Conn
-	r         chan []byte
-	writeLock sync.Mutex
-	muAlive   sync.Mutex
-	isAlive   bool
-	lastPing  time.Time
+	ws        *websocket.Conn // The underlying gorilla websocket
+	r         chan []byte     // channel containing received messages
+	writeLock sync.Mutex      // ensures there is only one writer at a time
+	muAlive   sync.Mutex      // mutex on isAlive
+	isAlive   bool            // true if the WebSocket is open, false otherwise
+	lastPing  time.Time       // time when the last ping was sent out
 }
 
 // Sets the WebSocket as inactive and closes

@@ -11,17 +11,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Returned by ValidateUsername in the event that a user already exists
 var ErrDuplicateUser error = errors.New("User with given username already exists")
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	ID          string
-	userList    UserList
-	userWords   *userWordsMap
-	roundEnded  bool
-	votingEnded bool
-	lobbyEnded  bool
-	totalScores map[string]int
+	ID          string         // The unique ID representing this lobby
+	userList    UserList       // Manages the list of usernames and WebSockets
+	userWords   *userWordsMap  // Manages the list of username and submissions
+	roundEnded  bool           // "Locks" the move from round to voting
+	votingEnded bool           // "Locks" the move from voting to scores
+	lobbyEnded  bool           // true when the lobby is closed, false otherwise
+	totalScores map[string]int // maps username to score
 }
 
 // Initializes a new Lobby with a unique ID

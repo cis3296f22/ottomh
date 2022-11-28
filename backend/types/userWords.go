@@ -6,9 +6,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+// Manages the list of users, and each users submission
 type userWordsMap struct {
-	Mu sync.RWMutex
-	m  (map[string][]string)
+	Mu sync.RWMutex          // Mutex for userWordsMap.m
+	m  (map[string][]string) // Maps username to a list of submissions
 }
 
 // Represents an answer submission
