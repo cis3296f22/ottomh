@@ -37,9 +37,7 @@ If you prefer to play the game locally instead of on the live server at https://
 
 ### Installing
 
-To download the game for local use, clone the repo or download the source from the release page.
-
-If you're looking to contribute to this project, please read the [Contribution](#contribution) section of this README.
+To download the game for local use, clone the repo or download the source from the 'releases' page.
 
 To clone the repo:
 ```bash
@@ -58,11 +56,11 @@ To run the project:
 
 By default, the server listens on port 8080. If you would like to use another port, set the $PORT environment variable.
 
-## Contributing
+## Contribution
 
 All contributions are appreciated and help support the project!
 
-If you would like to contribute to this project, please fork this repo, then make a pull request explaining your changes and contribution. Before making a pull request, please make sure that all tests pass 
+If you would like to contribute to this project, please fork this repo, then make a pull request explaining your changes and contribution. Before making a pull request, please make sure that all tests pass. Testing instructions are under the [Running tests](#running-tests) sections. 
 
 OTTOMH is built using ReactJs and Go, so you will need the `npm` and `go` commands in order to build and run the project as well as installing the necessary dependencies. Please see the build instructions under the '[Building](#building)' section of this README.
 
@@ -70,11 +68,11 @@ OTTOMH is built using ReactJs and Go, so you will need the `npm` and `go` comman
 
 To report any issues and/or bugs, please open an issue and include the following information so we can better understand and solve the problem:
 * State what the issue is
-* What you did to encounter this issue so that we can replicate it
-* What your browser you were using and what version is it
+* What did you do to encounter this issue so that we can replicate it
+* What browser you were using and what version was it
 * Additionally, if you're running the game on a local machine, what operating system and version were you using
 
-If you would like to make a feature request, please include in the title "Feature request:". For example, "Feature request: add light mode"
+If you would like to make a feature request, please include in the title "Feature request:". For example, "Feature request: add light mode".
 
 ### Running Tests
 
