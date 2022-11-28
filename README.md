@@ -17,18 +17,18 @@ Play the game here: https://ottomh.herokuapp.com/
 ## How to play
 
 <p float="left">
-    <img src="https://user-images.githubusercontent.com/44854928/204393382-8989f59b-30c6-4f06-a89c-5562c411beb3.png" width="200" />
-    <img src="https://user-images.githubusercontent.com/44854928/204393426-3d23e942-d573-40af-832e-08924ce6148f.png" width="200" />
-    <img src="https://user-images.githubusercontent.com/44854928/204393440-e9278ebc-3c5e-4c42-8330-35810b56c77c.png" width="200" />
-    <img src="https://user-images.githubusercontent.com/44854928/204393450-2c245d4f-dedc-47d4-bec9-9d59c9813626.png" width="200" />
-    <img src="https://user-images.githubusercontent.com/44854928/204393453-dec27bb0-4048-40d6-84c4-87db2e1b25c3.png" width="200" />
+    <img src="https://user-images.githubusercontent.com/44854928/204399336-498a6483-980b-4fd4-87a1-be1497b59c37.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204399609-157b2081-0ce7-4d37-bb0f-95836a8d62ba.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204399340-43808792-a356-4f4c-92a9-bbdb9d1c48ad.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204399347-108fbd40-d9bb-46ef-90ab-61c8053aabbe.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204399533-03be4279-4de0-4c38-918d-09b54d4e534e.png" width="198"/>
 </p>
-
 
 * Invite people! Create a new lobby, copy the lobby code, and send it to your teammates.
 * You have 60 seconds to submit as many words as you can think of at top of your head that begins with the given letter and matches the given category!
 * Compete against time and other players! Words can only be submitted ONCE, and the first person takes the credit for it.
 * Vote off words that don't match and earn points for the words that make it through the round!
+* View players' scores and rankings on the scoreboard at the end of each round!
 * Replay the game with the same people!
 
 ## Contributing
