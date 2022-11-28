@@ -17,7 +17,7 @@ type WordPacket struct {
 	Answer        string
 }
 
-// Initializes and empty userWordsMap
+// Initializes an empty userWordsMap
 func New() *userWordsMap {
 	s := new(userWordsMap)
 	s.m = make(map[string][]string)
