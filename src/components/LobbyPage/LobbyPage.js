@@ -71,14 +71,6 @@ export const LobbyPage = () => {
 
     ws.onclose = (event) => {
         setShowModal(true);
-        setTimeout(() => {
-            // show modal popup letting user know that the lobby is closed
-            setShowModal(false);
-
-            // prevent users from joining a lobby that doesn't
-            clearStore();
-            navigate("/");
-        }, "1500");
     }
 
     // Action for pressing the "Start" button while on the Waiting Page
@@ -96,7 +88,13 @@ export const LobbyPage = () => {
 
     return (
         <div className="lobby-page container-fluid h-100">
-            <Modal style={{ color: "black" }} show={showModal}>
+            <Modal style={{ color: "black" }} show={showModal}
+                onHide={() => {
+                    // prevent users from joining a lobby that doesn't
+                    clearStore();
+                    navigate("/");
+                }}
+            >
                 <Modal.Header closeButton>Lobby Closed</Modal.Header>
                 <Modal.Body>
                     <p>Lobby code '{lobbyId}' has been closed.</p>

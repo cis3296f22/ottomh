@@ -41,10 +41,10 @@ export const WaitState = ({ id, onStart }) => {
             <img src={logo} width="200" alt="brain logo" className="mb-2" />
             <h1 className="display-1">OTTOMH</h1>
 
-            <div className="d-flex justify-content-center align-items-center gap-3">
-                <h2>Code: {id = 1234}</h2>
+            <div>
+                <h2>Code: {id}</h2>
                 <Button className="copy-button" onClick={() => copyToClipBoard(id)} variant="primary">
-                    <i className="fa-solid fa-copy"></i>
+                    Copy Code
                 </Button>
             </div>
             
