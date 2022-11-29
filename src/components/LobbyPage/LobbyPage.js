@@ -1,3 +1,4 @@
+import './lobbyPageStyles.css';
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
@@ -58,7 +59,7 @@ export const LobbyPage = () => {
                     setIsUniqueWord(packetObject.isUniqueWord);
                     break;
                 default:
-                    
+
             }
         }
 
@@ -94,9 +95,13 @@ export const LobbyPage = () => {
 
 
     return (
-        <div className="container-fluid h-100">
-            <Modal style={{color: "black"}} show={showModal}>
-                <Modal.Body>Lobby code '{lobbyId}'' doesn't exist.</Modal.Body>
+        <div className="lobby-page container-fluid h-100">
+            <Modal style={{ color: "black" }} show={showModal}>
+                <Modal.Header closeButton>Lobby Closed</Modal.Header>
+                <Modal.Body>
+                    <p>Lobby code '{lobbyId}' has been closed.</p>
+                    <p>If you're trying to join a lobby, please double check that your lobby code is correct.</p>
+                </Modal.Body>
             </Modal>
 
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}

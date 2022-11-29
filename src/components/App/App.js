@@ -1,4 +1,3 @@
-import './appStyles.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { IndexPage, LobbyPage } from '../';
 

@@ -10,6 +10,7 @@ body {
   font-family: 'Merriweather', sans-serif;
   background-color: #282c34;
   color: white;
+  box-sizing: border-box;
 }
 
 code {
