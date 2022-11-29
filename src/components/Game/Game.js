@@ -91,9 +91,9 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
             <div className="game">
                 <div>
 
-                    <h2 className="title-h">
-                        {cat} <Badge bg="secondary">{letter}</Badge>
-                    </h2>
+                    <h1>
+                        {cat} <Badge className="letter">{letter}</Badge>
+                    </h1>
                     <p>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</p>
 
                     <Modal className="instruction-popup" show={show} onHide={handleClose}>
@@ -132,10 +132,7 @@ export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => 
                 </div>
                 <div>
                     <br />
-                    <h3>Time Remaining: </h3>
-
-
-                    <h1>{GamePageTimer(setLoading, time_picked)}</h1>
+                    {GamePageTimer(setLoading, time_picked)}
 
                     <Button variant="primary" id="directToVote" type="button" onClick={onTimeover} hidden></Button>
 

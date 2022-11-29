@@ -42,11 +42,11 @@ export const Voting = ({ onTimeover, words, cat, letter, time_picked }) => {
         </ListGroup.Item>);
 if (isLoading) {
     return (
-        <Container fluid className='m-5 w-auto text-center'
+        <Container fluid className='w-100 text-center'
             style={{ 'height': '95vh' }}>
             <Row className='h-25 align-content-center'>
                 <h1>
-                    {cat} <Badge bg="secondary">{letter}</Badge>
+                    {cat} <Badge className="letter">{letter}</Badge>
                 </h1>
                 <h2 className='m-0'>Cross off <del>words</del> that don't fit!</h2>
             </Row>

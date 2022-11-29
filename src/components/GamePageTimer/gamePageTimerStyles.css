@@ -1,0 +1,11 @@
+.timer-button {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    cursor: default !important;
+}
+
+.timer-button:active, .timer-button:hover {
+    top: 0 !important;
+    color: #4BA2AF !important;
+}

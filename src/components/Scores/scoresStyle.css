@@ -1,27 +1,52 @@
-.scores{
-    margin-top: 5rem;
+.scores {
     text-align: center;
 }
 
-.scoreheader{
-    border: solid;
-    background-color: #3399FF;
+.scoreheader {
+    color: #43BFA6;
+    border: solid #43BFA6;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
 }
 
-.player-score{
-    font-size: 3rem;
-}
-
-.note{
+.note {
     text-align: left;
 }
 
-.table{
-    color:white;
-    background-color: #FF6633;
+.table {
+    color: white;
+    background-color: #EB5160;
 }
 
-.crown{
+
+.crown {
     width: 4rem;
     margin-left: 6rem;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 3;
+    width: fit-content;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Medium devices (mobile-medium, 375px and up) */
+@media (min-width: 375px) {
+    .menu-buttons {
+        flex-direction: row;
+        gap: 2;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .table {
+        font-size: 1.25rem;
+    }
 }

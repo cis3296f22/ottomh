@@ -41,8 +41,8 @@ export const Scores = ({ onReplay }) => {
             <div>
                 <h3>Winner: {forwinnerdisplay[0]}</h3>
             </div>
-            <div>
-                <Button className='me-2' variant="secondary" type="button" onClick={() => { clearStore(); navigate("/") }}>
+            <div className="menu-buttons">
+                <Button className='me-2' variant="primary" type="button" onClick={() => { clearStore(); navigate("/") }}>
                     Back to Main
                 </Button>
                 {hostUser === username ?
@@ -50,12 +50,12 @@ export const Scores = ({ onReplay }) => {
                         Return to Lobby
                     </Button> : null}
             </div>
-            <div class="note">
+            <div className="note mt-4">
                 <p>*Scores are calucuted cumulatively</p>
             </div>
             <Table className='mt-2'>
                 <thead>
-                    <tr style={{ fontSize: `2.5rem` }}>
+                    <tr>
                         <th>#</th>
                         <th>Username</th>
                         <th>Scores</th>
@@ -63,7 +63,7 @@ export const Scores = ({ onReplay }) => {
                 </thead>
                 <tbody>
                     {sortedScores.map(item => (
-                        <tr item={item} style={{ fontSize: `2rem` }}>
+                        <tr item={item}>
                             <td>{rank += 1}</td> <td>{item[0]}</td> <td><Badge bg="primary">{item[1]}</Badge></td>
                         </tr>
                     ))}

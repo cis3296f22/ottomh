@@ -17,3 +17,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* override Bootstrap's primary button styles */
+.btn-primary {
+  font-weight: bold;
+  padding: 1rem;
+  background-color: #282c34;
+  color: #4BA2AF;
+  box-shadow: 0 .2em #4BA2AF;
+  border: 1px solid #4BA2AF;
+  cursor: pointer;
+}
+
+.btn-primary:active, .btn-primary:hover {
+  box-shadow: none;
+  position: relative;
+  top: .2em;
+  color: white;
+  background-color: #4BA2AF;
+  border: 1px solid #4BA2AF;
+}
