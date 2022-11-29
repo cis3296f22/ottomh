@@ -11,15 +11,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Returned by ValidateUsername in the event that a user already exists
 var ErrDuplicateUser error = errors.New("User with given username already exists")
 
 // A "Lobby" represents a game that is currently open or running.
 type Lobby struct {
-	ID          string
-	userList    UserList
-	roundEnded  bool
-	votingEnded bool
-	lobbyEnded  bool
+	ID          string         // The unique ID representing this lobby
+	userList    UserList       // Manages the list of usernames and WebSockets
+	userWords   *userWordsMap  // Manages the list of username and submissions
+	roundEnded  bool           // "Locks" the move from round to voting
+	votingEnded bool           // "Locks" the move from voting to scores
+	lobbyEnded  bool           // true when the lobby is closed, false otherwise
+	totalScores map[string]int // maps username to score
 }
 
 // Initializes a new Lobby with a unique ID
@@ -32,6 +35,7 @@ func makeLobby(ID string) *Lobby {
 		userList: UserList{
 			sockets: make(map[string]*WebSocket),
 		},
+		userWords: New(), // create new userWordsMap
 	}
 	go l.lifecycle()
 	return l
@@ -40,6 +44,12 @@ func makeLobby(ID string) *Lobby {
 // This forever-loop continuosly checks WebSockets for messages from
 // the client, and responds to those messages.
 func (l *Lobby) lifecycle() {
+	userPresent := 0 //number of user present to compare when sending crossed out words to userWordMap
+	numReceived := 0
+	scoresCalculated := true
+
+	crossedWordsMap := make(map[string]int)
+	l.totalScores = make(map[string]int)
 	// Loop over sockets, checking each for messages
 	for {
 		for _, socket := range l.userList.GetSocketList() {
@@ -51,27 +61,85 @@ func (l *Lobby) lifecycle() {
 				// Handle messages here!
 				switch packetIn.Event {
 				case "endround":
+					userPresent += 1
 					if !l.roundEnded {
+						// get all words submitted by every user
+						var totalWordsArr []string = l.userWords.genWordsArr() // a list of all the user words that were entered
+						log.Print("Total words submitted: ", totalWordsArr)
+
 						packetOut, _ := json.Marshal(map[string]interface{}{
-							"Event": "endround",
+							"Event":         "endround",
+							"TotalWordsArr": totalWordsArr,
 						})
 						l.userList.MessageAll(packetOut)
 						l.roundEnded = true
 					}
 				case "endvoting":
-					if !l.votingEnded {
+					//break the crossed words to store in map
+					var crossedWordsRaw interface{}
+					log.Print(packetIn.Data)
+					err := json.Unmarshal([]byte(packetIn.Data), &crossedWordsRaw)
+					if err != nil {
+						log.Print("Error unmarshaling crossedWords on an 'endvoting' message:", err)
+						break
+					}
+					switch crossedWordsRaw.(type) {
+					case []interface{}:
+						for _, r := range crossedWordsRaw.([]interface{}) {
+							s := r.(string)
+							if s != "" {
+								if _, ok := crossedWordsMap[s]; ok {
+									crossedWordsMap[s] += 1
+								} else {
+									crossedWordsMap[s] = 1
+								}
+							}
+						}
+					default:
+						log.Print("Data in 'endvoting' packet is not a slice")
+						break
+					}
+
+					// str := strings.Split(packetIn.Data, ",")
+					// for _, s := range str {
+					// 	if s != "" {
+					// 		if _, ok := crossedWordsMap[s]; ok {
+					// 			crossedWordsMap[s] += 1
+					// 		} else {
+					// 			crossedWordsMap[s] = 1
+					// 		}
+					// 	}
+					// }
+
+					// We only want to signal users to move to the next stage after
+					// all users have signaled that they are ready to move on.
+					numReceived += 1
+					if numReceived == userPresent && !l.votingEnded {
 						packetOut, _ := json.Marshal(map[string]interface{}{
 							"Event": "endvoting",
 						})
+
 						l.userList.MessageAll(packetOut)
 						l.votingEnded = true
+						l.userWords.removingCrossedWords(crossedWordsMap, userPresent)
+
 					}
 				case "begingame":
+					userPresent = 0 //reset userpresent to 0 when user decides to reset game:::::
+					numReceived = 0
+					scoresCalculated = true
+					crossedWordsMap = make(map[string]int) // reset dictionary when game reset:::::
+					// This is a new round, so we have not previously ended any stage
+					l.roundEnded = false
+					l.votingEnded = false
 					// Select a random category and letter
 					cat_i := rand.Intn(len(config.Categories))
 					category := config.Categories[cat_i]
 					// Recall that A has a byte value of 65, and there are 26 letters
 					letter := string(byte(rand.Intn(26) + 65))
+
+					// Clear all word submitted from previous round
+					l.userWords.clearAllWords()
 
 					// Tell all sockets to start the game
 					packetOut, _ := json.Marshal(map[string]interface{}{
@@ -81,16 +149,51 @@ func (l *Lobby) lifecycle() {
 					})
 					l.userList.MessageAll(packetOut)
 				case "getscores":
-					//sm := CreateScores()
-					//scorelist := sm.scorem
-					demoTest := "helloworld"
+					if scoresCalculated {
+						//here should take map from voted page
+						votedMap := l.userWords.mapGetter()
+						//return a map [string]int username:score
+						sm := CreateScores(votedMap)
+						//merge score map into total score map
+						for key := range sm.scorem {
+							l.totalScores[key] += sm.scorem[key]
+						}
+						//scorelist := sm.scorem
+						packetOut, _ := json.Marshal(map[string]interface{}{
+							"Event":  "getscores",
+							"Scores": l.totalScores,
+						})
+						l.userList.MessageAll(packetOut)
+					}
+					scoresCalculated = false
+				case "waitingRoom":
 					packetOut, _ := json.Marshal(map[string]interface{}{
-						"Event":  "getscores",
-						"Scores": demoTest,
+						"Event": "waitingRoom",
 					})
 					l.userList.MessageAll(packetOut)
+				case "checkword":
+					// declare reusable variables for this locality
+					var word WordPacket // WordPacket type struct declared in userWords.go
+					var isUnique bool   // if word submitted by user already exists in the user words map
+
+					// convert the stringified json object from packetIn.Data into a WordPacket type
+					err := json.Unmarshal([]byte(packetIn.Data), &word)
+					if err != nil {
+						log.Print("error occurred when trying to convert packetIn.Data to WordPacket struct -> error:  ", err)
+					}
+					// check if word is a duplicate
+					isUnique = l.userWords.UserWords(word)
+
+					// send isDup boolean result back to the frontend
+					packetOut, _ := json.Marshal(map[string]interface{}{
+						"Event":        "checkword",
+						"isUniqueWord": isUnique,
+						"Word":         word.Answer,
+					})
+					socket.WriteMessage(packetOut)
+
 				default:
-					log.Print("Recieved message from WebSocket: ", m)
+					log.Print("Recieved message from WebSocket: ", string(m))
 					if err := socket.WriteMessage(m); err != nil {
 						log.Print("Error writing message to WebSocket: ", err)
 					}
@@ -133,6 +236,7 @@ func (l *Lobby) acceptWebSocket(c *gin.Context, username string, host string) er
 	return nil
 }
 
+// Marks the lobby as closed
 func (l *Lobby) Close() {
 	l.lobbyEnded = true
 }

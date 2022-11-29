@@ -1,9 +1,5 @@
 .game{
-    margin-top: 5rem;
     text-align: center;
-}
-.title-h{
-    margin:1rem;
 }
 .input-box{
     margin-top: 1rem;
@@ -19,9 +15,17 @@
 .instruction-popup{
     color: black;
 }
+.reject-title{
+    color: red;
+}
 .answer-good{
     color: green;
 }
 .answer-bad{
     color: red;
+}
+.letter {
+    background-color: #EB5160 !important;
+    color: white !important;
+    cursor: default !important;
 }

@@ -15,9 +15,14 @@
     height: 6rem;
     overflow: hidden;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     word-break: break-all;
+}
+
+.playerlist-avatar p {
+    margin: 0;
 }
 
 .playerlist .host {

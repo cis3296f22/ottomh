@@ -4,8 +4,17 @@ import { useStore } from '../../store';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 
+import PropTypes from 'prop-types';
+
+/**
+ * This component moves the client to a game.
+ * @param props
+ * @param {boolean} props.isCreate true if this user is the host
+ * @param props.onBackClick callback when the user hits the back button
+ * @returns {JSX.Element}
+ */
 export const Join = ({ isCreate, onBackClick }) => {
     const navigate = useNavigate();
     const inputCodeRef = useRef(); // get HTML DOM reference to the input box for the lobby code
@@ -15,11 +24,6 @@ export const Join = ({ isCreate, onBackClick }) => {
         [state.setLobbyId, state.setUsername, state.setHostname, 
             state.socket, state.setSocket]
     ));
-    // when the component loads, immediately focus on the lobby code input box so that user can type immediately
-    // useEffect(() => {
-    //     inputNameRef.current.focus();
-    // });
-
     
     async function handleSubmit(e) {
         e.preventDefault(); // DO NOT REMOVE OR EVERYTHING WILL BREAK
@@ -31,6 +35,7 @@ export const Join = ({ isCreate, onBackClick }) => {
         if (isCreate) { // get lobby id from server
             let fetchUrl;
             username = inputHostNameRef.current.value;
+            username = username.toLowerCase()
             setHostname(username);
             setUsername(username);
             // send a request to the server to create a new lobby
@@ -54,6 +59,7 @@ export const Join = ({ isCreate, onBackClick }) => {
         } else { // get lobby id from input box
             lobbyId = inputCodeRef.current.value;
             username = inputNameRef.current.value;
+            username = username.toLowerCase()
             setUsername(username);
         }
 
@@ -95,3 +101,10 @@ export const Join = ({ isCreate, onBackClick }) => {
         </>
     );
 };
+
+Join.propTypes = {
+    /** true if this user is the host */
+    isCreate: PropTypes.bool,
+    /** callback when the user hits the back button */
+    onBackClick: PropTypes.func,
+}
