@@ -17,11 +17,11 @@ Play the game here: https://ottomh.herokuapp.com/
 ## Gameplay
 
 <p float="left">
-    <img src="https://user-images.githubusercontent.com/44854928/204399336-498a6483-980b-4fd4-87a1-be1497b59c37.png" width="198" />
-    <img src="https://user-images.githubusercontent.com/44854928/204399609-157b2081-0ce7-4d37-bb0f-95836a8d62ba.png" width="198" />
-    <img src="https://user-images.githubusercontent.com/44854928/204399340-43808792-a356-4f4c-92a9-bbdb9d1c48ad.png" width="198" />
-    <img src="https://user-images.githubusercontent.com/44854928/204399347-108fbd40-d9bb-46ef-90ab-61c8053aabbe.png" width="198" />
-    <img src="https://user-images.githubusercontent.com/44854928/204399533-03be4279-4de0-4c38-918d-09b54d4e534e.png" width="198"/>
+    <img src="https://user-images.githubusercontent.com/44854928/204468513-47a0c960-7d6f-4f36-94d0-06f382afe148.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204468521-27de6994-be36-430c-a709-121fc0057f36.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204468528-4920527e-3933-49a9-ad81-6b9efdf04cea.png" width="192" />
+    <img src="https://user-images.githubusercontent.com/44854928/204468532-81bc5417-d586-42f4-9289-1d98a9f0350b.png" width="198" />
+    <img src="https://user-images.githubusercontent.com/44854928/204468537-88d98909-36f0-4254-b6b4-3e2b282b6233.png" width="198"/>
 </p>
 
 * Invite people! Create a new lobby, copy the lobby code, and send it to your teammates.
