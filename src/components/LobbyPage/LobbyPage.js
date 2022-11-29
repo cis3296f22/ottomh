@@ -1,3 +1,4 @@
+import './lobbyPageStyles.css';
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "../../store";
@@ -90,7 +91,7 @@ export const LobbyPage = () => {
 
 
     return (
-        <div className="container-fluid h-100">
+        <div className="lobby-page container-fluid h-100">
             {stage === "waitingRoom" && <WaitState onStart={onStart} id={lobbyId} />}
 
             {stage === "playGame" && <Game onTimeover={() => setStage("voting")} cat={cat} letter={letter} time_picked={time_picked} isUniqueWord={isUniqueWord} />}
