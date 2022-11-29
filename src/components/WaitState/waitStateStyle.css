@@ -1,9 +1,18 @@
 .waitState{
     margin-top: 5rem;
     text-align: center;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.waitState h1 {
+.copy-button {
+    background-color: transparent !important;
+}
+
+.copy-modal {
+    color: black;
     text-align: center;
-    font-size: 5rem;
 }

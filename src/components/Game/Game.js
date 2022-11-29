@@ -6,147 +6,164 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Modal from 'react-bootstrap/Modal';
 import { PlayerList } from '../';
 import { GamePageTimer } from '../GamePageTimer/GamePageTimer.js';
-import {useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "../../store";
-import { useParams } from "react-router-dom";
+import PropTypes from 'prop-types';
 
-export const Game = ({onTimeover, cat, letter, time_picked}) => {
+/**
+ * The Game component displays the current category and letter, 
+ * and a text submission box.
+ * @param props
+ * @param props.onTimeover executed when the game timer ends
+ * @param {string} props.cat the category for this game round
+ * @param {string} props.letter the letter for this game round
+ * @param {string} props.time_picked timer duration in format "minutes:seconds"
+ * @param {string} props.isUniqueWord should the duplicate answer modal be displayed?
+ * @returns {JSX.Element}
+ */
+export const Game = ({ onTimeover, cat, letter, time_picked, isUniqueWord }) => {
     const [isLoading, _setLoading] = useState(true);
     const ws = useStore((state) => state.socket);
+    const currentPlayer = useStore(state => state.username);
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     //responding to word submissions
-    const [goodResponse, setGoodResponse] = useState(false)
     const [badResponse, setBadResponse] = useState(false)
     const [word, setWord] = useState("")
 
     const setLoading = (loading) => {
         // If the timer has ended
         if (!loading) {
-            ws.send(JSON.stringify({Event: 'endround'}));
+            ws.send(JSON.stringify({ Event: 'endround' }));
         }
 
         _setLoading(loading);
-
     }
-    const currentPlayer = useStore(state => state.username)
-    const { lobbyId } = useParams();
-    
-    async function handleSubmit(e) {
+
+    function handleSubmit(e) {
         e.preventDefault();
         let answer = document.getElementById("input-answer").value;
+        function letterCheck(word) {
+            return word.charAt(0) === letter.toLowerCase();
+        }
         //send answer here
         document.getElementById("input-answer").value = '';
-        
-        //send recieved answers along with user and lobbyId to backend for processing 
-        let url;
-        if (window.location.protocol === 'https:') {
-            url = `https://${window.location.host}/GetAnswers`;
-        } else {
-            url = `http://${window.location.host}/GetAnswers`;
-        }
+        answer = answer.toLowerCase();
+        if (letterCheck(answer)) {
+            // show this word in the modal
+            setWord(answer);
 
-        let response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify({
+            // prep the data object to be sent over websocket
+            // turn the data object into a string
+            let dataString = JSON.stringify({
                 CurrentPlayer: currentPlayer,
                 Answer: answer,
-                LobbyId: lobbyId })
-        })
-        if (response.status === 200) {
-            let all_answers = await response.json();
-            setWord(answer)
-            if(all_answers["Submissions"] === true) {
-                setGoodResponse(true)
-                setTimeout(() => {
-                    setGoodResponse(false)
-                  }, "700")
+            });
 
-            }  else {
-                setBadResponse(true)
+            //send recieved answers with username for backend processing
+            ws.send(JSON.stringify({
+                Event: "checkword",
+                Data: dataString
+            }));
+        } else {
+            handleShow()
+        } // end if-else statement
+
+
+    } // end handleSubmit()
+
+    // show modal for good word and bad word based on response from backend
+    useEffect(() => {
+        if (isUniqueWord !== null) { // make sure we don't render initial null state
+            if (isUniqueWord !== true) {
+                setBadResponse(true);
                 setTimeout(() => {
                     setBadResponse(false)
-                  }, "1500")
+                }, "500");
             }
         }
-             
-        
-    }
+    }, [isUniqueWord]);
 
     if (isLoading) {
-    return(
-        <div className="game">
-            <div>
-            
-                <Button variant="outline-info" onClick={handleShow}>
-                    How to Play!
-                </Button>
+        return (
+            <div className="game">
+                <div>
 
-                <h2 className="title-h">
-                    {cat} <Badge bg="secondary">{letter}</Badge>
-                </h2>
-                
-                <Modal className="instruction-popup" show={show} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>INFO</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</Modal.Body>
-                    <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    </Modal.Footer>
-                </Modal>
+                    <h2 className="title-h">
+                        {cat} <Badge bg="secondary">{letter}</Badge>
+                    </h2>
+                    <p>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</p>
 
-                <Form onSubmit={handleSubmit}>
-                    <InputGroup>
-                        <Form.Control
-                            className="input-box"
-                            id="input-answer"
-                            placeholder="Enter Answer Here"
-                            aria-label="Enter Answer"
-                            aria-describedby="submit-answer"
-                        />    
-                    </InputGroup>
-                    <Button className="input-button" variant="primary" id="submit-answer" type="submit">
+                    <Modal className="instruction-popup" show={show} onHide={handleClose}>
+                        <Modal.Header closeButton>
+                            <Modal.Title className="reject-title">Answer Rejected: Wrong Letter</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Enter as many words starting with letter "{letter}", belonging to Category "{cat}" as possible.</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Form onSubmit={handleSubmit}>
+                        <InputGroup>
+                            <Form.Control
+                                className="input-box"
+                                id="input-answer"
+                                placeholder="Enter Answer Here"
+                                aria-label="Enter Answer"
+                                aria-describedby="submit-answer"
+                                autoFocus
+                            />
+                        </InputGroup>
+                        <Button className="input-button" variant="primary" id="submit-answer" type="submit">
                             Submit Answer
-                    </Button>
-                </Form>
-                <Modal className="answer-good" show={goodResponse} onHide={() => setGoodResponse(false)}>
-                    <Modal.Header closeButton>
-                        <Modal.Title> Accepted! Good Job! </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body> Word submitted: ["{word}"]</Modal.Body>
-                </Modal>
-                <Modal className="answer-bad" show={badResponse} onHide={() => setBadResponse(false)}>
+                        </Button>
+                    </Form>
+                    <Modal className="answer-bad" show={badResponse} onHide={() => setBadResponse(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title> Rejected! Try Another Answer! </Modal.Title>
                         </Modal.Header>
                         <Modal.Body> Word submitted: ["{word}"]</Modal.Body>
-                </Modal>
-            </div>
-            <div>
-                <br/>
-                <h3>Time Remaining: </h3>
-               
-               
+                    </Modal>
+                </div>
+                <div>
+                    <br />
+                    <h3>Time Remaining: </h3>
+
+
                     <h1>{GamePageTimer(setLoading, time_picked)}</h1>
-        
-                <Button variant="primary" id ="directToVote" type="button" onClick={onTimeover} hidden></Button>
 
-     
+                    <Button variant="primary" id="directToVote" type="button" onClick={onTimeover} hidden></Button>
+
+
+                </div>
+                <div>
+                    <h3>Players:</h3>
+                    <PlayerList />
+                </div>
+                <input placeholder='theLetter'  value={letter} hidden />
             </div>
-            <div>
-                <h3>Players:</h3>
-                <PlayerList />
-            </div>
-        </div>
-    );
+        );
     }
-    else{
-           document.getElementById('directToVote').click()
-        }
+    else {
+        document.getElementById('directToVote').click()
+    }
 
+};
+
+Game.propTypes = {
+    /** executed when the game timer ends */
+    onTimeover: PropTypes.func,
+    /** the category for this game round */
+    cat: PropTypes.string,
+    /** the letter for this game round */
+    letter: PropTypes.string,
+    /** timer duration in format "minutes:seconds" */
+    time_picker: PropTypes.string,
+    /** should the duplicate answer modal be displayed? */
+    isUniqueWord: PropTypes.bool,
 };

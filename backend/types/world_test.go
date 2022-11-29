@@ -155,7 +155,8 @@ func TestWorld(t *testing.T) {
 		// Try join a Lobby with a correct request
 		// Creating a WebSocket specifically requires that the Gin Engine actually runs
 		go r.Run(":56789")
-		_, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
+		var c *websocket.Conn
+		c, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -164,6 +165,13 @@ func TestWorld(t *testing.T) {
 		_, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
 		if err != websocket.ErrBadHandshake {
 			t.Error("Error handling duplicate username")
+		}
+
+		// Close down the existing WebSocket, so that reconneciton should not raise an error
+		c.Close()
+		_, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("ws://localhost:56789/sockets/%s?username=tester", id), nil)
+		if err != nil {
+			t.Error("Disconnected users are not removed correctly:", err)
 		}
 	})
 

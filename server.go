@@ -35,14 +35,12 @@ func main() {
 	r.LoadHTMLFiles("build/index.html")
 
 	lob := types.World{Mu: sync.Mutex{}, Lobbies: make(map[string]*types.Lobby)}
-	v := types.New()
 
 	r.GET("/", routes.IndexHandler)
 	r.POST("/CreateLobby", lob.CreateLobby)
 	r.GET("/sockets/:id", lob.ConnectToLobby)
 	// Catch-all route to work nicely with react-router
 	r.GET("/:path", routes.IndexHandler)
-	r.POST("/GetAnswers", v.UserWords)
 
 	// DEBUG code: to profile this server:
 	// Add the following imports:

@@ -124,7 +124,7 @@ func TestTwoPlayerGame(t *testing.T) {
 		if j.Host != "testhost" {
 			t.Error("Lobby stores incorrect host")
 		}
-		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) && !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) {
+		if !reflect.DeepEqual([]string{"testhost", "testplayer"}, j.List) && !reflect.DeepEqual([]string{"testplayer", "testhost"}, j.List) {
 			t.Error("Lobby stores incorrect user list; got", j.List, "but expected", []string{"testhost", "testplayer"})
 		}
 
@@ -199,7 +199,7 @@ func TestTwoPlayerGame(t *testing.T) {
 
 	t.Run("Test Voting Ended Event", func(t *testing.T) {
 		// Send message as the player
-		err := player.WriteMessage(websocket.TextMessage, []byte("{\"Event\":\"endvoting\"}"))
+		err := player.WriteMessage(websocket.TextMessage, []byte(`{"Event":"endvoting","Data":"[\"xylophone\",\"xee\",\"xree\"]"}`))
 		if err != nil {
 			t.Error(err)
 		}

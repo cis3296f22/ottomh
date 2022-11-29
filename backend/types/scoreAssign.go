@@ -1,50 +1,18 @@
 package types
 
-import (
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
-
+// Represents a map between a username and score for that user
 type ScoreList struct {
-	scorem map[string]int
+	scorem map[string]int // maps username to score
 }
 
-func CreateScores() *ScoreList {
-	mapDemo := map[string][]string{
-		"user1": {"one", "two", "three", "four", "five"},
-		"user2": {"one", "two", "three", "four", "five"},
-		"user3": {"one", "two"},
-	}
+// Turn Map of words to number of words
+func CreateScores(wm map[string][]string) *ScoreList {
+
 	s := new(ScoreList)
 	s.scorem = make(map[string]int)
-	for key, element := range mapDemo {
+	for key, element := range wm {
 		s.scorem[key] = len(element)
 	}
+
 	return s
-}
-
-func (s *ScoreList) ScoreCalculator(c *gin.Context) {
-	mapDemo := map[string][]string{
-		"user1": {"one", "two", "three", "four", "five"},
-		"user2": {"one", "two", "three", "four", "five"},
-		"user3": {"one", "two"},
-	}
-
-	//Take map of list words and turn into score map
-	for key, element := range mapDemo {
-		s.scorem[key] = len(element)
-	}
-
-	//temporary verification
-	for key, element := range s.scorem {
-		fmt.Println("User:", key, "=>", "Score:", element)
-	}
-
-	// send map to front end
-	c.JSON(http.StatusOK, gin.H{
-		"Scores": s.scorem,
-	})
-
 }

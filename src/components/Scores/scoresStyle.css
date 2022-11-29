@@ -2,24 +2,26 @@
     margin-top: 5rem;
     text-align: center;
 }
-.scores-box{
-    height: 30rem;
-    margin-top: 1rem;
-    font-size: 1.3rem;
-    text-align: center;
-    border-style: solid;
-    border-color: white;
-    border-radius: 0.5rem;
+
+.scoreheader{
+    border: solid;
+    background-color: #3399FF;
 }
-.gold{
+
+.player-score{
     font-size: 3rem;
 }
-.silver{
-    font-size: 2rem;
+
+.note{
+    text-align: left;
 }
-.winner-box{
-    margin-top: 1rem;
+
+.table{
+    color:white;
+    background-color: #FF6633;
 }
+
 .crown{
-    width: 5rem;
+    width: 4rem;
+    margin-left: 6rem;
 }

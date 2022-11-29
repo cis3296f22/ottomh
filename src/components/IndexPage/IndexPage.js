@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { Button } from 'react-bootstrap';
+import logo from '../../images/logo.png';
 
 import { Join } from '../';
 
+/**
+ * This component represents the home page.
+ * @returns {JSX.Element}
+ */
 export const IndexPage = () => {
     const [menu, setMenu] = useState("home");
     const onBackClick = () => { setMenu("home") };
 
     return (
         <div className="container-fluid h-100 d-flex flex-column justify-content-center align-items-center text-center">
+            <img src={logo} width="200" alt="brain logo" class="mb-2" />
             <h1 className="display-1">OTTOMH</h1>
 
             {menu === "home" &&
